@@ -8,10 +8,10 @@ import {
   FetchConfigurationError,
   resolveBaseURL,
 } from '../../shared/authJsClient'
+import { useAuthState } from '../composables/useAuth'
 import {
   defineNuxtPlugin,
   useAuth,
-  useAuthState,
   useRequestEvent,
   useRuntimeConfig,
 } from '#imports'

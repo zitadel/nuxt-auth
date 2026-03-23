@@ -6,8 +6,8 @@ group: Application Side
 # Session Access and Management
 
 After setting up your provider, you can begin integrating NuxtAuth
-into your frontend. For this NuxtAuth provides two application-side
-composables that can be used to interact with the authentication session.
+into your frontend. NuxtAuth provides the `useAuth` composable to
+interact with the authentication session.
 
 ## `useAuth` composable
 
@@ -165,24 +165,3 @@ const { signOut } = useAuth()
 
 Trigger a refresh, this will do a provider-specific session refresh.
 
-## `useAuthState` composable
-
-The `useAuthState` composable is the underlying storage layer to access the
-session-state and data. Here are the main methods and properties you can use:
-
-```ts
-const { status, loading, data, lastRefreshedAt } = useAuthState()
-
-// Session status, either `unauthenticated`, `loading`, `authenticated`
-status.value
-
-// Whether any http request is still pending
-loading.value
-
-// Session data, either `undefined` (= authentication not attempted),
-// `null` (= user unauthenticated), `loading` (= session loading in progress)
-data.value
-
-// Time at which the session was last refreshed
-lastRefreshedAt.value
-```

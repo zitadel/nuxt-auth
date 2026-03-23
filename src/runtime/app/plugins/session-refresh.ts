@@ -1,5 +1,6 @@
 import { DefaultRefreshHandler } from '../utils/refreshHandler'
-import { defineNuxtPlugin, useAuthState, useRuntimeConfig } from '#imports'
+import { useAuthState } from '../composables/useAuth'
+import { defineNuxtPlugin, useRuntimeConfig } from '#imports'
 
 // noinspection JSUnusedGlobalSymbols
 /**

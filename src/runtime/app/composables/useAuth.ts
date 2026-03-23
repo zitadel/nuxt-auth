@@ -1,21 +1,67 @@
 import { defu } from 'defu'
-import { readonly } from 'vue'
+import { computed, readonly } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
+import type { Session } from '@auth/core/types'
 import type { AuthJsClient, ProviderInfo } from '../../shared/authJsClient'
 import type { SessionLastRefreshedAt, SessionStatus } from '../../shared/types'
 import { hasProtocol, isScriptProtocol } from 'ufo'
 import { determineCallbackUrl } from '../utils/callbackUrl'
-import type { SessionData } from './useAuthState'
 import type { NuxtApp } from '#app/nuxt'
 import { callWithNuxt } from '#app/nuxt'
 import {
   createError,
-  useAuthState,
   useNuxtApp,
   useRequestURL,
   useRouter,
   useRuntimeConfig,
+  useState,
 } from '#imports'
+
+/**
+ * The session data structure returned by Auth.js.
+ *
+ * @see {@link https://authjs.dev/getting-started/session-management}
+ */
+export type SessionData = Session
+
+/**
+ * Provides direct access to the writable reactive authentication state.
+ * Used internally by plugins that need to set `loading`, reset `data`
+ * on unmount, etc. Application code should use {@link useAuth} instead.
+ *
+ * @internal
+ */
+export function useAuthState() {
+  const data = useState<SessionData | undefined | null>(
+    'auth:data',
+    () => undefined,
+  )
+
+  const hasInitialSession = computed(() => !!data.value)
+
+  const lastRefreshedAt = useState<SessionLastRefreshedAt>(
+    'auth:lastRefreshedAt',
+    () => {
+      if (hasInitialSession.value) {
+        return new Date()
+      }
+      return undefined
+    },
+  )
+
+  const loading = useState<boolean>('auth:loading', () => false)
+  const status = computed<SessionStatus>(() => {
+    if (loading.value) {
+      return 'loading'
+    }
+    if (data.value) {
+      return 'authenticated'
+    }
+    return 'unauthenticated'
+  })
+
+  return { data, loading, lastRefreshedAt, status }
+}
 
 interface SecondarySignInOptions extends Record<string, unknown> {
   /** URL to redirect to after signing in. Defaults to current page. */
@@ -56,7 +102,7 @@ interface GetSessionOptions {
  * that occurred, and navigation details for handling redirects.
  *
  * When using OAuth providers, a successful sign-in typically results in a
- * redirect to the provider's authorization page. For credentials-based
+ * redirect to the provider's authorisation page. For credentials-based
  * authentication, the result indicates whether the credentials were valid.
  *
  * @example
@@ -98,7 +144,7 @@ export interface SignInResult {
 
   /**
    * The URL to redirect to after sign-in. For OAuth providers, this is the
-   * provider's authorization URL. For credentials, this is typically the
+   * provider's authorisation URL. For credentials, this is typically the
    * callback URL or the page the user was trying to access.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -148,7 +194,7 @@ export interface UseAuthReturn {
    *
    * @param provider - Provider ID (e.g., "github", "credentials")
    * @param options - Sign-in options including credentials for password auth
-   * @param authorizationParams - Additional OAuth query parameters
+   * @param authorisationParams - Additional OAuth query parameters
    */
   signIn: (
     provider?: string,
@@ -158,7 +204,7 @@ export interface UseAuthReturn {
       external?: boolean
       callGetSession?: boolean
     } & Record<string, unknown>,
-    authorizationParams?: Record<string, string>,
+    authorisationParams?: Record<string, string>,
   ) => Promise<SignInResult>
 
   /**
@@ -283,8 +329,6 @@ export interface UseAuthReturn {
  * }
  * ```
  *
- * @see `useAuthState` for accessing raw authentication state without the
- *      action methods
  * @see {@link https://authjs.dev/} for Auth.js documentation
  */
 export function useAuth(): UseAuthReturn {
@@ -320,8 +364,8 @@ export function useAuth(): UseAuthReturn {
    *                  `redirect: false` to handle the result programmatically
    *                  instead of redirecting.
    *
-   * @param authorizationParams - Additional query parameters to include in the
-   *                              OAuth authorization URL. Use this for OAuth
+   * @param authorisationParams - Additional query parameters to include in the
+   *                              OAuth authorisation URL. Use this for OAuth
    *                              scopes, prompts, or provider-specific params.
    *                              Example: `{ scope: "read:user user:email" }`
    *
@@ -357,7 +401,7 @@ export function useAuth(): UseAuthReturn {
   async function signIn(
     provider?: string,
     options?: SecondarySignInOptions,
-    authorizationParams?: Record<string, string>,
+    authorisationParams?: Record<string, string>,
   ): Promise<SignInResult> {
     // 1. Lead to error page if no providers are available
     const configuredProviders = await callWithNuxt(nuxt, () =>
@@ -422,7 +466,7 @@ export function useAuth(): UseAuthReturn {
     })
 
     const fetchSignIn = () =>
-      client.signIn(provider!, selectedProvider.type, body, authorizationParams)
+      client.signIn(provider!, selectedProvider.type, body, authorisationParams)
 
     const signInData = await callWithNuxt(nuxt, fetchSignIn)
 

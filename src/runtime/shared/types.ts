@@ -1,5 +1,3 @@
-import type { ComputedRef, Ref } from 'vue'
-
 /**
  * Configuration for the global application-side authentication-middleware.
  *
@@ -217,8 +215,6 @@ export interface RouteOptions {
   disableServerSideAuth: boolean
 }
 
-// Common useAuthStatus & useAuth return-types
-
 /**
  * Timestamp of the last session refresh, or undefined if never refreshed.
  * @internal
@@ -227,22 +223,6 @@ export type SessionLastRefreshedAt = Date | undefined
 
 /** Current authentication status */
 export type SessionStatus = 'authenticated' | 'unauthenticated' | 'loading'
-
-/**
- * Wrapped session data as a Vue ref.
- * @internal
- */
-export type WrappedSessionData<SessionData> = Ref<
-  SessionData | null | undefined
->
-
-/** @internal */
-export interface CommonUseAuthStateReturn<SessionData> {
-  data: WrappedSessionData<SessionData>
-  loading: Ref<boolean>
-  lastRefreshedAt: Ref<SessionLastRefreshedAt>
-  status: ComputedRef<SessionStatus>
-}
 
 /** @internal */
 export interface ModuleOptionsNormalized extends ModuleOptions {

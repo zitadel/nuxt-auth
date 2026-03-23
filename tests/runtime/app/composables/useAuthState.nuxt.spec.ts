@@ -1,7 +1,8 @@
 // @vitest-environment nuxt
 import { describe, it, expect, beforeEach } from 'vitest'
 import { registerEndpoint } from '@nuxt/test-utils/runtime'
-import { useAuth, useAuthState } from '#imports'
+import { useAuth } from '#imports'
+import { useAuthState } from '../../../../src/runtime/app/composables/useAuth'
 
 const EMPTY_SESSION = {}
 

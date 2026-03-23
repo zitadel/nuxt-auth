@@ -5,7 +5,6 @@ export default {
     'src/module.ts',
     'src/runtime/shared/types.ts',
     'src/runtime/app/composables/useAuth.ts',
-    'src/runtime/app/composables/useAuthState.ts',
     'src/runtime/server/services/index.ts',
   ],
   projectDocuments: [

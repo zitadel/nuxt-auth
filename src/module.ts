@@ -82,10 +82,6 @@ export default defineNuxtModule<ModuleOptions>({
         name: 'useAuth',
         from: resolve('./runtime/app/composables/useAuth'),
       },
-      {
-        name: 'useAuthState',
-        from: resolve('./runtime/app/composables/useAuthState'),
-      },
     ])
 
     // 5. Create virtual imports for server-side
