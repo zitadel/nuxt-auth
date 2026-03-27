@@ -1,6 +1,11 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
-  modules: ['../src/module.ts', '@nuxtjs/tailwindcss'],
+  modules: ['../src/module.ts'],
+  app: {
+    head: {
+      script: [{ src: 'https://cdn.tailwindcss.com' }],
+    },
+  },
   auth: {
     provider: {
       type: 'authjs',
