@@ -11,7 +11,6 @@ export default [
       'docs/**',
       'build/**',
       'playground-authjs/**',
-      'examples/**',
       '*.config.*',
       '**/*.css',
     ],

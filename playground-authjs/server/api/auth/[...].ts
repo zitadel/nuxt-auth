@@ -6,6 +6,19 @@ export default NuxtAuthHandler({
   // a) Never hardcode your secret in your code!! and b) use a secure secret, `test-123` is **not** secure!!
   secret: process.env.AUTH_SECRET ?? 'test-123',
   providers: [
+    // Conditionally add a mock OIDC provider when the env var is set (used by E2E OAuth tests)
+    ...(process.env.OAUTH_ISSUER_URL
+      ? [
+          {
+            id: 'mock-oidc',
+            name: 'Mock OIDC',
+            type: 'oidc' as const,
+            issuer: process.env.OAUTH_ISSUER_URL,
+            clientId: process.env.OAUTH_CLIENT_ID ?? 'test-client',
+            clientSecret: process.env.OAUTH_CLIENT_SECRET ?? 'test-secret',
+          },
+        ]
+      : []),
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID ?? 'your-client-id',
       clientSecret: process.env.GITHUB_CLIENT_SECRET ?? 'your-client-secret',

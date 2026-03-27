@@ -1,11 +1,10 @@
 /**
- * End-to-end browser tests for the sample Nuxt application that consumes
- * the {@link @zitadel/nuxt-auth} module.
+ * End-to-end browser tests for the full OAuth 2.0 authorization-code flow.
  *
- * These tests exercise the full OAuth 2.0 authorization-code flow in a
- * real browser (Playwright) against a real OIDC provider running inside a
- * Docker container (navikt/mock-oauth2-server via testcontainers). Nothing
- * is stubbed or mocked: the Nuxt application is built in production mode,
+ * These tests exercise a real OIDC sign-in and sign-out in a real browser
+ * (Playwright) against a real OIDC provider running inside a Docker
+ * container (navikt/mock-oauth2-server via testcontainers). Nothing is
+ * stubbed or mocked: the Nuxt application is built in production mode,
  * served by Nitro, and every redirect, cookie, and token exchange happens
  * over HTTP exactly as it would in a deployed environment.
  *
@@ -14,7 +13,7 @@
  * 1. A mock-oauth2-server container is started with interactive login
  *    enabled so that the server renders an HTML login form instead of
  *    issuing tokens automatically.
- * 2. The sample Nuxt application is built and started with environment
+ * 2. The playground Nuxt application is built and started with environment
  *    variables pointing at the containerised OIDC issuer.
  * 3. Each test opens a fresh Playwright page, drives the UI through
  *    Auth.js built-in HTML pages (sign-in, sign-out), and asserts the
@@ -31,6 +30,8 @@ import { afterAll, describe, it } from 'vitest'
 import { createPage, setup, url } from '@nuxt/test-utils/e2e'
 import { GenericContainer, Wait } from 'testcontainers'
 import type { StartedTestContainer } from 'testcontainers'
+
+const TEST_PORT = 3457
 
 const container: StartedTestContainer = await new GenericContainer(
   'ghcr.io/navikt/mock-oauth2-server:2.1.10',
@@ -50,6 +51,8 @@ afterAll(async () => {
   await container.stop()
 })
 
+type Page = Awaited<ReturnType<typeof createPage>>
+
 /**
  * Performs a complete sign-in flow against the mock OIDC provider using
  * the Auth.js built-in sign-in page. The function navigates to the
@@ -58,14 +61,9 @@ afterAll(async () => {
  * fills in the username, and submits the form. After the OAuth callback
  * completes the browser is redirected back to the application.
  *
- * This helper exists so that tests requiring an authenticated session do
- * not duplicate the sign-in choreography.
- *
  * @param page - The Playwright page instance to drive.
  */
-async function signIn(
-  page: Awaited<ReturnType<typeof createPage>>,
-): Promise<void> {
+async function signIn(page: Page): Promise<void> {
   await page.goto(url('/api/auth/signin'))
   await page.waitForSelector('button:has-text("Sign in with Mock OIDC")', {
     timeout: 5000,
@@ -86,22 +84,39 @@ async function signIn(
  *
  * @param page - The Playwright page instance to drive.
  */
-async function signOut(
-  page: Awaited<ReturnType<typeof createPage>>,
-): Promise<void> {
+async function signOut(page: Page): Promise<void> {
   await page.goto(url('/api/auth/signout'))
   await page.waitForSelector('form', { timeout: 5000 })
   await page.click('button[type="submit"], input[type="submit"]')
 }
 
-describe('sample app browser tests', async () => {
+/**
+ * Asserts the page shows an unauthenticated state by checking for
+ * the "Sign in" button in the layout header.
+ */
+async function expectUnauthenticated(page: Page): Promise<void> {
+  await page.waitForSelector('summary:has-text("Sign in")', {
+    timeout: 15000,
+  })
+}
+
+/**
+ * Asserts the page shows an authenticated state by checking for
+ * the green status indicator in the layout header.
+ */
+async function expectAuthenticated(page: Page): Promise<void> {
+  await page.waitForSelector('.bg-green-400', { timeout: 15000 })
+}
+
+describe('OAuth browser tests', async () => {
   await setup({
-    rootDir: fileURLToPath(new URL('../examples/sample-app', import.meta.url)),
+    rootDir: fileURLToPath(new URL('../playground-authjs', import.meta.url)),
     browser: true,
     server: true,
     build: true,
+    port: TEST_PORT,
     env: {
-      AUTH_ORIGIN: 'http://localhost:3000/api/auth',
+      AUTH_ORIGIN: `http://localhost:${TEST_PORT}/api/auth`,
       AUTH_SECRET: 'test-secret-for-testing',
       OAUTH_ISSUER_URL: issuerUrl,
       OAUTH_CLIENT_ID: 'test-client',
@@ -111,7 +126,7 @@ describe('sample app browser tests', async () => {
 
   it('shows the homepage in an unauthenticated state', async () => {
     const page = await createPage('/')
-    await page.waitForSelector('text=Status: unauthenticated')
+    await expectUnauthenticated(page)
     await page.close()
   })
 
@@ -119,7 +134,7 @@ describe('sample app browser tests', async () => {
     const page = await createPage('/')
     await signIn(page)
     await page.goto(url('/'))
-    await page.waitForSelector('text=Status: authenticated', { timeout: 15000 })
+    await expectAuthenticated(page)
     await page.close()
   })
 
@@ -127,12 +142,10 @@ describe('sample app browser tests', async () => {
     const page = await createPage('/')
     await signIn(page)
     await page.goto(url('/'))
-    await page.waitForSelector('text=Status: authenticated', { timeout: 15000 })
+    await expectAuthenticated(page)
     await signOut(page)
     await page.goto(url('/'))
-    await page.waitForSelector('text=Status: unauthenticated', {
-      timeout: 15000,
-    })
+    await expectUnauthenticated(page)
     await page.close()
   })
 })

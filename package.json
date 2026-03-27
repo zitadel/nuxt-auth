@@ -62,8 +62,7 @@
     "zitadel"
   ],
   "workspaces": [
-    "playground-authjs",
-    "examples/sample-app"
+    "playground-authjs"
   ],
   "peerDependencies": {
     "@auth/core": ">=0.40.0",
