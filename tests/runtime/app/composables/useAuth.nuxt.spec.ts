@@ -2,6 +2,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { registerEndpoint } from '@nuxt/test-utils/runtime'
 import { useAuth } from '#imports'
+import { useAuthState } from '../../../../src/runtime/app/composables/useAuth'
 
 const PROVIDERS = {
   credentials: {
@@ -203,6 +204,70 @@ describe('useAuth', () => {
       await refresh()
 
       expect(status.value).toBe('authenticated')
+    })
+  })
+
+  describe('useAuthState', () => {
+    it('returns data, loading, lastRefreshedAt, and status', () => {
+      const state = useAuthState()
+
+      expect(state).toHaveProperty('data')
+      expect(state).toHaveProperty('loading')
+      expect(state).toHaveProperty('lastRefreshedAt')
+      expect(state).toHaveProperty('status')
+    })
+
+    it('shares state with useAuth', async () => {
+      registerEndpoint('/api/auth/session', () => AUTHENTICATED_SESSION)
+
+      const { getSession } = useAuth()
+      await getSession()
+
+      const { data, status } = useAuthState()
+
+      expect(data.value).toEqual(AUTHENTICATED_SESSION)
+      expect(status.value).toBe('authenticated')
+    })
+
+    it('status is unauthenticated when session is empty', () => {
+      const { status, data } = useAuthState()
+
+      expect(data.value).toBeNull()
+      expect(status.value).toBe('unauthenticated')
+    })
+
+    it('status is authenticated when session has data', async () => {
+      registerEndpoint('/api/auth/session', () => AUTHENTICATED_SESSION)
+
+      const { getSession } = useAuth()
+      await getSession()
+
+      const { status } = useAuthState()
+
+      expect(status.value).toBe('authenticated')
+    })
+
+    it('status is loading while fetching', () => {
+      const { loading, status } = useAuthState()
+
+      loading.value = true
+      expect(status.value).toBe('loading')
+
+      loading.value = false
+      expect(status.value).toBe('unauthenticated')
+    })
+
+    it('loading takes precedence over data for status', async () => {
+      registerEndpoint('/api/auth/session', () => AUTHENTICATED_SESSION)
+
+      const { getSession } = useAuth()
+      await getSession()
+
+      const { loading, status } = useAuthState()
+      expect(status.value).toBe('authenticated')
+
+      loading.value = true
+      expect(status.value).toBe('loading')
     })
   })
 })
