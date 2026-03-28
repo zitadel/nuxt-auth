@@ -31,11 +31,15 @@ watch(lastRefreshedAt, () => {
         </div>
         <div class="flex justify-between items-center bg-gray-50 rounded p-3">
           <span class="text-gray-500">Last refreshed</span>
-          <pre data-testid="last-refreshed-at" class="text-gray-800">{{ lastRefreshedAt ?? 'never' }}</pre>
+          <pre data-testid="last-refreshed-at" class="text-gray-800">{{
+            lastRefreshedAt ?? 'never'
+          }}</pre>
         </div>
         <div class="flex justify-between items-center bg-gray-50 rounded p-3">
           <span class="text-gray-500">Refresh count</span>
-          <pre data-testid="refresh-count" class="text-gray-800">{{ refreshCount }}</pre>
+          <pre data-testid="refresh-count" class="text-gray-800">{{
+            refreshCount
+          }}</pre>
         </div>
       </div>
     </div>
@@ -44,7 +48,8 @@ watch(lastRefreshedAt, () => {
       <p class="text-sm text-gray-500 leading-relaxed mb-3">
         The playground is configured with
         <code class="font-mono text-gray-600">enablePeriodically: 3000</code>
-        and <code class="font-mono text-gray-600">enableOnWindowFocus: true</code>.
+        and
+        <code class="font-mono text-gray-600">enableOnWindowFocus: true</code>.
         This means the session is automatically refreshed every 3 seconds and
         whenever you switch back to this browser tab.
       </p>
@@ -55,7 +60,10 @@ watch(lastRefreshedAt, () => {
         the count jump.
       </p>
     </div>
-    <nuxt-link to="/" class="inline-block mt-6 text-sm text-blue-600 hover:underline">
+    <nuxt-link
+      to="/"
+      class="inline-block mt-6 text-sm text-blue-600 hover:underline"
+    >
       &larr; Back to home
     </nuxt-link>
   </div>

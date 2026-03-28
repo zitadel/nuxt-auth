@@ -15,7 +15,10 @@
         sign-in page. This is the zero-configuration default.
       </p>
     </div>
-    <nuxt-link to="/" class="inline-block mt-6 text-sm text-blue-600 hover:underline">
+    <nuxt-link
+      to="/"
+      class="inline-block mt-6 text-sm text-blue-600 hover:underline"
+    >
       &larr; Back to home
     </nuxt-link>
   </div>

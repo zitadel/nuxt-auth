@@ -24,9 +24,9 @@ definePageMeta({
       <p class="text-sm text-gray-500 leading-relaxed mb-3">
         This page uses
         <code class="font-mono text-gray-600">unauthenticatedOnly: true</code>
-        in its page meta. This is the inverse of a protected page &mdash;
-        only unauthenticated visitors are allowed. Authenticated users are
-        sent to the URL specified by
+        in its page meta. This is the inverse of a protected page &mdash; only
+        unauthenticated visitors are allowed. Authenticated users are sent to
+        the URL specified by
         <code class="font-mono text-gray-600">navigateAuthenticatedTo</code>.
       </p>
       <p class="text-sm text-gray-500 leading-relaxed">
@@ -35,7 +35,10 @@ definePageMeta({
         user to visit.
       </p>
     </div>
-    <nuxt-link to="/" class="inline-block mt-6 text-sm text-blue-600 hover:underline">
+    <nuxt-link
+      to="/"
+      class="inline-block mt-6 text-sm text-blue-600 hover:underline"
+    >
       &larr; Back to home
     </nuxt-link>
   </div>

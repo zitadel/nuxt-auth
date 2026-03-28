@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div>
@@ -27,8 +26,8 @@
           Globally protected
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
-          Protected by the global middleware with no explicit auth meta.
-          You can access this because you are signed in.
+          Protected by the global middleware with no explicit auth meta. You can
+          access this because you are signed in.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -41,8 +40,8 @@
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
           Protected by the named
           <code class="text-gray-500">zitadel-auth</code> middleware via
-          <code class="text-gray-500">definePageMeta</code>.
-          You can access this because you are signed in.
+          <code class="text-gray-500">definePageMeta</code>. You can access this
+          because you are signed in.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -66,8 +65,8 @@
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
           Restricted to unauthenticated users via
-          <code class="text-gray-500">unauthenticatedOnly: true</code>.
-          You will be redirected away because you are signed in.
+          <code class="text-gray-500">unauthenticatedOnly: true</code>. You will
+          be redirected away because you are signed in.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -78,8 +77,8 @@
           SWR cached
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
-          Demonstrates stale-while-revalidate caching with route rules.
-          Compares server vs client render times.
+          Demonstrates stale-while-revalidate caching with route rules. Compares
+          server vs client render times.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -91,8 +90,8 @@
           API (inline auth)
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
-          Nitro server route that checks the session inside the handler.
-          Returns your session data as JSON.
+          Nitro server route that checks the session inside the handler. Returns
+          your session data as JSON.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -104,8 +103,8 @@
           API (middleware auth)
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
-          Nitro server route where auth is checked by server middleware
-          before the handler runs. Returns your session data as JSON.
+          Nitro server route where auth is checked by server middleware before
+          the handler runs. Returns your session data as JSON.
         </p>
       </nuxt-link>
     </div>

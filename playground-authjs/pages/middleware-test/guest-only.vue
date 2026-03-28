@@ -23,13 +23,19 @@ definePageMeta({
       <p class="text-sm text-gray-500 leading-relaxed">
         Setting
         <code class="font-mono text-gray-600">unauthenticatedOnly: true</code>
-        with <code class="font-mono text-gray-600">navigateAuthenticatedTo: '/'</code>
-        means only guests can see this page. If a signed-in user navigates
-        here, they are automatically sent to the home page. This pattern is
-        ideal for login or registration pages.
+        with
+        <code class="font-mono text-gray-600"
+          >navigateAuthenticatedTo: '/'</code
+        >
+        means only guests can see this page. If a signed-in user navigates here,
+        they are automatically sent to the home page. This pattern is ideal for
+        login or registration pages.
       </p>
     </div>
-    <nuxt-link to="/" class="inline-block mt-6 text-sm text-blue-600 hover:underline">
+    <nuxt-link
+      to="/"
+      class="inline-block mt-6 text-sm text-blue-600 hover:underline"
+    >
       &larr; Back to home
     </nuxt-link>
   </div>

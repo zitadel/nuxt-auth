@@ -17,14 +17,20 @@ definePageMeta({ auth: { unauthenticatedOnly: false } })
       <h2 class="font-semibold text-gray-800 mb-2">How it works</h2>
       <p class="text-sm text-gray-500 leading-relaxed">
         Setting
-        <code class="font-mono text-gray-600">definePageMeta({ auth: { unauthenticatedOnly: false } })</code>
+        <code class="font-mono text-gray-600"
+          >definePageMeta({ auth: { unauthenticatedOnly: false } })</code
+        >
         is the object form of protection. It behaves identically to
         <code class="font-mono text-gray-600">auth: true</code> &mdash; the
-        explicit <code class="font-mono text-gray-600">unauthenticatedOnly: false</code>
+        explicit
+        <code class="font-mono text-gray-600">unauthenticatedOnly: false</code>
         confirms this is not a guest-only page.
       </p>
     </div>
-    <nuxt-link to="/" class="inline-block mt-6 text-sm text-blue-600 hover:underline">
+    <nuxt-link
+      to="/"
+      class="inline-block mt-6 text-sm text-blue-600 hover:underline"
+    >
       &larr; Back to home
     </nuxt-link>
   </div>

@@ -96,19 +96,24 @@ async function mySignInHandler({
       <h2 class="font-semibold text-gray-800 mb-2">How it works</h2>
       <p class="text-sm text-gray-500 leading-relaxed mb-3">
         The first button calls
-        <code class="font-mono text-gray-600">signIn('credentials', { ... })</code>
+        <code class="font-mono text-gray-600"
+          >signIn('credentials', { ... })</code
+        >
         which submits credentials to the Auth.js backend and redirects on
         success. This is the standard flow.
       </p>
       <p class="text-sm text-gray-500 leading-relaxed">
         The second button uses a custom handler that passes
-        <code class="font-mono text-gray-600">redirect: false</code> to
-        get the result back as a return value. This lets you handle errors
-        yourself (e.g. show an alert) and manually call
+        <code class="font-mono text-gray-600">redirect: false</code> to get the
+        result back as a return value. This lets you handle errors yourself
+        (e.g. show an alert) and manually call
         <code class="font-mono text-gray-600">navigateTo()</code> on success.
       </p>
     </div>
-    <nuxt-link to="/" class="inline-block mt-6 text-sm text-blue-600 hover:underline">
+    <nuxt-link
+      to="/"
+      class="inline-block mt-6 text-sm text-blue-600 hover:underline"
+    >
       &larr; Back to home
     </nuxt-link>
   </div>

@@ -17,13 +17,18 @@ definePageMeta({ auth: true })
       <h2 class="font-semibold text-gray-800 mb-2">How it works</h2>
       <p class="text-sm text-gray-500 leading-relaxed">
         Setting
-        <code class="font-mono text-gray-600">definePageMeta({ auth: true })</code>
+        <code class="font-mono text-gray-600"
+          >definePageMeta({ auth: true })</code
+        >
         explicitly requires authentication. This is equivalent to the default
         behavior when the global middleware is enabled, but makes the intent
         explicit in the code.
       </p>
     </div>
-    <nuxt-link to="/" class="inline-block mt-6 text-sm text-blue-600 hover:underline">
+    <nuxt-link
+      to="/"
+      class="inline-block mt-6 text-sm text-blue-600 hover:underline"
+    >
       &larr; Back to home
     </nuxt-link>
   </div>

@@ -50,8 +50,8 @@ definePageMeta({ auth: false })
           Globally protected
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
-          Protected by the global middleware with no explicit auth meta.
-          You will be redirected to sign in.
+          Protected by the global middleware with no explicit auth meta. You
+          will be redirected to sign in.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -64,8 +64,8 @@ definePageMeta({ auth: false })
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
           Protected by the named
           <code class="text-gray-500">zitadel-auth</code> middleware via
-          <code class="text-gray-500">definePageMeta</code>.
-          You will be redirected to sign in.
+          <code class="text-gray-500">definePageMeta</code>. You will be
+          redirected to sign in.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -89,8 +89,8 @@ definePageMeta({ auth: false })
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
           Restricted to unauthenticated users via
-          <code class="text-gray-500">unauthenticatedOnly: true</code>.
-          You can access this as a guest.
+          <code class="text-gray-500">unauthenticatedOnly: true</code>. You can
+          access this as a guest.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -101,8 +101,8 @@ definePageMeta({ auth: false })
           SWR cached
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
-          Demonstrates stale-while-revalidate caching with route rules.
-          Compares server vs client render times.
+          Demonstrates stale-while-revalidate caching with route rules. Compares
+          server vs client render times.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -114,8 +114,8 @@ definePageMeta({ auth: false })
           API (inline auth)
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
-          Nitro server route that checks the session inside the handler.
-          Returns 401 without a valid session.
+          Nitro server route that checks the session inside the handler. Returns
+          401 without a valid session.
         </p>
       </nuxt-link>
       <nuxt-link
@@ -127,8 +127,8 @@ definePageMeta({ auth: false })
           API (middleware auth)
         </div>
         <p class="text-sm text-gray-400 mt-2 leading-relaxed">
-          Nitro server route where auth is checked by server middleware
-          before the handler runs. Returns 403 without a valid session.
+          Nitro server route where auth is checked by server middleware before
+          the handler runs. Returns 403 without a valid session.
         </p>
       </nuxt-link>
     </div>
