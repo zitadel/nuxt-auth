@@ -21,7 +21,7 @@ export interface GlobalMiddlewareOptions {
  * `'credentials'`. The credentials provider in Auth.js silently ignores
  * `callbackUrl`, so `addDefaultCallbackUrl` is intentionally absent.
  */
-interface ProviderAuthjsCredentials {
+export interface ProviderAuthjsCredentials {
   /**
    * Uses the `authjs` provider to facilitate authentication.
    */
@@ -51,7 +51,7 @@ interface ProviderAuthjsCredentials {
  * Configuration for the `authjs`-provider when using any provider other
  * than `'credentials'`.
  */
-interface ProviderAuthjsOther {
+export interface ProviderAuthjsOther {
   /**
    * Uses the `authjs` provider to facilitate authentication.
    */

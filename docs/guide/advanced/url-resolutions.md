@@ -66,7 +66,7 @@ We recommend the following setup to configure your `AUTH_ORIGIN` or `baseURL`:
 export default defineNuxtConfig({
   // ... other configuration
   auth: {
-    baseUrl: 'https://my-backend.com/api/auth', // [!code --]
+    baseURL: 'https://my-backend.com/api/auth', // [!code --]
     // This is technically not needed as it is the default, but it's here for illustrative purposes
     originEnvKey: 'AUTH_ORIGIN', // [!code ++]
   }
