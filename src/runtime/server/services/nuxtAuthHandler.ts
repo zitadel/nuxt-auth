@@ -281,7 +281,7 @@ export async function getServerSession(
   const trustHostUserPreference = runtimeConfig.public.auth.provider.trustHost
 
   // Avoid running auth middleware on auth middleware (see #186)
-  if (event.path && event.path.startsWith(authBasePathname)) {
+  if (event.path && event.path.startsWith(authBasePathname + '/')) {
     return null
   }
 
