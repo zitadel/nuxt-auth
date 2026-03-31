@@ -37,7 +37,7 @@ export class DefaultRefreshHandler implements RefreshHandler {
 
   /** Pre-bound reference to {@link visibilityHandler} so the same function
    *  can be passed to both `addEventListener` and `removeEventListener`. */
-  private boundVisibilityHandler: typeof this.visibilityHandler
+  private readonly boundVisibilityHandler: typeof this.visibilityHandler
 
   constructor(public config: DefaultRefreshHandlerConfig) {
     this.boundVisibilityHandler = this.visibilityHandler.bind(this)

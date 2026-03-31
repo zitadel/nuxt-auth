@@ -603,7 +603,7 @@ export function useAuth(): UseAuthReturn {
         sessionData !== null &&
         Object.keys(sessionData).length > 0
       ) {
-        data.value = sessionData
+        data.value = sessionData as unknown as SessionData
       } else {
         data.value = null
       }

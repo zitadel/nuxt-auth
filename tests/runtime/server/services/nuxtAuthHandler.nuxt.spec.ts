@@ -6,7 +6,7 @@ import type { AddressInfo } from 'node:net'
 import { createApp, toNodeListener } from 'h3'
 import { skipCSRFCheck } from '@auth/core'
 import Credentials from '@auth/core/providers/credentials'
-import { NuxtAuthHandler } from '../../../../src/runtime/server/services/nuxtAuthHandler'
+import { NuxtAuthHandler } from '../../../../src/runtime/server/services'
 
 describe('NuxtAuthHandler', () => {
   let baseURL: string

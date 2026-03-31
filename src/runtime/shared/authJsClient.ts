@@ -29,7 +29,7 @@ export function resolveBaseURL(runtimeConfig: RuntimeConfig): string {
   // On the server, allow overriding via the configured environment variable.
   // `import.meta.server` is `true` on the server and `undefined`/`false` on
   // the client, so this branch is tree-shaken for client builds.
-  if (import.meta.server !== false && runtimeConfig.public.auth.originEnvKey) {
+  if (import.meta.server && runtimeConfig.public.auth.originEnvKey) {
     const envBaseURL = process.env[runtimeConfig.public.auth.originEnvKey]
     if (envBaseURL) {
       baseURL = envBaseURL
@@ -282,14 +282,15 @@ export class AuthJsClient {
    * @returns The raw session data object, or `null`-ish data when there is
    *   no active session. Callers are responsible for the empty-object check.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getSession(callbackUrl?: string): Promise<any> {
+  async getSession(
+    callbackUrl?: string,
+  ): Promise<Record<string, unknown> | null> {
     return this.fetch(
       '/session',
       {
-        params: callbackUrl ? { callbackUrl } : undefined,
+        query: callbackUrl ? { callbackUrl } : undefined,
       },
-      /* forwardResponseCookies */ true,
+      true,
     )
   }
 
@@ -319,22 +320,20 @@ export class AuthJsClient {
     providerType: string,
     body: URLSearchParams,
     authorizationParams?: Record<string, string>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<Record<string, any>> {
+  ): Promise<{ url: string }> {
     const action = providerType === 'credentials' ? 'callback' : 'signin'
     return this.fetch<{ url: string }>(
       `/${action}/${provider}`,
       {
         method: 'post',
-        params: authorizationParams,
+        query: authorizationParams,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body,
       },
-      /* forwardResponseCookies */ true,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ).catch<Record<string, any>>((error: { data: any }) => error.data)
+      true,
+    ).catch((error: { data: { url: string } }) => error.data)
   }
 
   /**

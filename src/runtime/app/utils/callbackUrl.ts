@@ -83,7 +83,5 @@ async function normalizeCallbackUrl(rawCallbackUrl: string) {
   // The difference with `router.resolve` is that relative paths (`./example`) are not supported
   // because they make little sense for authentication routes which can be `/api/auth/signin` and `/api/auth/signin/provider`,
   // i.e. different levels. Users should prefer their own resolution instead of relying on relative paths.
-  const resolvedUserRoute = router.options.history.createHref(rawCallbackUrl)
-
-  return resolvedUserRoute
+  return router.options.history.createHref(rawCallbackUrl)
 }

@@ -37,8 +37,6 @@ const authjsDefaults: DeepRequired<ProviderAuthjs> = {
 }
 
 const PACKAGE_NAME = 'zitadel-auth'
-const MIDDLEWARE_NAME = PACKAGE_NAME
-
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: PACKAGE_NAME,
@@ -149,7 +147,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     // 6. Register the global authentication middleware
     addRouteMiddleware({
-      name: MIDDLEWARE_NAME,
+      name: PACKAGE_NAME,
       path: resolve('./runtime/app/middleware/auth'),
       global: true,
     })

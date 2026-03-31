@@ -8,15 +8,15 @@ category: Server Side
 
 All endpoints that NextAuth.js supports are also supported by `nuxt-auth`:
 
-| Endpoint                         | Request      | Description                                                   |
-| -------------------------------- | :----------- | :------------------------------------------------------------ |
-| `${baseURL}/signin`              | `GET`        | Displays the built-in/unbranded sign-in                       |
-| `${baseURL}/signin/:provider`    | `POST`       | Starts a provider-specific sign-in                            |
-| `${baseURL}/callback/:provider`  | `GET` `POST` | Handles returning requests from OAuth services during sign-in |
-| `${baseURL}/signout`             | `GET` `POST` | Displays the built-in/unbranded sign out                      |
-| `${baseURL}/session`             | `GET`        | Returns client-safe session object                            |
-| `${baseURL}/csrf`                | `GET`        | Returns object containing CSRF                                |
-| `${baseURL}/providers`           | `GET`        | Returns a list of configured OAuth providers                  |
+| Endpoint                        | Request      | Description                                                   |
+|---------------------------------|:-------------|:--------------------------------------------------------------|
+| `${baseURL}/signin`             | `GET`        | Displays the built-in/unbranded sign-in                       |
+| `${baseURL}/signin/:provider`   | `POST`       | Starts a provider-specific sign-in                            |
+| `${baseURL}/callback/:provider` | `GET` `POST` | Handles returning requests from OAuth services during sign-in |
+| `${baseURL}/signout`            | `GET` `POST` | Displays the built-in/unbranded sign out                      |
+| `${baseURL}/session`            | `GET`        | Returns client-safe session object                            |
+| `${baseURL}/csrf`               | `GET`        | Returns object containing CSRF                                |
+| `${baseURL}/providers`          | `GET`        | Returns a list of configured OAuth providers                  |
 
 The `baseURL` is `/api/auth` per default and can be configured in the
 `nuxt.config.ts`.

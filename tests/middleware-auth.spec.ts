@@ -10,6 +10,7 @@ const mockAuthConfig = {
   },
 }
 
+// noinspection JSUnusedGlobalSymbols
 vi.mock('#imports', () => ({
   defineNuxtRouteMiddleware: (fn: (...args: unknown[]) => unknown) => fn,
   navigateTo: (...args: unknown[]) => mockNavigateTo(...args),

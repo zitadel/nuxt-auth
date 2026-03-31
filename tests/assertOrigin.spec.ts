@@ -9,6 +9,7 @@ const mockConfig = {
   },
 }
 
+// noinspection JSUnusedGlobalSymbols
 vi.mock('nitropack/runtime/plugin', () => ({
   defineNitroPlugin: (fn: () => void) => fn,
 }))
