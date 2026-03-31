@@ -87,12 +87,9 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   })
   nuxtApp.provide('authClient', client)
 
-  // Skip auth if we're prerendering
-  let nitroPrerender = false
-  if (nuxtApp.ssrContext) {
-    nitroPrerender =
-      getHeader(nuxtApp.ssrContext.event, 'x-nitro-prerender') !== undefined
-  }
+  const nitroPrerender =
+    nuxtApp.ssrContext !== undefined &&
+    getHeader(nuxtApp.ssrContext.event, 'x-nitro-prerender') !== undefined
 
   const disableServerSideAuth =
     routeRules.disableServerSideAuth ??

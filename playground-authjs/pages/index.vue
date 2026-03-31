@@ -32,7 +32,7 @@ definePageMeta({ auth: false })
         access to guests only, or apply the named middleware explicitly. Two
         built-in providers are configured: a hardcoded credentials provider
         (<code class="font-mono text-blue-800">jsmith</code> /
-        <code class="font-mono text-blue-800">hunter2</code>) and GitHub OAuth.
+        <code class="font-mono text-blue-800">hunter2</code>).
       </p>
     </div>
 

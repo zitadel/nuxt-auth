@@ -148,12 +148,6 @@ Providers: {{ providers }}</pre
               >
                 Sign in with credentials
               </nuxt-link>
-              <button
-                class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
-                @click="signIn('github', { callbackUrl: '/dashboard' })"
-              >
-                Sign in with GitHub
-              </button>
               <div class="border-t border-gray-100 my-1" />
               <button
                 class="block w-full text-left px-4 py-2.5 text-xs text-gray-400 hover:bg-gray-50"

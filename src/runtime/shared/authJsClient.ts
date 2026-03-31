@@ -7,7 +7,7 @@ import {
   withQuery,
   withTrailingSlash,
 } from 'ufo'
-import { ERROR_PREFIX } from './logger'
+const ERROR_PREFIX = '[@zitadel/nuxt-auth]'
 
 export interface RuntimeConfig {
   readonly public: {

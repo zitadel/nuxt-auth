@@ -38,23 +38,9 @@ async function mySignInHandler({
   <div class="max-w-sm mx-auto">
     <h1 class="text-3xl font-bold text-gray-900 mb-3 text-center">Sign in</h1>
     <p class="text-center text-gray-400 mb-8">
-      Use the test credentials or sign in with GitHub.
+      Use the test credentials to sign in.
     </p>
     <div class="space-y-4">
-      <button
-        class="w-full px-4 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition font-medium"
-        @click="signIn('github')"
-      >
-        Sign in with GitHub
-      </button>
-      <div class="relative py-2">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-gray-200" />
-        </div>
-        <div class="relative flex justify-center text-xs">
-          <span class="bg-gray-50 px-2 text-gray-400">or use credentials</span>
-        </div>
-      </div>
       <input
         v-model="username"
         type="text"

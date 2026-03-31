@@ -13,7 +13,7 @@ export interface GlobalMiddlewareOptions {
    * @example /i-caught-you-but-now-you-are-signed-in
    * @default true
    */
-  addDefaultCallbackUrl?: boolean | string
+  readonly addDefaultCallbackUrl?: boolean | string
 }
 
 /**
@@ -198,12 +198,12 @@ export interface ModuleOptions {
 
 export type AuthMeta =
   | boolean
-  | { mode: 'protected'; redirectTo?: string }
-  | { mode: 'guest'; redirectTo?: string }
+  | { readonly mode: 'protected'; readonly redirectTo?: string }
+  | { readonly mode: 'guest'; readonly redirectTo?: string }
   | {
-      unauthenticatedOnly: boolean
-      navigateAuthenticatedTo?: string
-      navigateUnauthenticatedTo?: string
+      readonly unauthenticatedOnly: boolean
+      readonly navigateAuthenticatedTo?: string
+      readonly navigateUnauthenticatedTo?: string
     }
 
 export interface RouteOptions {

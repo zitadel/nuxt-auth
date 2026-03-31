@@ -68,9 +68,8 @@ describe('auth module integration', async () => {
       const providers = await $fetch<Record<string, unknown>>(
         '/api/auth/providers',
       )
-      expect(Object.keys(providers)).toHaveLength(2)
+      expect(Object.keys(providers)).toHaveLength(1)
       expect(providers.credentials).toBeDefined()
-      expect(providers.github).toBeDefined()
     })
 
     it('credentials provider has correct structure', async () => {
@@ -95,17 +94,6 @@ describe('auth module integration', async () => {
       expect(credentials.callbackUrl).toContain(
         '/api/auth/callback/credentials',
       )
-    })
-
-    it('github provider has correct structure', async () => {
-      const providers = await $fetch<
-        Record<string, { id: string; name: string; type: string }>
-      >('/api/auth/providers')
-
-      const github = providers.github!
-      expect(github.id).toBe('github')
-      expect(github.name).toBe('GitHub')
-      expect(github.type).toBe('oauth')
     })
   })
 
@@ -230,13 +218,6 @@ describe('auth module integration', async () => {
       const html = await response.text()
 
       expect(html).toContain('Credentials')
-    })
-
-    it('shows github provider option', async () => {
-      const response = await fetch(url('/api/auth/signin'))
-      const html = await response.text()
-
-      expect(html).toContain('GitHub')
     })
 
     it('includes csrf token in form', async () => {

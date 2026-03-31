@@ -1,5 +1,4 @@
 import Credentials from '@auth/core/providers/credentials'
-import GitHub from '@auth/core/providers/github'
 import { NuxtAuthHandler } from '#auth'
 
 // noinspection JSUnusedGlobalSymbols
@@ -20,10 +19,6 @@ export default NuxtAuthHandler({
           },
         ]
       : []),
-    GitHub({
-      clientId: process.env.GITHUB_CLIENT_ID ?? 'your-client-id',
-      clientSecret: process.env.GITHUB_CLIENT_SECRET ?? 'your-client-secret',
-    }),
     Credentials({
       // The name to display on the sign in form (e.g. 'Sign in with...')
       name: 'Credentials',

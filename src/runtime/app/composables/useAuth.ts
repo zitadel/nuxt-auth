@@ -746,8 +746,6 @@ export function useAuth(): UseAuthReturn {
   }
 }
 
-const URL_QUOTE_RE = /"/g
-
 function navigateToAuthPageWN(
   nuxt: NuxtApp,
   href: string,
@@ -851,7 +849,7 @@ function navigateToAuthPage(
       async function redirect(response: false | undefined) {
         // Matches upstream navigateTo — remove if Nuxt deprecates `app:redirected`
         await nuxtApp.callHook('app:redirected')
-        const encodedLoc = location.replace(URL_QUOTE_RE, '%22')
+        const encodedLoc = location.replace(/"/g, '%22')
         const encodedHeader = encodeURL(location, isExternalHost)
 
         nuxtApp.ssrContext!._renderResponse = {

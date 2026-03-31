@@ -5,6 +5,7 @@ import {
   createError,
   eventHandler,
   getHeaders,
+  getQuery,
   getRequestURL,
   setResponseStatus,
   splitCookiesString,
@@ -167,8 +168,7 @@ export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
     // instead of a 302 so the client can handle navigation.
     const location = response.headers.get('location')
     if (location && response.status >= 300 && response.status < 400) {
-      const url = new URL(request.url)
-      if (url.searchParams.get('json') === 'true') {
+      if (getQuery(event).json === 'true') {
         for (const cookie of setCookieHeaders) {
           appendResponseHeader(event, 'set-cookie', cookie)
         }
