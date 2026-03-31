@@ -29,8 +29,8 @@ import { useAuth } from '../src/runtime/app/composables/useAuth'
 ;(globalThis as any).$fetch = $fetch
 
 const responses = {
-  providers: {} as Record<string, unknown>,
-  csrf: { csrfToken: 'test-csrf-token' },
+  providers: {} as Record<string, unknown> | null,
+  csrf: { csrfToken: 'test-csrf-token' } as { csrfToken: string | null },
   session: {} as Record<string, unknown>,
   signIn: { url: 'http://localhost:3000/' } as Record<string, unknown>,
   signOut: { url: '/' } as { url: string },
@@ -51,6 +51,11 @@ const PROVIDERS = {
     id: 'github',
     name: 'GitHub',
     type: 'oauth',
+  },
+  email: {
+    id: 'email',
+    name: 'Email',
+    type: 'email',
   },
 }
 
@@ -225,126 +230,440 @@ describe('useAuth', () => {
   })
 
   describe('signIn', () => {
-    it('authenticates with valid credentials', async () => {
-      responses.signIn = { url: 'http://localhost:3000/' }
-      responses.session = AUTHENTICATED_SESSION
+    describe('with credentials provider', () => {
+      it('returns success for valid credentials with redirect: false', async () => {
+        responses.signIn = { url: 'http://localhost:3000/' }
+        responses.session = AUTHENTICATED_SESSION
 
-      const { signIn } = useAuth()
-      const result = await signIn('credentials', {
-        username: 'jsmith',
-        password: 'hunter2',
-        redirect: false,
+        const { signIn } = useAuth()
+        const result = await signIn('credentials', {
+          username: 'jsmith',
+          password: 'hunter2',
+          redirect: false,
+        })
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 200,
+          error: null,
+          url: 'http://localhost:3000/',
+        })
       })
 
-      expect(result).toMatchObject({
-        ok: true,
-        status: 200,
-        error: null,
-        url: 'http://localhost:3000/',
+      it('reports credential errors with redirect: false', async () => {
+        responses.signIn = {
+          url: 'http://localhost:3000/api/auth/signin?error=CredentialsSignin',
+        }
+
+        const { signIn } = useAuth()
+        const result = await signIn('credentials', {
+          username: 'wrong',
+          password: 'wrong',
+          redirect: false,
+        })
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 200,
+          error: 'CredentialsSignin',
+          url: null,
+        })
+      })
+
+      it('updates reactive state after successful sign-in', async () => {
+        responses.signIn = { url: 'http://localhost:3000/' }
+        responses.session = AUTHENTICATED_SESSION
+
+        const { signIn, status, data } = useAuth()
+        await signIn('credentials', {
+          username: 'jsmith',
+          password: 'hunter2',
+          redirect: false,
+        })
+
+        expect(status.value).toBe('authenticated')
+        expect(data.value).toEqual(AUTHENTICATED_SESSION)
+      })
+
+      it('sets SSR redirect when redirect is true (default)', async () => {
+        responses.signIn = { url: 'http://localhost:3000/' }
+
+        const { signIn } = useAuth()
+        const result = await signIn('credentials', {
+          username: 'jsmith',
+          password: 'hunter2',
+        })
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 302,
+          error: null,
+          url: 'http://localhost:3000/',
+        })
+        expect(nuxtApp.ssrContext?._renderResponse).toMatchObject({
+          statusCode: 302,
+          headers: { location: 'http://localhost:3000/' },
+        })
+      })
+
+      it('falls back to callbackUrl when server returns no url', async () => {
+        responses.signIn = {}
+
+        const { signIn } = useAuth()
+        const result = await signIn('credentials', {
+          username: 'jsmith',
+          password: 'hunter2',
+          redirect: true,
+        })
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 302,
+        })
+        // Falls back to callbackUrl (inferred from current page)
+        expect(result.url).toBeDefined()
+      })
+
+      it('uses custom callbackUrl when provided', async () => {
+        responses.signIn = { url: 'http://localhost:3000/' }
+        responses.session = AUTHENTICATED_SESSION
+
+        const { signIn } = useAuth()
+        const result = await signIn('credentials', {
+          username: 'jsmith',
+          password: 'hunter2',
+          redirect: false,
+          callbackUrl: '/dashboard',
+        })
+
+        expect(result).toMatchObject({ ok: true, status: 200 })
       })
     })
 
-    it('reports credential errors', async () => {
-      responses.signIn = {
-        url: 'http://localhost:3000/api/auth/signin?error=CredentialsSignin',
-      }
+    describe('with OAuth provider', () => {
+      it('sets SSR redirect to OAuth authorisation URL', async () => {
+        responses.signIn = { url: 'https://github.com/login/oauth/authorize' }
 
-      const { signIn } = useAuth()
-      const result = await signIn('credentials', {
-        username: 'wrong',
-        password: 'wrong',
-        redirect: false,
+        const { signIn } = useAuth()
+        const result = await signIn('github')
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 302,
+          url: 'https://github.com/login/oauth/authorize',
+        })
+        expect(nuxtApp.ssrContext?._renderResponse).toMatchObject({
+          statusCode: 302,
+          headers: {
+            location: 'https://github.com/login/oauth/authorize',
+          },
+        })
       })
 
-      expect(result).toMatchObject({
-        ok: true,
-        status: 200,
-        error: 'CredentialsSignin',
-        url: null,
+      it('always redirects even when redirect: false is passed', async () => {
+        responses.signIn = { url: 'https://github.com/login/oauth/authorize' }
+
+        const { signIn } = useAuth()
+        const result = await signIn('github', { redirect: false })
+
+        // OAuth providers do not support redirect: false, so it redirects anyway
+        expect(result).toMatchObject({
+          ok: true,
+          status: 302,
+          url: 'https://github.com/login/oauth/authorize',
+        })
+      })
+
+      it('forwards authorisationParams as query parameters', async () => {
+        responses.signIn = { url: 'https://github.com/login/oauth/authorize' }
+
+        const { signIn } = useAuth()
+        await signIn('github', {}, { scope: 'read:user read:org' })
+
+        expect(lastSignInQuery).toMatchObject({
+          scope: 'read:user read:org',
+        })
+      })
+
+      it('falls back to callbackUrl when server returns no url', async () => {
+        responses.signIn = {}
+
+        const { signIn } = useAuth()
+        const result = await signIn('github')
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 302,
+        })
+        expect(result.url).toBeDefined()
+        expect(nuxtApp.ssrContext?._renderResponse).toMatchObject({
+          statusCode: 302,
+        })
       })
     })
 
-    it('updates reactive state after successful sign-in', async () => {
-      responses.signIn = { url: 'http://localhost:3000/' }
-      responses.session = AUTHENTICATED_SESSION
+    describe('with email provider', () => {
+      it('returns success with redirect: false', async () => {
+        responses.signIn = { url: 'http://localhost:3000/verify' }
+        responses.session = AUTHENTICATED_SESSION
 
-      const { signIn, status, data } = useAuth()
-      await signIn('credentials', {
-        username: 'jsmith',
-        password: 'hunter2',
-        redirect: false,
+        const { signIn } = useAuth()
+        const result = await signIn('email', {
+          email: 'jsmith@example.com',
+          redirect: false,
+        })
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 200,
+          url: 'http://localhost:3000/verify',
+        })
       })
 
-      expect(status.value).toBe('authenticated')
-      expect(data.value).toEqual(AUTHENTICATED_SESSION)
-    })
+      it('sets SSR redirect when redirect is true', async () => {
+        responses.signIn = { url: 'http://localhost:3000/verify' }
 
-    it('returns InvalidProvider for unknown provider', async () => {
-      const { signIn } = useAuth()
-      const result = await signIn('nonexistent')
+        const { signIn } = useAuth()
+        const result = await signIn('email', {
+          email: 'jsmith@example.com',
+        })
 
-      expect(result.error).toBe('InvalidProvider')
-      expect(result.ok).toBe(false)
-      expect(result.status).toBe(400)
-    })
-
-    it('forwards authorisationParams as query parameters', async () => {
-      responses.signIn = { url: 'https://github.com/login/oauth/authorize' }
-
-      const { signIn } = useAuth()
-      await signIn('github', {}, { scope: 'read:user read:org' })
-
-      expect(lastSignInQuery).toMatchObject({ scope: 'read:user read:org' })
-    })
-
-    it('sets SSR redirect for OAuth providers', async () => {
-      responses.signIn = { url: 'https://github.com/login/oauth/authorize' }
-
-      const { signIn } = useAuth()
-      const result = await signIn('github')
-
-      expect(result).toMatchObject({
-        ok: true,
-        status: 302,
-        url: 'https://github.com/login/oauth/authorize',
+        expect(result).toMatchObject({
+          ok: true,
+          status: 302,
+          url: 'http://localhost:3000/verify',
+        })
+        expect(nuxtApp.ssrContext?._renderResponse).toMatchObject({
+          statusCode: 302,
+        })
       })
-      expect(nuxtApp.ssrContext?._renderResponse).toMatchObject({
-        statusCode: 302,
-        headers: { location: 'https://github.com/login/oauth/authorize' },
+    })
+
+    describe('with undefined provider', () => {
+      it('redirects to all-providers page when no defaultProvider', async () => {
+        const { signIn } = useAuth()
+        const result = await signIn(undefined)
+
+        expect(result).toMatchObject({
+          error: 'InvalidProvider',
+          ok: false,
+          status: 400,
+        })
+        expect(result.url).toContain('/signin')
+      })
+
+      it('uses defaultProvider when configured', async () => {
+        _setRuntimeConfig({
+          public: {
+            auth: {
+              baseURL,
+              disableInternalRouting: true,
+              originEnvKey: 'AUTH_ORIGIN',
+              provider: {
+                defaultProvider: 'credentials',
+                addDefaultCallbackUrl: true,
+                trustHost: false,
+              },
+              sessionRefresh: {},
+            },
+          },
+        })
+
+        responses.signIn = { url: 'http://localhost:3000/' }
+        responses.session = AUTHENTICATED_SESSION
+
+        const { signIn } = useAuth()
+        const result = await signIn(undefined, {
+          username: 'jsmith',
+          password: 'hunter2',
+          redirect: false,
+        })
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 200,
+          url: 'http://localhost:3000/',
+        })
+      })
+    })
+
+    describe('with invalid provider', () => {
+      it('returns InvalidProvider with status 400', async () => {
+        const { signIn } = useAuth()
+        const result = await signIn('nonexistent')
+
+        expect(result.error).toBe('InvalidProvider')
+        expect(result.ok).toBe(false)
+        expect(result.status).toBe(400)
+      })
+    })
+
+    describe('when server returns no providers', () => {
+      it('returns InvalidProvider with status 500', async () => {
+        responses.providers = null
+
+        const { signIn } = useAuth()
+        const result = await signIn('credentials', {
+          username: 'jsmith',
+          password: 'hunter2',
+        })
+
+        expect(result).toMatchObject({
+          error: 'InvalidProvider',
+          ok: false,
+          status: 500,
+        })
+        expect(result.url).toContain('/error')
+      })
+    })
+
+    describe('response url with error query param', () => {
+      it('extracts error from redirect url for credentials', async () => {
+        responses.signIn = {
+          url: 'http://localhost:3000/api/auth/signin?error=CredentialsSignin',
+        }
+
+        const { signIn } = useAuth()
+        const result = await signIn('credentials', { redirect: true })
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 302,
+          error: 'CredentialsSignin',
+        })
+      })
+
+      it('extracts error from redirect url for OAuth', async () => {
+        responses.signIn = {
+          url: 'http://localhost:3000/api/auth/signin?error=OAuthSignin',
+        }
+
+        const { signIn } = useAuth()
+        const result = await signIn('github')
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 302,
+          error: 'OAuthSignin',
+        })
+      })
+
+      it('extracts error from response url with redirect: false', async () => {
+        responses.signIn = {
+          url: 'http://localhost:3000/api/auth/signin?error=CredentialsSignin',
+        }
+
+        const { signIn } = useAuth()
+        const result = await signIn('credentials', {
+          username: 'wrong',
+          password: 'wrong',
+          redirect: false,
+        })
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 200,
+          error: 'CredentialsSignin',
+          url: null,
+        })
+      })
+
+      it('returns null error when url has no error param', async () => {
+        responses.signIn = { url: 'http://localhost:3000/' }
+        responses.session = AUTHENTICATED_SESSION
+
+        const { signIn } = useAuth()
+        const result = await signIn('credentials', {
+          username: 'jsmith',
+          password: 'hunter2',
+          redirect: false,
+        })
+
+        expect(result).toMatchObject({
+          ok: true,
+          status: 200,
+          error: null,
+          url: 'http://localhost:3000/',
+        })
       })
     })
   })
 
   describe('signOut', () => {
-    it('clears session data', async () => {
-      responses.session = AUTHENTICATED_SESSION
-      const { getSession, signOut, status } = useAuth()
-      await getSession()
-      expect(status.value).toBe('authenticated')
+    describe('with redirect: false', () => {
+      it('clears session data and returns signout response', async () => {
+        responses.session = AUTHENTICATED_SESSION
+        const { getSession, signOut, status } = useAuth()
+        await getSession()
+        expect(status.value).toBe('authenticated')
 
-      responses.signOut = { url: '/' }
-      responses.session = {}
-      await signOut({ redirect: false })
-      expect(status.value).toBe('unauthenticated')
+        responses.signOut = { url: '/goodbye' }
+        responses.session = {}
+        const result = await signOut({ redirect: false })
+
+        expect(status.value).toBe('unauthenticated')
+        expect(result).toEqual({ url: '/goodbye' })
+      })
+
+      it('uses custom callbackUrl', async () => {
+        responses.signOut = { url: '/custom-bye' }
+        responses.session = {}
+
+        const { signOut } = useAuth()
+        const result = await signOut({
+          redirect: false,
+          callbackUrl: '/custom-bye',
+        })
+
+        expect(result).toEqual({ url: '/custom-bye' })
+      })
     })
 
-    it('returns signout response', async () => {
-      responses.signOut = { url: '/goodbye' }
-      const { signOut } = useAuth()
-      const result = await signOut({ redirect: false })
+    describe('with redirect: true (default)', () => {
+      it('sets SSR redirect to signout url', async () => {
+        responses.signOut = { url: '/goodbye' }
 
-      expect(result).toEqual({ url: '/goodbye' })
+        const { signOut } = useAuth()
+        await signOut()
+
+        expect(nuxtApp.ssrContext?._renderResponse).toMatchObject({
+          statusCode: 302,
+          headers: { location: '/goodbye' },
+        })
+      })
+
+      it('falls back to callbackUrl when server returns no url', async () => {
+        responses.signOut = {} as { url: string }
+
+        const { signOut } = useAuth()
+        await signOut({ callbackUrl: '/fallback' })
+
+        expect(nuxtApp.ssrContext?._renderResponse).toMatchObject({
+          statusCode: 302,
+        })
+      })
+
+      it('uses custom callbackUrl for redirect', async () => {
+        responses.signOut = { url: '/custom-logout' }
+
+        const { signOut } = useAuth()
+        await signOut({ callbackUrl: '/custom-logout' })
+
+        expect(nuxtApp.ssrContext?._renderResponse).toMatchObject({
+          statusCode: 302,
+          headers: { location: '/custom-logout' },
+        })
+      })
     })
 
-    it('sets SSR redirect when redirect is true', async () => {
-      responses.signOut = { url: '/goodbye' }
+    describe('with missing CSRF token', () => {
+      it('throws an error', async () => {
+        responses.csrf = { csrfToken: null }
 
-      const { signOut } = useAuth()
-      await signOut()
-
-      expect(nuxtApp.ssrContext?._renderResponse).toMatchObject({
-        statusCode: 302,
-        headers: { location: '/goodbye' },
+        const { signOut } = useAuth()
+        await expect(signOut()).rejects.toThrow(
+          'Could not fetch CSRF Token for signing out',
+        )
       })
     })
   })
