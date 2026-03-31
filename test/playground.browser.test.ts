@@ -185,6 +185,54 @@ describe('global auth middleware', async () => {
     })
   })
 
+  describe('open redirect prevention', () => {
+    it('rejects an external callbackUrl passed via sign-in query param', async () => {
+      const page = await createPage()
+      await page.goto(
+        url('/api/auth/signin?callbackUrl=https://evil.example.com'),
+      )
+      await page.waitForSelector('input[name="username"]', { timeout: 10000 })
+      await page.fill('input[name="username"]', 'jsmith')
+      await page.fill('input[name="password"]', 'hunter2')
+      await page
+        .locator('form:has(input[name="username"]) button[type="submit"]')
+        .click()
+      await page.waitForURL(
+        (pageUrl) => !pageUrl.href.includes('/api/auth/'),
+        { timeout: 10000 },
+      )
+
+      const finalUrl = new URL(page.url())
+      expect(
+        finalUrl.hostname,
+        `Expected to stay on the app but was redirected to ${finalUrl.href}`,
+      ).not.toBe('evil.example.com')
+      await page.close()
+    })
+
+    it('rejects an external callbackUrl passed via sign-out query param', async () => {
+      const page = await createPage()
+      await signIn(page)
+
+      await page.goto(
+        url('/api/auth/signout?callbackUrl=https://evil.example.com'),
+      )
+      await page.waitForSelector('button[type="submit"]', { timeout: 10000 })
+      await page.locator('button[type="submit"]').click()
+      await page.waitForURL(
+        (pageUrl) => !pageUrl.href.includes('/api/auth/'),
+        { timeout: 10000 },
+      )
+
+      const finalUrl = new URL(page.url())
+      expect(
+        finalUrl.hostname,
+        `Expected to stay on the app but was redirected to ${finalUrl.href}`,
+      ).not.toBe('evil.example.com')
+      await page.close()
+    })
+  })
+
   describe('DefaultRefreshHandler', () => {
     it('refreshes the session periodically', async () => {
       const page = await createPage()
