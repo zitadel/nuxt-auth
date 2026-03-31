@@ -32,7 +32,7 @@ const topLevelDefaults = {
 const authjsDefaults: DeepRequired<ProviderAuthjs> = {
   type: 'authjs',
   trustHost: false,
-  defaultProvider: '', // this satisfies Required and also gets caught at `!provider` check
+  defaultProvider: '',
   addDefaultCallbackUrl: true,
 }
 
@@ -48,7 +48,6 @@ export default defineNuxtModule<ModuleOptions>({
   setup(userOptions, nuxt) {
     const logger = useLogger(PACKAGE_NAME)
 
-    // 0. Assemble all options
     const options = defu(
       {
         // We use `as` to infer backend types correctly for runtime-usage (everything is set, although for user everything was optional)
@@ -61,20 +60,16 @@ export default defineNuxtModule<ModuleOptions>({
       topLevelDefaults,
     )
 
-    // 1. Check if module should be enabled at all
     if (!options.isEnabled) {
       logger.info(`Skipping ${PACKAGE_NAME} setup, as module is disabled`)
       return
     }
 
-    // 2. Set up runtime configuration
     nuxt.options.runtimeConfig = nuxt.options.runtimeConfig || { public: {} }
     nuxt.options.runtimeConfig.public.auth = options
 
-    // 3. Locate runtime directory
     const { resolve } = createResolver(import.meta.url)
 
-    // 4. Add nuxt-auth app composables
     addImports([
       {
         name: 'useAuth',
@@ -82,7 +77,6 @@ export default defineNuxtModule<ModuleOptions>({
       },
     ])
 
-    // 5. Create virtual imports for server-side
     nuxt.hook(
       // @ts-expect-error nitro:config hook exists but type definition is missing
       'nitro:config',
@@ -92,7 +86,6 @@ export default defineNuxtModule<ModuleOptions>({
       }) => {
         nitroConfig.alias = nitroConfig.alias || {}
 
-        // Inline module runtime in Nitro bundle
         nitroConfig.externals = defu(
           typeof nitroConfig.externals === 'object'
             ? nitroConfig.externals
@@ -145,23 +138,19 @@ export default defineNuxtModule<ModuleOptions>({
         ].join('\n'),
     })
 
-    // 6. Register the global authentication middleware
     addRouteMiddleware({
       name: PACKAGE_NAME,
       path: resolve('./runtime/app/middleware/auth'),
       global: true,
     })
 
-    // 7. Add plugins for initial load and session refresh
     addPlugin(resolve('./runtime/app/plugins/auth'))
     addPlugin(resolve('./runtime/app/plugins/session-refresh'))
 
-    // 8. Add a server-plugin to check the `origin` on production-startup
     addServerPlugin(resolve('./runtime/server/plugins/assertOrigin'))
   },
 }) satisfies NuxtModule<ModuleOptions>
 
-// Used by nuxt/module-builder for `types.d.ts` generation
 export type {
   GlobalMiddlewareOptions,
   ModuleOptions,
@@ -169,8 +158,8 @@ export type {
   ProviderAuthjs,
   SessionRefreshConfig,
 } from './runtime/shared/types'
-// Augment types for type inference in source code
 declare module '@nuxt/schema' {
+  // noinspection JSUnusedGlobalSymbols
   interface PublicRuntimeConfig {
     auth: ModuleOptionsNormalized
   }

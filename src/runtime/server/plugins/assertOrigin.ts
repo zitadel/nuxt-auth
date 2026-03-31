@@ -30,7 +30,6 @@ export default defineNitroPlugin(() => {
   try {
     const runtimeConfig = useRuntimeConfig()
 
-    // Resolve the base URL, checking the configured env var for an override
     let baseURL = runtimeConfig.public.auth.baseURL
     const originEnvKey = runtimeConfig.public.auth.originEnvKey
     if (originEnvKey) {

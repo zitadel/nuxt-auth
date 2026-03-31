@@ -2,6 +2,7 @@ import Credentials from '@auth/core/providers/credentials'
 import GitHub from '@auth/core/providers/github'
 import { NuxtAuthHandler } from '#auth'
 
+// noinspection JSUnusedGlobalSymbols
 export default NuxtAuthHandler({
   // a) Never hardcode your secret in your code!! and b) use a secure secret, `test-123` is **not** secure!!
   secret: process.env.AUTH_SECRET ?? 'test-123',

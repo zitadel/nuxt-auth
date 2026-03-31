@@ -58,10 +58,8 @@ function getNitroRouteRules(path: string): Partial<RouteOptions> {
 }
 
 export default defineNuxtPlugin(async (nuxtApp) => {
-  // 1. Initialize authentication state, potentially fetch current session
   const { data, loading } = useAuthState()
 
-  // use runtimeConfig
   const wholeRuntimeConfig = useRuntimeConfig()
   const runtimeConfig = wholeRuntimeConfig.public.auth
 
@@ -69,13 +67,10 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     ? getNitroRouteRules(nuxtApp._route.path)
     : {}
 
-  // Set the correct `baseURL` on the server,
-  // because the client would not have access to environment variables
   if (import.meta.server) {
     runtimeConfig.baseURL = resolveBaseURL(wholeRuntimeConfig)
   }
 
-  // 2. Construct and provide the AuthJsClient
   const client = new AuthJsClient(runtimeConfig.baseURL, {
     nuxt: nuxtApp,
     getRequestCookies: async () => {
@@ -93,8 +88,6 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   })
   nuxtApp.provide('authClient', client)
 
-  // 3. Fetch the initial session
-
   // Skip auth if we're prerendering
   let nitroPrerender = false
   if (nuxtApp.ssrContext) {
@@ -102,7 +95,6 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       getHeader(nuxtApp.ssrContext.event, 'x-nitro-prerender') !== undefined
   }
 
-  // Prioritize `routeRules` setting over `runtimeConfig` settings, fallback to false
   let disableServerSideAuth = routeRules.disableServerSideAuth
   disableServerSideAuth ??= runtimeConfig?.disableServerSideAuth
   disableServerSideAuth ??= false
@@ -111,9 +103,6 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     loading.value = true
   }
 
-  // Only fetch session if it was not yet initialized server-side.
-  // Skip the session fetch on error pages (e.g. 404) to avoid unnecessary
-  // work and the ERR_HTTP_HEADERS_SENT issue (nuxt/framework#9438).
   const isErrorUrl = nuxtApp.ssrContext?.error === true
   const shouldFetchSession =
     typeof data.value === 'undefined' &&

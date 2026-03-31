@@ -393,7 +393,6 @@ export function useAuth(): UseAuthReturn {
     options?: SecondarySignInOptions,
     authorisationParams?: Record<string, string>,
   ): Promise<SignInResult> {
-    // 1. Lead to error page if no providers are available
     const configuredProviders = await callWithNuxt(nuxt, () =>
       client.getProviders(),
     )
@@ -410,12 +409,10 @@ export function useAuth(): UseAuthReturn {
       }
     }
 
-    // 2. If no `provider` was given, either use the configured `defaultProvider` or `undefined` (leading to a forward to the `/login` page with all providers)
     if (typeof provider === 'undefined') {
       provider = runtimeConfig.public.auth.provider.defaultProvider
     }
 
-    // 3. Redirect to the general sign-in page with all providers in case either no provider or no valid provider was selected
     const { redirect = true } = options ?? {}
 
     const callbackUrl = await callWithNuxt(nuxt, () =>
@@ -440,7 +437,6 @@ export function useAuth(): UseAuthReturn {
       }
     }
 
-    // 4. Perform a sign-in straight away with the selected provider
     const isCredentials = selectedProvider.type === 'credentials'
     const isEmail = selectedProvider.type === 'email'
     const isSupportingReturn = isCredentials || isEmail
@@ -464,7 +460,6 @@ export function useAuth(): UseAuthReturn {
       const href = signInData.url ?? callbackUrl
       const navigationResult = await navigateToAuthPageWN(nuxt, href)
 
-      // We use `http://_` as a base to allow relative URLs in `callbackUrl`. We only need the `error` query param
       const error = new URL(href, 'http://_').searchParams.get('error')
 
       return {
@@ -476,7 +471,6 @@ export function useAuth(): UseAuthReturn {
       }
     }
 
-    // At this point the request succeeded (i.e., it went through)
     const error = new URL(signInData.url).searchParams.get('error')
     await getSessionWithNuxt(nuxt)
 
@@ -678,7 +672,6 @@ export function useAuth(): UseAuthReturn {
 
     const csrfToken = await callWithNuxt(nuxt, () => client.getCsrfToken())
 
-    // Determine the correct callback URL
     const callbackUrl = await determineCallbackUrl(
       runtimeConfig.public.auth,
       userCallbackUrl,
@@ -834,7 +827,6 @@ function navigateToAuthPage(
   // https://github.com/nuxt/nuxt/blob/dc69e26c5b9adebab3bf4e39417288718b8ddf07/packages/nuxt/src/app/composables/router.ts#L84-L93
   const inMiddleware = Boolean(nuxtApp._processingMiddleware)
 
-  // Script protocol check runs on both client and server, matching Nuxt 4.4.2's navigateTo.
   // https://github.com/nuxt/nuxt/blob/v4.4.2/packages/nuxt/src/app/composables/router.ts#L167-L172
   const isExternalHost = hasProtocol(href, { acceptRelative: true })
   if (isExternalHost) {
@@ -849,15 +841,13 @@ function navigateToAuthPage(
 
   if (import.meta.server) {
     if (nuxtApp.ssrContext) {
-      // This is a difference with `nuxt/nuxt` - we do not add `app.baseURL` here because all consumers are responsible for it
-      // We also skip resolution for internal routing to avoid triggering `No match found` warning from Vue Router
       const location =
         isExternalHost || isInternalRouting
           ? href
           : router.resolve(href).fullPath || '/'
 
       async function redirect(response: false | undefined) {
-        // TODO: consider deprecating in favour of `app:rendered` and removing
+        // Matches upstream navigateTo — remove if Nuxt deprecates `app:redirected`
         await nuxtApp.callHook('app:redirected')
         const encodedLoc = location.replace(URL_QUOTE_RE, '%22')
         const encodedHeader = encodeURL(location, isExternalHost)
@@ -870,31 +860,21 @@ function navigateToAuthPage(
         return response
       }
 
-      // We wait to perform the redirect last in case any other middleware will intercept the redirect
-      // and redirect somewhere else instead.
+      // `final.fullPath` is not percent-encoded, so comparing it to `location` always fails.
+      // See: https://github.com/nuxt/nuxt/issues/33273
       if (!isExternalHost && inMiddleware) {
-        // `final.fullPath` is not percent-encoded, so comparing it to `location` always fails.
-        // Return `undefined` instead of aborting to preserve compatibility.
-        // See: https://github.com/nuxt/nuxt/issues/33273
         return redirect(undefined)
       }
-      return redirect(
-        !inMiddleware ? undefined : /* abort further route navigation */ false,
-      )
+      return redirect(!inMiddleware ? undefined : false)
     }
   }
 
   // https://github.com/nuxt/nuxt/blob/v4.4.2/packages/nuxt/src/app/composables/router.ts#L199
   nuxtApp._scope.stop()
   window.location.href = href
-  // If href contains a hash, the browser does not reload the page. We reload manually.
   if (href.includes('#')) {
     window.location.reload()
   }
 
-  // Never-resolving promise blocks further execution while window.location.href
-  // navigation completes. We do not want a fallback to router.push() here because
-  // Auth.js routes are not registered with vue-router, which would trigger a
-  // "No match found" warning and potentially render the wrong page.
   return new Promise<void>(() => {})
 }

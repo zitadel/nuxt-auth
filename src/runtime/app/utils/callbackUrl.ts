@@ -8,7 +8,6 @@ interface AuthRuntimeConfigForCallbackUrl {
   }
 }
 
-// Overloads for better typing
 export async function determineCallbackUrl(
   authConfig: AuthRuntimeConfigForCallbackUrl,
   userCallbackUrl: string | undefined,
@@ -38,20 +37,16 @@ export async function determineCallbackUrl(
   userCallbackUrl: string | undefined,
   inferFromRequest?: boolean | undefined,
 ): Promise<string | undefined> {
-  // Priority 1: User setting
   if (userCallbackUrl) {
     return await normalizeCallbackUrl(userCallbackUrl)
   }
 
-  // Priority 2: `addDefaultCallbackUrl`
   const authConfigCallbackUrl = authConfig.provider?.addDefaultCallbackUrl
 
-  // If a string value was set, always callback to it
   if (typeof authConfigCallbackUrl === 'string') {
     return await normalizeCallbackUrl(authConfigCallbackUrl)
   }
 
-  // Priority 3: Infer callback URL from the request
   const shouldInferFromRequest =
     inferFromRequest !== false &&
     (inferFromRequest === true || authConfigCallbackUrl === true)

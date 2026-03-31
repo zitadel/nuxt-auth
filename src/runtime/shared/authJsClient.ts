@@ -2,7 +2,6 @@
 import { parseURL, withLeadingSlash } from 'ufo'
 import { ERROR_PREFIX } from './logger'
 
-// Slimmed-down type to allow easy unit testing
 export interface RuntimeConfig {
   public: {
     auth: {
@@ -147,10 +146,6 @@ export class AuthJsClient {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Private helpers
-  // ---------------------------------------------------------------------------
-
   /**
    * Resolve an endpoint segment against the base URL. Returns a pathname
    * for internal routing or a full href for external routing.
@@ -189,7 +184,6 @@ export class AuthJsClient {
       }
     }
 
-    // Browser: include cookies by default (https://github.com/zitadel/nuxt-auth/issues/1063)
     if (!fetchOptions.credentials) {
       fetchOptions.credentials = 'include'
     }
@@ -247,10 +241,6 @@ export class AuthJsClient {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // URL helpers for navigation (not API calls)
-  // ---------------------------------------------------------------------------
-
   /** Returns the URL for the Auth.js error page. */
   getErrorPageUrl(): string {
     return this.url('error')
@@ -264,10 +254,6 @@ export class AuthJsClient {
       : ''
     return `${signinUrl}${queryParams}`
   }
-
-  // ---------------------------------------------------------------------------
-  // Public API — clean, semantic, no URLs visible to callers
-  // ---------------------------------------------------------------------------
 
   /** Fetch all configured authentication providers. */
   async getProviders(): Promise<Record<string, ProviderInfo | undefined>> {

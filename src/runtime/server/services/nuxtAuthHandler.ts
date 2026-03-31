@@ -280,7 +280,9 @@ export async function getServerSession(
   )
   const trustHostUserPreference = runtimeConfig.public.auth.provider.trustHost
 
-  // Avoid running auth middleware on auth middleware (see #186)
+  // Return null for requests already targeting auth endpoints to prevent
+  // infinite recursion: server middleware → getServerSession → $fetch →
+  // server middleware → getServerSession → ...
   if (event.path && event.path.startsWith(authBasePathname + '/')) {
     return null
   }
