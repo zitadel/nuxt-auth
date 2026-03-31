@@ -782,27 +782,47 @@ function encodeURL(location: string, isExternalHost = false) {
 }
 
 /**
- * Custom navigation utility for Auth.js routes. This function exists because
- * Nuxt's built-in `navigateTo` cannot be used for Auth.js callback URLs for
- * two independently verified reasons:
+ * Custom navigation utility for Auth.js routes.
  *
- * 1. **Malformed Location header on SSR.** `navigateTo` puts raw URLs directly
- *    into the `Location` response header. Auth.js callback URLs contain encoded
- *    characters (e.g. `?callbackUrl=https%3A%2F%2F...`) that would produce a
- *    malformed redirect. Our {@link encodeURL} helper handles this correctly.
+ * This is a workaround for two Nuxt bugs that prevent `navigateTo` from
+ * handling Auth.js callback URLs correctly. It should be removed once the
+ * upstream issues are resolved — tracked in
+ * {@link https://github.com/zitadel/nuxt-auth/issues/5}.
  *
- * 2. **Broken deferred redirect in middleware.** On SSR inside middleware,
- *    `navigateTo` defers the redirect via
+ * ### Why not `navigateTo`?
+ *
+ * 1. **Malformed `Location` header on SSR.** `navigateTo` writes raw URLs
+ *    into the HTTP `Location` header. Auth.js callback URLs contain
+ *    percent-encoded characters (e.g. `?callbackUrl=https%3A%2F%2F...`)
+ *    that produce malformed redirects. The {@link encodeURL} helper used
+ *    here handles this correctly.
+ *
+ * 2. **Broken deferred redirect in middleware.** During SSR middleware,
+ *    `navigateTo` defers the redirect with
  *    `router.afterEach(final => final.fullPath === fullPath ? redirect() : undefined)`.
- *    This equality check never passes for Auth.js routes because `/api/auth/signin`
- *    is not a vue-router route — vue-router percent-decodes `fullPath`, breaking
- *    the comparison. This is a confirmed Nuxt bug:
- *    https://github.com/nuxt/nuxt/issues/33273 (filed Sep 2025, still unresolved).
- *    Our implementation calls `redirect()` immediately, bypassing this broken path.
+ *    The equality check never passes for Auth.js routes because vue-router
+ *    percent-decodes `fullPath`, breaking the comparison. This is a
+ *    confirmed Nuxt bug:
+ *    {@link https://github.com/nuxt/nuxt/issues/33273 | nuxt/nuxt#33273}
+ *    (filed Sep 2025, still unresolved). This implementation calls
+ *    `redirect()` immediately, bypassing the broken path.
  *
- * Do NOT replace this function with `navigateTo` until both issues are resolved upstream.
+ * ### Differences from `navigateTo`
  *
- * Adapted from https://github.com/nuxt/nuxt/blob/dc69e26c5b9adebab3bf4e39417288718b8ddf07/packages/nuxt/src/app/composables/router.ts#L130-L247
+ * - Does **not** prepend `app.baseURL` — all callers are responsible for
+ *   providing fully resolved paths.
+ * - Skips vue-router resolution for internal routing to avoid `No match
+ *   found` warnings for non-router routes like `/api/auth/signin`.
+ * - On the client, always performs a full-page navigation via
+ *   `window.location.href` (never `router.push`) because Auth.js routes
+ *   are not registered with vue-router.
+ *
+ * @param nuxtApp - The current Nuxt application instance.
+ * @param href - The URL to navigate to (absolute or relative path).
+ * @param isInternalRouting - When `true`, skip vue-router resolution.
+ *
+ * @see {@link https://github.com/nuxt/nuxt/blob/v4.4.2/packages/nuxt/src/app/composables/router.ts#L141-L251 | Nuxt 4.4.2 navigateTo} — the upstream implementation this is adapted from.
+ * @see {@link https://github.com/zitadel/nuxt-auth/issues/5} — tracking issue for removing this workaround.
  */
 function navigateToAuthPage(
   nuxtApp: NuxtApp,
@@ -814,18 +834,21 @@ function navigateToAuthPage(
   // https://github.com/nuxt/nuxt/blob/dc69e26c5b9adebab3bf4e39417288718b8ddf07/packages/nuxt/src/app/composables/router.ts#L84-L93
   const inMiddleware = Boolean(nuxtApp._processingMiddleware)
 
+  // Script protocol check runs on both client and server, matching Nuxt 4.4.2's navigateTo.
+  // https://github.com/nuxt/nuxt/blob/v4.4.2/packages/nuxt/src/app/composables/router.ts#L167-L172
+  const isExternalHost = hasProtocol(href, { acceptRelative: true })
+  if (isExternalHost) {
+    const { protocol } = new URL(
+      href,
+      import.meta.client ? window.location.href : 'http://localhost',
+    )
+    if (protocol && isScriptProtocol(protocol)) {
+      throw new Error(`Cannot navigate to a URL with '${protocol}' protocol.`)
+    }
+  }
+
   if (import.meta.server) {
     if (nuxtApp.ssrContext) {
-      const isExternalHost = hasProtocol(href, { acceptRelative: true })
-      if (isExternalHost) {
-        const { protocol } = new URL(href, 'http://localhost')
-        if (protocol && isScriptProtocol(protocol)) {
-          throw new Error(
-            `Cannot navigate to a URL with '${protocol}' protocol.`,
-          )
-        }
-      }
-
       // This is a difference with `nuxt/nuxt` - we do not add `app.baseURL` here because all consumers are responsible for it
       // We also skip resolution for internal routing to avoid triggering `No match found` warning from Vue Router
       const location =
@@ -861,6 +884,8 @@ function navigateToAuthPage(
     }
   }
 
+  // https://github.com/nuxt/nuxt/blob/v4.4.2/packages/nuxt/src/app/composables/router.ts#L199
+  nuxtApp._scope.stop()
   window.location.href = href
   // If href contains a hash, the browser does not reload the page. We reload manually.
   if (href.includes('#')) {
