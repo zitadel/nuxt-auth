@@ -1,12 +1,15 @@
 /**
  * End-to-end tests for server-side API route protection.
  *
- * The playground-authjs application defines two API routes:
+ * The playground-authjs application defines several API routes with
+ * different protection strategies:
  *
- * | Route              | Protection                                  |
- * |--------------------|---------------------------------------------|
- * | `/api/unprotected` | None — publicly accessible                  |
- * | `/api/secured`     | `getServerSession` check — returns 403      |
+ * | Route                       | Protection                              |
+ * |-----------------------------|-----------------------------------------|
+ * | `/api/unprotected`          | None — publicly accessible              |
+ * | `/api/secured`              | Inline `getServerSession` — throws 403  |
+ * | `/api/protected/inline`     | Inline `getServerSession` — returns JSON |
+ * | `/api/protected/middleware`  | Server middleware — throws 403          |
  *
  * Each test makes HTTP requests as either an unauthenticated or
  * authenticated user and asserts that the server either grants access
@@ -73,6 +76,18 @@ describe('server-side route protection', async () => {
       const response = await fetch(url('/api/secured'))
       expect(response.status).toBe(403)
     })
+
+    it('returns unauthenticated from inline-protected route', async () => {
+      const response = await fetch(url('/api/protected/inline'))
+      expect(response.status).toBe(200)
+      const body = await response.json()
+      expect(body.status).toBe('unauthenticated!')
+    })
+
+    it('rejects access to middleware-protected route with 403', async () => {
+      const response = await fetch(url('/api/protected/middleware'))
+      expect(response.status).toBe(403)
+    })
   })
 
   describe('authenticated', () => {
@@ -96,6 +111,28 @@ describe('server-side route protection', async () => {
       expect(body.status).toBe('ok')
       expect(body.session).toBeDefined()
       expect(body.session.user).toBeDefined()
+    })
+
+    it('returns authenticated from inline-protected route with session', async () => {
+      const cookies = await login()
+      const response = await fetch(url('/api/protected/inline'), {
+        headers: { Cookie: cookies },
+      })
+      expect(response.status).toBe(200)
+      const body = await response.json()
+      expect(body.status).toBe('authenticated!')
+      expect(body.session).toBeDefined()
+      expect(body.session.user).toBeDefined()
+    })
+
+    it('allows access to middleware-protected route with session', async () => {
+      const cookies = await login()
+      const response = await fetch(url('/api/protected/middleware'), {
+        headers: { Cookie: cookies },
+      })
+      expect(response.status).toBe(200)
+      const body = await response.json()
+      expect(body.status).toBe('authenticated')
     })
   })
 })

@@ -1,8 +1,8 @@
 /**
- * End-to-end browser tests for the route middleware and the
- * {@link DefaultRefreshHandler}.
+ * End-to-end browser tests for the route middleware, named middleware,
+ * credentials error handling, and the {@link DefaultRefreshHandler}.
  *
- * ## Middleware tests
+ * ## Global middleware tests
  *
  * The playground-authjs application defines five pages under
  * `/middleware-test/`, each with a different `auth` meta value:
@@ -19,6 +19,21 @@
  * page as either an unauthenticated or authenticated user and asserts
  * that the middleware either grants access (the page heading is visible)
  * or redirects away (the URL no longer matches the target path).
+ *
+ * ## Named middleware tests
+ *
+ * Two pages under `/protected/` test different protection strategies:
+ *
+ * | Page            | Protection                                    |
+ * |-----------------|-----------------------------------------------|
+ * | `globally`      | No `definePageMeta` — global middleware only   |
+ * | `locally`       | `definePageMeta({ middleware: 'zitadel-auth' })` |
+ *
+ * ## Credentials error tests
+ *
+ * The Auth.js built-in sign-in form at `/api/auth/signin` is tested
+ * with invalid credentials to verify that the user stays on the
+ * sign-in page and is not authenticated.
  *
  * ## Refresh handler tests
  *
@@ -227,6 +242,68 @@ describe('global auth middleware', async () => {
         finalUrl.hostname,
         `Expected to stay on the app but was redirected to ${finalUrl.href}`,
       ).not.toBe('evil.example.com')
+      await page.close()
+    })
+  })
+
+  describe('page-level protection', () => {
+    it('redirects unauthenticated user from globally protected page', async () => {
+      const page = await createPage()
+      await expectRedirected(page, '/protected/globally')
+      await page.close()
+    })
+
+    it('allows authenticated user to access globally protected page', async () => {
+      const page = await createPage()
+      await signIn(page)
+      await expectAccessGranted(
+        page,
+        '/protected/globally',
+        'Globally protected',
+      )
+      await page.close()
+    })
+
+    it('redirects unauthenticated user from locally protected page', async () => {
+      const page = await createPage()
+      await expectRedirected(page, '/protected/locally')
+      await page.close()
+    })
+  })
+
+  describe('invalid credentials', () => {
+    it('stays on the sign-in page after submitting wrong credentials', async () => {
+      const page = await createPage()
+      await page.goto(url('/api/auth/signin'))
+      await page.waitForSelector('input[name="username"]', { timeout: 10000 })
+      await page.fill('input[name="username"]', 'jsmith')
+      await page.fill('input[name="password"]', 'wrong-password')
+      await page
+        .locator('form:has(input[name="username"]) button[type="submit"]')
+        .click()
+      await page.waitForLoadState('networkidle')
+
+      const currentPath = new URL(page.url()).pathname
+      expect(
+        currentPath,
+        'Expected to stay on the sign-in page after invalid credentials',
+      ).toContain('/api/auth/signin')
+      await page.close()
+    })
+
+    it('does not create a session after invalid credentials', async () => {
+      const page = await createPage()
+      await page.goto(url('/api/auth/signin'))
+      await page.waitForSelector('input[name="username"]', { timeout: 10000 })
+      await page.fill('input[name="username"]', 'jsmith')
+      await page.fill('input[name="password"]', 'wrong-password')
+      await page
+        .locator('form:has(input[name="username"]) button[type="submit"]')
+        .click()
+      await page.waitForLoadState('networkidle')
+
+      // Navigate to a protected page — should be redirected
+      await expectRedirected(page, '/middleware-test/no-meta')
       await page.close()
     })
   })
