@@ -4,20 +4,46 @@ import type {
 } from '../../shared/types'
 import { useAuth } from '#imports'
 
+/**
+ * Default implementation of {@link RefreshHandler} that keeps the Auth.js
+ * session fresh using two complementary strategies:
+ *
+ * - **Periodic polling** — when {@link DefaultRefreshHandlerConfig.enablePeriodically}
+ *   is set, a `setInterval` timer calls {@link useAuth.refresh | refresh()} at the
+ *   configured interval (default 1 000 ms when set to `true`).
+ * - **Tab-focus refresh** — when {@link DefaultRefreshHandlerConfig.enableOnWindowFocus}
+ *   is `true`, a `visibilitychange` listener triggers a refresh each time the
+ *   browser tab becomes visible again.
+ *
+ * Both strategies skip the refresh when no session exists
+ * (`data.value` is falsy). If both fire at the same time the worst outcome
+ * is a redundant `GET /api/auth/session` — the responses are identical and
+ * write to the same reactive ref, so there is no state-corruption risk.
+ *
+ * ### Lifecycle
+ *
+ * The {@link SessionRefreshPlugin | session-refresh plugin} calls
+ * {@link init} after the initial session fetch and {@link destroy} when the
+ * Vue app unmounts (or on HMR in development).
+ *
+ * @see {@link RefreshHandler} for the interface contract.
+ */
 export class DefaultRefreshHandler implements RefreshHandler {
-  /** Result of `useAuth` composable, mostly used for session data/refreshing */
+  /** Cached return value of {@link useAuth}, used for session data and refresh. */
   auth?: ReturnType<typeof useAuth>
 
-  /** Refetch interval */
+  /** Handle returned by `setInterval`, cleared in {@link destroy}. */
   refetchIntervalTimer?: ReturnType<typeof setInterval>
 
-  /** Because passing `this.visibilityHandler` to `document.addEventHandler` loses `this` context */
+  /** Pre-bound reference to {@link visibilityHandler} so the same function
+   *  can be passed to both `addEventListener` and `removeEventListener`. */
   private boundVisibilityHandler: typeof this.visibilityHandler
 
   constructor(public config: DefaultRefreshHandlerConfig) {
     this.boundVisibilityHandler = this.visibilityHandler.bind(this)
   }
 
+  /** Starts the periodic timer and visibility listener. */
   init(): void {
     this.auth = useAuth()
 
@@ -41,25 +67,21 @@ export class DefaultRefreshHandler implements RefreshHandler {
     }
   }
 
+  /** Tears down the timer, removes the visibility listener, and releases state. */
   destroy(): void {
-    // Clear visibility handler
     document.removeEventListener(
       'visibilitychange',
       this.boundVisibilityHandler,
       false,
     )
-
-    // Clear refetch interval
     clearInterval(this.refetchIntervalTimer)
-
-    // Release state
     this.auth = undefined
   }
 
+  /** Handles `visibilitychange` events — refreshes the session when the tab
+   *  becomes visible and {@link DefaultRefreshHandlerConfig.enableOnWindowFocus}
+   *  is enabled. */
   visibilityHandler(): void {
-    // Listen for when the page is visible, if the user switches tabs
-    // and makes our tab visible again, re-fetch the session, but only if
-    // this feature is not disabled.
     if (
       this.config?.enableOnWindowFocus &&
       document.visibilityState === 'visible' &&
