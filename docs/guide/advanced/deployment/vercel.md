@@ -6,7 +6,7 @@ category: Deployment
 
 # Deploying on Vercel
 
-When deploying on Vercel ensure all required environment variables are set. Read more about general deployment [here](/guide/advanced/deployment/self-hosted).
+When deploying on Vercel ensure all required environment variables are set. Read more about general deployment [here](./self-hosted.md).
 
 ## Differences to Self hosted deployments
 

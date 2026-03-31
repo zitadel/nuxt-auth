@@ -6,7 +6,7 @@ category: Deployment
 
 # Deploying on Netlify
 
-When deploying on Netlify ensure all required environment variables are set. Read more about general deployment [here](/guide/advanced/deployment/self-hosted).
+When deploying on Netlify ensure all required environment variables are set. Read more about general deployment [here](./self-hosted.md).
 
 ## Differences to Self hosted deployments
 

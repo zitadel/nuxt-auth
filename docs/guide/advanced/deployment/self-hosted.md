@@ -34,4 +34,4 @@ When [attempting to determine the server origin](https://github.com/zitadel/nuxt
 We recommend setting the `NUXT_AUTH_ORIGIN` during runtime and leaving the `baseURL`-config key empty, to avoid using a potentially incorrect ORIGIN.
 :::
 
-In addition to verifying that the origin is correctly set, also ensure that you have a secure [`secret` set in the NuxtAuthHandler](/guide/authjs/nuxt-auth-handler#secret).
+In addition to verifying that the origin is correctly set, also ensure that you have a secure [`secret` set in the NuxtAuthHandler](../../authjs/nuxt-auth-handler.md#secret).

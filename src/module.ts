@@ -169,10 +169,6 @@ export type {
   ProviderAuthjs,
   SessionRefreshConfig,
 } from './runtime/shared/types'
-export interface ModulePublicRuntimeConfig {
-  auth: ModuleOptionsNormalized
-}
-
 // Augment types for type inference in source code
 declare module '@nuxt/schema' {
   interface PublicRuntimeConfig {
