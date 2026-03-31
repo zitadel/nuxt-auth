@@ -24,9 +24,6 @@ vi.mock('#imports', () => ({
   }),
 }))
 
-// Must import after vi.mock.
-// Cast: real type requires (to, from) but our mock makes defineNuxtRouteMiddleware
-// an identity function, so middleware is the raw (to) => ... callback.
 const middleware = (await import('../src/runtime/app/middleware/auth'))
   .default as unknown as (to: RouteLike) => unknown
 

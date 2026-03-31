@@ -13,6 +13,7 @@ import { ref, type Ref } from 'vue'
 
 const stateMap = new Map<string, Ref>()
 
+/** Keyed reactive state backed by a simple Map — mirrors Nuxt's `useState`. */
 export function useState<T>(key: string, init?: () => T): Ref<T> {
   if (!stateMap.has(key)) {
     stateMap.set(key, ref(init?.()) as Ref)
@@ -20,6 +21,7 @@ export function useState<T>(key: string, init?: () => T): Ref<T> {
   return stateMap.get(key) as Ref<T>
 }
 
+/** Subset of the real NuxtApp shape needed by composables under test. */
 export interface NuxtApp {
   $authClient?: unknown
   ssrContext?: {
@@ -38,6 +40,7 @@ export interface NuxtApp {
 
 let _nuxtApp: NuxtApp | null = null
 
+/** Returns the NuxtApp instance set via {@link _setNuxtApp}. */
 export function useNuxtApp(): NuxtApp {
   if (!_nuxtApp) {
     throw new Error('Nuxt app not set. Call _setNuxtApp() in test setup.')
@@ -45,20 +48,19 @@ export function useNuxtApp(): NuxtApp {
   return _nuxtApp
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/** Executes `fn` — the real `callWithNuxt` sets context; here it just calls through. */
 export function callWithNuxt<T>(
-  _nuxt: any,
-  fn: (...args: any[]) => T,
-  args?: any[],
+  _nuxt: NuxtApp,
+  fn: (...args: unknown[]) => T,
+  args?: unknown[],
 ): T {
   return args ? fn(...args) : fn()
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let _runtimeConfig: any = null
+let _runtimeConfig: Record<string, unknown> | null = null
 
-export function useRuntimeConfig() {
+/** Returns the runtime config set via {@link _setRuntimeConfig}. */
+export function useRuntimeConfig(): Record<string, unknown> {
   if (!_runtimeConfig) {
     throw new Error(
       'Runtime config not set. Call _setRuntimeConfig() in test setup.',
@@ -69,10 +71,12 @@ export function useRuntimeConfig() {
 
 let _requestURL = new URL('http://localhost:3000/')
 
+/** Returns the request URL set via {@link _setRequestURL}. */
 export function useRequestURL(): URL {
   return _requestURL
 }
 
+/** Stub router with minimal `resolve` and `createHref` implementations. */
 export function useRouter() {
   return {
     resolve: (path: string) => ({ fullPath: path }),
@@ -84,6 +88,7 @@ export function useRouter() {
   }
 }
 
+/** Creates an Error with an optional `statusCode`, matching Nuxt's `createError`. */
 export function createError(
   input: string | { status?: number; statusCode?: number; message?: string },
 ) {
@@ -95,19 +100,22 @@ export function createError(
   return error
 }
 
+/** Sets the NuxtApp instance returned by {@link useNuxtApp}. */
 export function _setNuxtApp(app: NuxtApp) {
   _nuxtApp = app
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function _setRuntimeConfig(config: any) {
+/** Sets the runtime config returned by {@link useRuntimeConfig}. */
+export function _setRuntimeConfig(config: Record<string, unknown>) {
   _runtimeConfig = config
 }
 
+/** Sets the URL returned by {@link useRequestURL}. */
 export function _setRequestURL(url: URL) {
   _requestURL = url
 }
 
+/** Clears all state — call in `beforeEach` to isolate tests. */
 export function _resetState() {
   stateMap.clear()
   _nuxtApp = null

@@ -24,9 +24,7 @@ import {
   type NuxtApp,
 } from './helpers/nuxt-env'
 import { useAuth } from '../src/runtime/app/composables/useAuth'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-;(globalThis as any).$fetch = $fetch
+;(globalThis as unknown as Record<string, unknown>).$fetch = $fetch
 
 const responses = {
   providers: {} as Record<string, unknown> | null,
@@ -320,7 +318,6 @@ describe('useAuth', () => {
           ok: true,
           status: 302,
         })
-        // Falls back to callbackUrl (inferred from current page)
         expect(result.url).toBeDefined()
       })
 
@@ -366,7 +363,6 @@ describe('useAuth', () => {
         const { signIn } = useAuth()
         const result = await signIn('github', { redirect: false })
 
-        // OAuth providers do not support redirect: false, so it redirects anyway
         expect(result).toMatchObject({
           ok: true,
           status: 302,

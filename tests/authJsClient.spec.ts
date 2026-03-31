@@ -21,6 +21,7 @@ import {
   getQuery,
   getHeader,
   readBody,
+  setCookie,
   toNodeListener,
 } from 'h3'
 import { $fetch } from 'ofetch'
@@ -29,20 +30,20 @@ import {
   FetchConfigurationError,
   type AuthJsClientDeps,
 } from '../src/runtime/shared/authJsClient'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-;(globalThis as any).$fetch = $fetch
+;(globalThis as unknown as Record<string, unknown>).$fetch = $fetch
 
 const responses = {
   providers: {} as Record<string, unknown>,
   csrf: { csrfToken: 'test-csrf' },
   session: {} as Record<string, unknown>,
+  sessionCookie: undefined as string | undefined,
   signIn: { url: 'http://localhost:3000/' } as Record<string, unknown>,
   signOut: { url: '/' } as { url: string },
 }
 
 let lastSignInEndpoint = ''
 let lastSignInQuery: Record<string, string> = {}
+let lastSessionQuery: Record<string, string> = {}
 let lastRequestHeaders: Record<string, string | undefined> = {}
 let lastSignOutBody: Record<string, string> = {}
 let server: Server
@@ -66,6 +67,13 @@ beforeAll(async () => {
       lastRequestHeaders = {
         cookie: getHeader(event, 'cookie'),
         host: getHeader(event, 'host'),
+      }
+      lastSessionQuery = getQuery(event) as Record<string, string>
+      if (responses.sessionCookie) {
+        setCookie(event, 'authjs.session-token', 'abc', {
+          path: '/',
+          httpOnly: true,
+        })
       }
       return responses.session
     }),
@@ -134,6 +142,7 @@ beforeEach(() => {
   responses.signOut = { url: '/' }
   lastSignInEndpoint = ''
   lastSignInQuery = {}
+  lastSessionQuery = {}
   lastRequestHeaders = {}
   lastSignOutBody = {}
 })
@@ -190,7 +199,6 @@ describe('AuthJsClient', () => {
         nuxt: { ssrContext: { event: { path: '/api/auth/session' } } },
       })
 
-      // Should NOT throw — external routing doesn't do recursion detection
       responses.session = { user: 'test' }
       const session = await client.getSession()
       expect(session).toEqual({ user: 'test' })
@@ -207,20 +215,25 @@ describe('AuthJsClient', () => {
       expect(lastRequestHeaders.cookie).toBe('session=abc123; csrf=xyz')
     })
 
-    it('calls appendResponseCookies for session fetch', async () => {
+    it('forwards response cookies from session fetch', async () => {
+      responses.session = { user: 'test' }
+      responses.sessionCookie = 'authjs.session-token=abc; Path=/; HttpOnly'
+
       const appendSpy = vi.fn()
       const client = new AuthJsClient(baseURL, {
         ...makeDeps(),
         appendResponseCookies: appendSpy,
       })
 
-      responses.session = { user: 'test' }
       await client.getSession()
 
-      // appendResponseCookies is called when forwardResponseCookies is true
-      // (which it is for getSession). Whether cookies are present depends on
-      // the server response, but the mechanism is exercised.
-      expect(appendSpy).toBeDefined()
+      expect(appendSpy).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.stringContaining('authjs.session-token=abc'),
+        ]),
+      )
+
+      responses.sessionCookie = undefined
     })
   })
 
@@ -260,9 +273,7 @@ describe('AuthJsClient', () => {
       const client = new AuthJsClient(baseURL, makeDeps())
       await client.getSession('/after-signin')
 
-      // The session endpoint receives the callbackUrl param
-      // (verified by checking the fetch call was made successfully)
-      expect(true).toBe(true)
+      expect(lastSessionQuery.callbackUrl).toBe('/after-signin')
     })
   })
 

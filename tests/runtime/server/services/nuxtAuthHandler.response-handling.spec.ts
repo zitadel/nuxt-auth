@@ -1,13 +1,5 @@
 // @vitest-environment node
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  afterAll,
-  beforeEach,
-  vi,
-} from 'vitest'
+import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest'
 import { IncomingMessage, ServerResponse } from 'node:http'
 import { Socket } from 'node:net'
 import { createApp, toNodeListener, promisifyNodeListener } from 'h3'
@@ -55,10 +47,6 @@ describe('NuxtAuthHandler response handling', () => {
     const app = createApp()
     app.use(handler)
     listener = promisifyNodeListener(toNodeListener(app))
-  })
-
-  afterAll(() => {
-    // no-op
   })
 
   beforeEach(() => {

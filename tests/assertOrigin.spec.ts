@@ -17,8 +17,6 @@ vi.mock('#imports', () => ({
   useRuntimeConfig: () => mockConfig,
 }))
 
-// Import once — the mock uses our mutable config object.
-// Cast: real type requires NitroApp arg, but our mock makes it a plain callback.
 const plugin = (await import('../src/runtime/server/plugins/assertOrigin'))
   .default as unknown as () => void
 
@@ -80,8 +78,6 @@ describe('assertOrigin plugin', () => {
   })
 
   it('falls back to baseURL when originEnvKey is set but env is empty', () => {
-    // originEnvKey is AUTH_ORIGIN but we don't set that env var
-    // baseURL is a full URL so it should pass
     expect(() => plugin()).not.toThrow()
   })
 })
