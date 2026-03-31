@@ -4,7 +4,7 @@ import type { Ref, ComputedRef } from 'vue'
 import type { Session } from '@auth/core/types'
 import type { AuthJsClient, ProviderInfo } from '../../shared/authJsClient'
 import type { SessionLastRefreshedAt, SessionStatus } from '../../shared/types'
-import { hasProtocol, isScriptProtocol } from 'ufo'
+import { getQuery, hasProtocol, isScriptProtocol } from 'ufo'
 import { determineCallbackUrl } from '../utils/callbackUrl'
 import type { NuxtApp } from '#app/nuxt'
 import { callWithNuxt } from '#app/nuxt'
@@ -37,12 +37,10 @@ export function useAuthState() {
     () => undefined,
   )
 
-  const hasInitialSession = computed(() => !!data.value)
-
   const lastRefreshedAt = useState<SessionLastRefreshedAt>(
     'auth:lastRefreshedAt',
     () => {
-      if (hasInitialSession.value) {
+      if (data.value) {
         return new Date()
       }
       return undefined
@@ -65,29 +63,29 @@ export function useAuthState() {
 
 interface SecondarySignInOptions extends Record<string, unknown> {
   /** URL to redirect to after signing in. Defaults to current page. */
-  callbackUrl?: string
+  readonly callbackUrl?: string
   /** Whether to redirect after sign-in. @default true */
-  redirect?: boolean
+  readonly redirect?: boolean
   /** Whether to call getSession after sign-in. @default true */
-  callGetSession?: boolean
+  readonly callGetSession?: boolean
 }
 
 interface SignOutOptions {
   /** URL to redirect to after signing out. */
-  callbackUrl?: string
+  readonly callbackUrl?: string
   /** Whether to redirect after sign-out. @default true */
-  redirect?: boolean
+  readonly redirect?: boolean
 }
 
 interface GetSessionOptions {
   /** If true, redirects to sign-in when not authenticated. */
-  required?: boolean
+  readonly required?: boolean
   /** URL to redirect to after sign-in (when required is true). */
-  callbackUrl?: string
+  readonly callbackUrl?: string
   /** Custom handler when unauthenticated and required is true. */
-  onUnauthenticated?: () => void
+  readonly onUnauthenticated?: () => void
   /** Refetch session even if token is null. @default false */
-  force?: boolean
+  readonly force?: boolean
 }
 
 /**
@@ -120,21 +118,21 @@ export interface SignInResult {
    * credentials and "InvalidProvider" when the specified provider doesn't
    * exist or isn't configured.
    */
-  error: string | null
+  readonly error: string | null
 
   /**
    * The HTTP status code from the sign-in response. A status of 200 indicates
    * success without redirect, 302 indicates a successful redirect, and 4xx/5xx
    * codes indicate various error conditions.
    */
-  status: number
+  readonly status: number
 
   /**
    * Indicates whether the sign-in request completed without server errors.
    * Note that this being true doesn't necessarily mean the user is
    * authenticated; check the error property for authentication failures.
    */
-  ok: boolean
+  readonly ok: boolean
 
   /**
    * The URL to redirect to after sign-in. For OAuth providers, this is the
@@ -142,7 +140,7 @@ export interface SignInResult {
    * callback URL or the page the user was trying to access.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  url: any
+  readonly url: any
 
   /**
    * The result from the internal navigation handler. This value should be
@@ -152,7 +150,7 @@ export interface SignInResult {
    *
    * @see https://github.com/zitadel/nuxt-auth/pull/1057
    */
-  navigationResult: boolean | string | void | undefined
+  readonly navigationResult: boolean | string | void | undefined
 }
 
 export type { ProviderInfo }
@@ -409,9 +407,8 @@ export function useAuth(): UseAuthReturn {
       }
     }
 
-    if (typeof provider === 'undefined') {
-      provider = runtimeConfig.public.auth.provider.defaultProvider
-    }
+    const resolvedProvider =
+      provider ?? runtimeConfig.public.auth.provider.defaultProvider
 
     const { redirect = true } = options ?? {}
 
@@ -419,7 +416,8 @@ export function useAuth(): UseAuthReturn {
       determineCallbackUrl(runtimeConfig.public.auth, options?.callbackUrl),
     )
 
-    const selectedProvider = provider && configuredProviders[provider]
+    const selectedProvider =
+      resolvedProvider && configuredProviders[resolvedProvider]
     if (!selectedProvider) {
       const hrefSignInAllProviderPage = client.getSignInPageUrl(callbackUrl)
       const navigationResult = await navigateToAuthPageWN(
@@ -451,16 +449,20 @@ export function useAuth(): UseAuthReturn {
       json: true,
     })
 
-    const fetchSignIn = () =>
-      client.signIn(provider!, selectedProvider.type, body, authorisationParams)
-
-    const signInData = await callWithNuxt(nuxt, fetchSignIn)
+    const signInData = await callWithNuxt(nuxt, () =>
+      client.signIn(
+        resolvedProvider!,
+        selectedProvider.type,
+        body,
+        authorisationParams,
+      ),
+    )
 
     if (redirect || !isSupportingReturn) {
       const href = signInData.url ?? callbackUrl
       const navigationResult = await navigateToAuthPageWN(nuxt, href)
 
-      const error = new URL(href, 'http://_').searchParams.get('error')
+      const error = (getQuery(href).error as string) ?? null
 
       return {
         error,
@@ -471,7 +473,7 @@ export function useAuth(): UseAuthReturn {
       }
     }
 
-    const error = new URL(signInData.url).searchParams.get('error')
+    const error = (getQuery(signInData.url).error as string) ?? null
     await getSessionWithNuxt(nuxt)
 
     return {

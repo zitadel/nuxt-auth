@@ -89,12 +89,12 @@ export interface RefreshHandler {
    * Initializes the refresh handler.
    * Will be called inside `app:mounted` lifecycle hook.
    */
-  init: () => void
+  readonly init: () => void
 
   /**
    * Handles cleanup of the refresh handler. Will be called on `unmount` app hook.
    */
-  destroy: () => void
+  readonly destroy: () => void
 }
 
 /** @internal */
@@ -109,14 +109,14 @@ export interface DefaultRefreshHandlerConfig {
    * @example 1000
    * @default false
    */
-  enablePeriodically?: number | boolean
+  readonly enablePeriodically?: number | boolean
   /**
    * Whether to refresh the session every time the browser window is refocused.
    *
    * @example false
    * @default true
    */
-  enableOnWindowFocus?: boolean
+  readonly enableOnWindowFocus?: boolean
 }
 
 /**

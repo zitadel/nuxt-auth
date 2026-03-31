@@ -1,13 +1,20 @@
 /* eslint-disable no-undef */
-import { parseURL, withLeadingSlash } from 'ufo'
+import {
+  hasProtocol,
+  parseURL,
+  withLeadingSlash,
+  withoutLeadingSlash,
+  withQuery,
+  withTrailingSlash,
+} from 'ufo'
 import { ERROR_PREFIX } from './logger'
 
 export interface RuntimeConfig {
-  public: {
-    auth: {
-      baseURL: string
-      disableInternalRouting: boolean
-      originEnvKey: string
+  readonly public: {
+    readonly auth: {
+      readonly baseURL: string
+      readonly disableInternalRouting: boolean
+      readonly originEnvKey: string
     }
   }
 }
@@ -49,12 +56,14 @@ export function resolveBaseURL(runtimeConfig: RuntimeConfig): string {
  * by plain vitest without a Nuxt test environment.
  */
 export interface NuxtAppLike {
-  ssrContext?: {
-    event?: {
-      path?: string
-      node?: {
-        req?: {
-          headers?: Record<string, string | string[] | undefined>
+  readonly ssrContext?: {
+    readonly event?: {
+      readonly path?: string
+      readonly node?: {
+        readonly req?: {
+          readonly headers?: Readonly<
+            Record<string, string | string[] | undefined>
+          >
         }
       }
     }
@@ -67,9 +76,9 @@ export interface NuxtAppLike {
  * testable and decoupled from the Nuxt runtime.
  */
 export interface AuthJsClientDeps {
-  nuxt: NuxtAppLike
-  getRequestCookies: () => Promise<string | undefined>
-  appendResponseCookies: (cookies: string[]) => void
+  readonly nuxt: NuxtAppLike
+  readonly getRequestCookies: () => Promise<string | undefined>
+  readonly appendResponseCookies: (cookies: readonly string[]) => void
 }
 
 export class FetchConfigurationError extends Error {}
@@ -81,23 +90,23 @@ export class FetchConfigurationError extends Error {}
  */
 export interface ProviderInfo {
   /** The unique identifier for this provider, e.g., "github" or "google" */
-  id: string
+  readonly id: string
 
   /** The human-readable display name, e.g., "GitHub" or "Google" */
-  name: string
+  readonly name: string
 
   /**
    * The provider type indicating the authentication mechanism. Common values
    * are "oauth" for OAuth/OIDC providers, "credentials" for username/password
    * authentication, and "email" for magic link authentication.
    */
-  type: string
+  readonly type: string
 
   /** The URL to initiate sign-in with this provider */
-  signinUrl?: string
+  readonly signinUrl?: string
 
   /** The OAuth callback URL configured for this provider */
-  callbackUrl?: string
+  readonly callbackUrl?: string
 }
 
 /**
@@ -133,9 +142,9 @@ export class AuthJsClient {
   ) {
     // A trailing slash is required for `new URL(segment, base)` to append
     // rather than replace the last path segment.
-    const withSlash = baseURL.endsWith('/') ? baseURL : baseURL + '/'
+    const withSlash = withTrailingSlash(baseURL)
 
-    if (baseURL.startsWith('http://') || baseURL.startsWith('https://')) {
+    if (hasProtocol(baseURL)) {
       this.base = new URL(withSlash)
       this.isInternalRouting = false
     } else {
@@ -153,7 +162,7 @@ export class AuthJsClient {
   private url(endpoint: string): string {
     // Strip leading slash — `new URL('/foo', base)` replaces the entire path,
     // whereas `new URL('foo', base)` appends relative to base.
-    const relative = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint
+    const relative = withoutLeadingSlash(endpoint)
     const resolved = new URL(relative, this.base)
     return this.isInternalRouting ? resolved.pathname : resolved.href
   }
@@ -223,13 +232,13 @@ export class AuthJsClient {
         return res._data as T
       })
     } catch (error) {
-      let errorMessage = `${ERROR_PREFIX} Error while requesting ${joinedPath}.`
-      errorMessage +=
+      const errorMessage =
+        `${ERROR_PREFIX} Error while requesting ${joinedPath}.` +
         ' Have you added the authentication handler server-endpoint `[...].ts`?' +
         ' Have you added the authentication handler in a non-default location' +
         ' (default is `~/server/api/auth/[...].ts`) and not updated the' +
-        ' module-setting `auth.basePath`?'
-      errorMessage += ' Error is:'
+        ' module-setting `auth.basePath`?' +
+        ' Error is:'
       console.error(errorMessage)
       console.error(error)
 
@@ -249,10 +258,7 @@ export class AuthJsClient {
   /** Returns the URL for the Auth.js sign-in page listing all providers. */
   getSignInPageUrl(callbackUrl?: string): string {
     const signinUrl = this.url('signin')
-    const queryParams = callbackUrl
-      ? `?${new URLSearchParams({ callbackUrl })}`
-      : ''
-    return `${signinUrl}${queryParams}`
+    return callbackUrl ? withQuery(signinUrl, { callbackUrl }) : signinUrl
   }
 
   /** Fetch all configured authentication providers. */

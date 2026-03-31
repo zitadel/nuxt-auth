@@ -1,5 +1,5 @@
-import { getHeader } from 'h3'
-import { withoutBase, withoutTrailingSlash } from 'ufo'
+import { appendResponseHeader, getHeader } from 'h3'
+import { parsePath, withoutBase, withoutTrailingSlash } from 'ufo'
 import { createRouter, toRouteMatcher } from 'radix3'
 import type { RouteMatcher } from 'radix3'
 import type { RouteOptions } from '../../shared/types'
@@ -44,7 +44,7 @@ function getNitroRouteRules(path: string): Partial<RouteOptions> {
   const matches = routeMatcher
     .matchAll(
       withoutBase(
-        withoutTrailingSlash(path.split('?')[0]),
+        withoutTrailingSlash(parsePath(path).pathname),
         app?.baseURL || '/',
       ),
     )
@@ -77,11 +77,10 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       const event = await callWithNuxt(nuxtApp, useRequestEvent)
       return event?.node.req.headers.cookie
     },
-    appendResponseCookies: (cookies: string[]) => {
+    appendResponseCookies: (cookies: readonly string[]) => {
       if (nuxtApp.ssrContext?.event) {
-        const event = nuxtApp.ssrContext.event
         for (const cookie of cookies) {
-          event.node.res.appendHeader('set-cookie', cookie)
+          appendResponseHeader(nuxtApp.ssrContext.event, 'set-cookie', cookie)
         }
       }
     },
@@ -95,9 +94,10 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       getHeader(nuxtApp.ssrContext.event, 'x-nitro-prerender') !== undefined
   }
 
-  let disableServerSideAuth = routeRules.disableServerSideAuth
-  disableServerSideAuth ??= runtimeConfig?.disableServerSideAuth
-  disableServerSideAuth ??= false
+  const disableServerSideAuth =
+    routeRules.disableServerSideAuth ??
+    runtimeConfig?.disableServerSideAuth ??
+    false
 
   if (disableServerSideAuth) {
     loading.value = true

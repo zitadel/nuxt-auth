@@ -39,7 +39,7 @@ export class DefaultRefreshHandler implements RefreshHandler {
    *  can be passed to both `addEventListener` and `removeEventListener`. */
   private readonly boundVisibilityHandler: typeof this.visibilityHandler
 
-  constructor(public config: DefaultRefreshHandlerConfig) {
+  constructor(public readonly config: DefaultRefreshHandlerConfig) {
     this.boundVisibilityHandler = this.visibilityHandler.bind(this)
   }
 
@@ -57,7 +57,9 @@ export class DefaultRefreshHandler implements RefreshHandler {
 
     if (enablePeriodically !== false && enablePeriodically !== undefined) {
       const intervalTime =
-        enablePeriodically === true ? 1000 : safeTimerDelay(enablePeriodically)
+        enablePeriodically === true
+          ? 1000
+          : Math.min(enablePeriodically, MAX_SAFE_INTERVAL_MS)
 
       this.refetchIntervalTimer = setInterval(() => {
         if (this.auth?.data.value) {
@@ -94,6 +96,3 @@ export class DefaultRefreshHandler implements RefreshHandler {
 
 /** Maximum delay accepted by `setInterval` (signed 32-bit integer). */
 const MAX_SAFE_INTERVAL_MS = 2147483647
-function safeTimerDelay(milliseconds: number): number {
-  return Math.min(milliseconds, MAX_SAFE_INTERVAL_MS)
-}

@@ -30,14 +30,10 @@ export default defineNitroPlugin(() => {
   try {
     const runtimeConfig = useRuntimeConfig()
 
-    let baseURL = runtimeConfig.public.auth.baseURL
     const originEnvKey = runtimeConfig.public.auth.originEnvKey
-    if (originEnvKey) {
-      const envBaseURL = process.env[originEnvKey]
-      if (envBaseURL) {
-        baseURL = envBaseURL
-      }
-    }
+    const baseURL =
+      (originEnvKey && process.env[originEnvKey]) ||
+      runtimeConfig.public.auth.baseURL
 
     const parsed = parseURL(baseURL)
 
