@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 /**
  * Minimal, real implementations of Nuxt runtime primitives.
  *
