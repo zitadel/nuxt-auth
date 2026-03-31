@@ -68,8 +68,6 @@ interface SecondarySignInOptions extends Record<string, unknown> {
   callbackUrl?: string
   /** Whether to redirect after sign-in. @default true */
   redirect?: boolean
-  /** Allow external callback URLs. @default false */
-  external?: boolean
   /** Whether to call getSession after sign-in. @default true */
   callGetSession?: boolean
 }
@@ -79,8 +77,6 @@ interface SignOutOptions {
   callbackUrl?: string
   /** Whether to redirect after sign-out. @default true */
   redirect?: boolean
-  /** Allow external callback URLs. @default false */
-  external?: boolean
 }
 
 interface GetSessionOptions {
@@ -88,8 +84,6 @@ interface GetSessionOptions {
   required?: boolean
   /** URL to redirect to after sign-in (when required is true). */
   callbackUrl?: string
-  /** Allow external callback URLs. @default false */
-  external?: boolean
   /** Custom handler when unauthenticated and required is true. */
   onUnauthenticated?: () => void
   /** Refetch session even if token is null. @default false */
@@ -201,7 +195,6 @@ export interface UseAuthReturn {
     options?: {
       callbackUrl?: string
       redirect?: boolean
-      external?: boolean
       callGetSession?: boolean
     } & Record<string, unknown>,
     authorisationParams?: Record<string, string>,
@@ -215,7 +208,6 @@ export interface UseAuthReturn {
   signOut: (options?: {
     callbackUrl?: string
     redirect?: boolean
-    external?: boolean
   }) => Promise<unknown>
 
   /**
@@ -226,7 +218,6 @@ export interface UseAuthReturn {
   getSession: (getSessionOptions?: {
     required?: boolean
     callbackUrl?: string
-    external?: boolean
     onUnauthenticated?: () => void
     force?: boolean
   }) => Promise<SessionData | null>
@@ -241,7 +232,6 @@ export interface UseAuthReturn {
   refresh: (getSessionOptions?: {
     required?: boolean
     callbackUrl?: string
-    external?: boolean
     onUnauthenticated?: () => void
     force?: boolean
   }) => Promise<SessionData | null>

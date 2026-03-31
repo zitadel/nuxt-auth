@@ -197,10 +197,9 @@ describe('global auth middleware', async () => {
       await page
         .locator('form:has(input[name="username"]) button[type="submit"]')
         .click()
-      await page.waitForURL(
-        (pageUrl) => !pageUrl.href.includes('/api/auth/'),
-        { timeout: 10000 },
-      )
+      await page.waitForURL((pageUrl) => !pageUrl.href.includes('/api/auth/'), {
+        timeout: 10000,
+      })
 
       const finalUrl = new URL(page.url())
       expect(
@@ -219,10 +218,9 @@ describe('global auth middleware', async () => {
       )
       await page.waitForSelector('button[type="submit"]', { timeout: 10000 })
       await page.locator('button[type="submit"]').click()
-      await page.waitForURL(
-        (pageUrl) => !pageUrl.href.includes('/api/auth/'),
-        { timeout: 10000 },
-      )
+      await page.waitForURL((pageUrl) => !pageUrl.href.includes('/api/auth/'), {
+        timeout: 10000,
+      })
 
       const finalUrl = new URL(page.url())
       expect(
