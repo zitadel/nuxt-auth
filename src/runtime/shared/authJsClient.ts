@@ -7,7 +7,9 @@ import {
   withQuery,
   withTrailingSlash,
 } from 'ufo'
-const ERROR_PREFIX = '[@zitadel/nuxt-auth]'
+import { consola } from 'consola'
+
+const logger = consola.withTag('@zitadel/nuxt-auth')
 
 export interface RuntimeConfig {
   readonly public: {
@@ -186,8 +188,8 @@ export class AuthJsClient {
     if (this.isInternalRouting) {
       const currentPath = this.deps.nuxt.ssrContext?.event?.path
       if (currentPath?.startsWith(joinedPath)) {
-        console.error(
-          `${ERROR_PREFIX} Recursion detected at ${joinedPath}. Have you set the correct \`auth.baseURL\`?`,
+        logger.error(
+          `Recursion detected at ${joinedPath}. Have you set the correct \`auth.baseURL\`?`,
         )
         throw new FetchConfigurationError('Server configuration error')
       }
@@ -232,15 +234,14 @@ export class AuthJsClient {
         return res._data as T
       })
     } catch (error) {
-      const errorMessage =
-        `${ERROR_PREFIX} Error while requesting ${joinedPath}.` +
-        ' Have you added the authentication handler server-endpoint `[...].ts`?' +
-        ' Have you added the authentication handler in a non-default location' +
-        ' (default is `~/server/api/auth/[...].ts`) and not updated the' +
-        ' module-setting `auth.basePath`?' +
-        ' Error is:'
-      console.error(errorMessage)
-      console.error(error)
+      logger.error(
+        `Error while requesting ${joinedPath}.`,
+        'Have you added the authentication handler server-endpoint `[...].ts`?',
+        'Have you added the authentication handler in a non-default location',
+        '(default is `~/server/api/auth/[...].ts`) and not updated the',
+        'module-setting `auth.basePath`?',
+        error,
+      )
 
       throw new FetchConfigurationError(
         'Runtime error, check the console logs to debug, open an issue at' +

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { consola } from 'consola'
 
 const mockConfig = {
   public: {
@@ -46,7 +47,7 @@ describe('assertOrigin plugin', () => {
     mockConfig.public.auth.baseURL = '/api/auth'
     mockConfig.public.auth.originEnvKey = ''
     vi.stubEnv('NODE_ENV', 'development')
-    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {})
+    const infoSpy = vi.spyOn(consola, 'info').mockImplementation(() => {})
 
     expect(() => plugin()).not.toThrow()
     expect(infoSpy).toHaveBeenCalledWith(
@@ -68,7 +69,7 @@ describe('assertOrigin plugin', () => {
     mockConfig.public.auth.baseURL = ''
     mockConfig.public.auth.originEnvKey = ''
     vi.stubEnv('NODE_ENV', 'development')
-    const infoSpy = vi.spyOn(console, 'info').mockImplementation(() => {})
+    const infoSpy = vi.spyOn(consola, 'info').mockImplementation(() => {})
 
     expect(() => plugin()).not.toThrow()
     expect(infoSpy).toHaveBeenCalledWith(

@@ -13,6 +13,7 @@ import {
 } from 'h3'
 import { Auth, createActionURL, setEnvDefaults } from '@auth/core'
 import type { AuthConfig, Session } from '@auth/core/types'
+import { consola } from 'consola'
 import { defu } from 'defu'
 import { parseURL, withLeadingSlash } from 'ufo'
 import { useRuntimeConfig } from '#imports'
@@ -127,14 +128,14 @@ export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
         'AUTH_NO_SECRET: No `secret` - this is an error in production. You can ignore this during development',
       )
     } else {
-      console.info(
+      consola.info(
         'AUTH_NO_SECRET: No `secret` - this is an error in production. You can ignore this during development',
       )
     }
   }
 
   if (authOptions) {
-    console.error(
+    consola.error(
       'You setup the auth handler for a second time - this is likely undesired. Make sure that you only call `NuxtAuthHandler( ... )` once',
     )
   }

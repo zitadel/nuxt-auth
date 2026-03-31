@@ -25,11 +25,11 @@ export interface ProviderAuthjsCredentials {
   /**
    * Uses the `authjs` provider to facilitate authentication.
    */
-  type: 'authjs'
+  readonly type: 'authjs'
   /**
    * Selects the credentials provider as the default sign-in method.
    */
-  defaultProvider: 'credentials'
+  readonly defaultProvider: 'credentials'
   /**
    * If set to `true`, `authjs` will use either the `x-forwarded-host` or `host` headers instead of `auth.baseURL`.
    *
@@ -39,12 +39,12 @@ export interface ProviderAuthjsCredentials {
    * You should **try to avoid using advanced options** unless you are very comfortable using them.
    * @default false
    */
-  trustHost?: boolean
+  readonly trustHost?: boolean
   /**
    * Not available for the credentials provider — Auth.js silently ignores
    * `callbackUrl` for credentials sign-in.
    */
-  addDefaultCallbackUrl?: never
+  readonly addDefaultCallbackUrl?: never
 }
 
 /**
@@ -55,14 +55,14 @@ export interface ProviderAuthjsOther {
   /**
    * Uses the `authjs` provider to facilitate authentication.
    */
-  type: 'authjs'
+  readonly type: 'authjs'
   /**
    * Select the default-provider to use when `signIn` is called. Setting this here will also effect the global middleware behavior: E.g., when you set it to `github` and the user is unauthorized, they will be directly forwarded to the Github OAuth page instead of seeing the app-login page.
    *
    * @example "github"
    * @default undefined
    */
-  defaultProvider?: Exclude<string, 'credentials'>
+  readonly defaultProvider?: Exclude<string, 'credentials'>
   /**
    * If set to `true`, `authjs` will use either the `x-forwarded-host` or `host` headers instead of `auth.baseURL`.
    *
@@ -72,11 +72,11 @@ export interface ProviderAuthjsOther {
    * You should **try to avoid using advanced options** unless you are very comfortable using them.
    * @default false
    */
-  trustHost?: boolean
+  readonly trustHost?: boolean
   /**
    * Whether to add a callbackUrl to sign in requests. Setting this to a string-value will result in that being used as the callbackUrl path. Setting this to `true` will result in the blocked original target path being chosen (if it can be determined).
    */
-  addDefaultCallbackUrl?: boolean | string
+  readonly addDefaultCallbackUrl?: boolean | string
 }
 
 /**

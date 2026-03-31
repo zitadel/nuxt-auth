@@ -1,3 +1,4 @@
+import { consola } from 'consola'
 import { parseURL } from 'ufo'
 import { defineNitroPlugin } from 'nitropack/runtime/plugin'
 import { useRuntimeConfig } from '#imports'
@@ -45,7 +46,7 @@ export default defineNitroPlugin(() => {
     }
   } catch (error) {
     if (process.env.NODE_ENV !== 'production') {
-      console.info(
+      consola.info(
         'AUTH_NO_ORIGIN: No `origin` - this is an error in production. You can ignore this during development',
       )
     } else {
