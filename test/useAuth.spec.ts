@@ -2,7 +2,7 @@
  * Pure unit tests for the `useAuth` composable.
  *
  * These tests run without the Nuxt runtime. The Nuxt primitives (`useState`,
- * `useNuxtApp`, etc.) are provided by `tests/helpers/nuxt-env.ts` via vitest
+ * `useNuxtApp`, etc.) are provided by `test/helpers/nuxt-env.ts` via vitest
  * `resolve.alias`. A real h3 HTTP server acts as the auth backend, and a
  * real `AuthJsClient` makes real HTTP calls via ofetch.
  */

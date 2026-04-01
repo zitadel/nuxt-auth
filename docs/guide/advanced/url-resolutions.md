@@ -6,7 +6,7 @@ group: Advanced
 # Pathing logic in NuxtAuth
 
 This page is here to clarify how the pathing logic works in `@zitadel/nuxt-auth`.
-You can find a full overview of how URLs are handled [in the issue comment](https://github.com/zitadel/nuxt-auth/pull/913#issuecomment-2359137989) and in spec files for the [`authjs` provider](https://github.com/zitadel/nuxt-auth/blob/main/tests/authjs.url.spec.ts).
+You can find a full overview of how URLs are handled [in the issue comment](https://github.com/zitadel/nuxt-auth/pull/913#issuecomment-2359137989) and in spec files for the [`authjs` provider](https://github.com/zitadel/nuxt-auth/blob/main/test/authjs.url.spec.ts).
 
 ## `baseURL` is a prefix
 

@@ -29,10 +29,4 @@ export default [
       'no-redeclare': 'off',
     },
   },
-  {
-    files: ['spec/**/*.ts'],
-    rules: {
-      'import/no-unresolved': 'off',
-    },
-  },
 ]

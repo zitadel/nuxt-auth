@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 
 const nuxtEnv = fileURLToPath(
-  new URL('./tests/helpers/nuxt-env.ts', import.meta.url),
+  new URL('./test/helpers/nuxt-env.ts', import.meta.url),
 )
 
 export default defineConfig({
@@ -17,8 +17,8 @@ export default defineConfig({
     'import.meta.server': true,
   },
   test: {
-    include: ['tests/**/*.spec.ts', 'spec/*.spec.ts', 'test/*.test.ts'],
-    exclude: ['tests/**/*.nuxt.spec.ts'],
+    include: ['test/**/*.spec.ts', 'test/**/*.test.ts'],
+    exclude: ['test/**/*.nuxt.spec.ts'],
     testTimeout: 60000,
     reporters: ['default', 'junit'],
     outputFile: {

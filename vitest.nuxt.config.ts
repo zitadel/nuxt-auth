@@ -4,7 +4,7 @@ import { defineVitestConfig } from '@nuxt/test-utils/config'
 export default defineVitestConfig({
   test: {
     environment: 'nuxt',
-    include: ['tests/**/*.nuxt.spec.ts'],
+    include: ['test/**/*.nuxt.spec.ts'],
     testTimeout: 60000,
     reporters: ['default', 'junit'],
     outputFile: {
