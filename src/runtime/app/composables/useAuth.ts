@@ -4,7 +4,7 @@ import type { Ref, ComputedRef } from 'vue'
 import type { Session } from '@auth/core/types'
 import type { AuthJsClient, ProviderInfo } from '../../shared/authJsClient'
 import type { SessionLastRefreshedAt, SessionStatus } from '../../shared/types'
-import { getQuery, hasProtocol, isScriptProtocol } from 'ufo'
+import { getQuery, hasProtocol, isScriptProtocol, parseURL } from 'ufo'
 import { determineCallbackUrl } from '../utils/callbackUrl'
 import type { NuxtApp } from '#app/nuxt'
 import { callWithNuxt } from '#app/nuxt'
@@ -830,10 +830,7 @@ function navigateToAuthPage(
   // https://github.com/nuxt/nuxt/blob/v4.4.2/packages/nuxt/src/app/composables/router.ts#L167-L172
   const isExternalHost = hasProtocol(href, { acceptRelative: true })
   if (isExternalHost) {
-    const { protocol } = new URL(
-      href,
-      import.meta.client ? window.location.href : 'http://localhost',
-    )
+    const { protocol } = parseURL(href)
     if (protocol && isScriptProtocol(protocol)) {
       throw new Error(`Cannot navigate to a URL with '${protocol}' protocol.`)
     }

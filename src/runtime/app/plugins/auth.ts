@@ -100,12 +100,11 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     loading.value = true
   }
 
-  const isErrorUrl = nuxtApp.ssrContext?.error === true
   const shouldFetchSession =
     typeof data.value === 'undefined' &&
     !nitroPrerender &&
     !disableServerSideAuth &&
-    !isErrorUrl
+    nuxtApp.ssrContext?.error !== true
 
   const { getSession } = useAuth()
 

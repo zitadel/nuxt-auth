@@ -89,7 +89,7 @@
     "knip": "^5.66.4",
     "nitropack": "^2.11.13",
     "nuxt": "^4.0.0",
-    "playwright-core": "^1.52.0",
+    "playwright": "^1.52.0",
     "prettier": "^3.5.3",
     "semantic-release": "^25.0.1",
     "testcontainers": "^11.12.0",

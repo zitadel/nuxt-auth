@@ -32,11 +32,10 @@ export default defineNitroPlugin(() => {
     const runtimeConfig = useRuntimeConfig()
 
     const originEnvKey = runtimeConfig.public.auth.originEnvKey
-    const baseURL =
+    const parsed = parseURL(
       (originEnvKey && process.env[originEnvKey]) ||
-      runtimeConfig.public.auth.baseURL
-
-    const parsed = parseURL(baseURL)
+        runtimeConfig.public.auth.baseURL,
+    )
 
     if (!parsed.protocol || !parsed.host) {
       // noinspection ExceptionCaughtLocallyJS
