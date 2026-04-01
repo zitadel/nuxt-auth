@@ -43,32 +43,40 @@ Whether the module is enabled at all.
 - **Type**: `string`
 - **Default**: `AUTH_ORIGIN`
 
-The name of the environment variable that holds the origin of the application.
-This is used to determine the origin of your application in production.
+The name of the environment variable that holds the full base URL of the application.
+This is used to determine the base URL of your application in production.
 
 By default, NuxtAuth will look at `AUTH_ORIGIN` environment variable and
 `runtimeConfig.authOrigin`.
 
-> **Tip:** If you want to use `runtimeConfig` and `NUXT_` prefixed environment
-> variables, you need to make sure to also define the key inside
-> `runtimeConfig`, because otherwise Nuxt will not acknowledge your env
-> variable
-> ([issue #906](https://github.com/zitadel/nuxt-auth/issues/906), read more
-> [here](https://nuxt.com/docs/guide/going-further/runtime-config#environment-variables)).
->
-> ```ts
-> export default defineNuxtConfig({
->   auth: {
->     originEnvKey: 'NUXT_YOUR_ORIGIN',
->   },
->   runtimeConfig: {
->     yourOrigin: '',
->   },
-> })
-> ```
+::: warning
+Despite the name "origin", this variable expects the **full** base URL including
+the pathname, e.g. `http://localhost:3000/api/auth`.
+:::
 
-You can read additional information on `origin` and `baseURL` determining in
-the error reference.
+::: tip
+If you want to use `runtimeConfig` and `NUXT_` prefixed environment
+variables, you need to make sure to also define the key inside
+`runtimeConfig`, because otherwise Nuxt will not acknowledge your env
+variable
+([issue #906](https://github.com/sidebase/nuxt-auth/issues/906), read more
+[here](https://nuxt.com/docs/guide/going-further/runtime-config#environment-variables)).
+
+```ts [nuxt.config.ts]
+export default defineNuxtConfig({
+  auth: {
+    // NUXT_YOUR_ORIGIN=https://example.com/api/auth
+    originEnvKey: 'NUXT_YOUR_ORIGIN',
+  },
+  runtimeConfig: {
+    yourOrigin: '',
+  },
+})
+```
+:::
+
+You can read additional information on `baseURL` determining in
+the [URL resolution guide](../advanced/url-resolutions.md).
 
 ## `disableServerSideAuth`
 
@@ -89,8 +97,8 @@ The full URL at which the app will run combined with the path to
 authentication. You should only use `baseURL` if you want to set it statically
 for your application.
 
-You can read additional information on `origin` and `baseURL` determining in
-the error reference.
+You can read additional information on `baseURL` determining in
+the [URL resolution guide](../advanced/url-resolutions.md).
 
 > **Tip:** If you would like to overwrite the `baseURL` at runtime you can use
 > the `originEnvKey` option.
