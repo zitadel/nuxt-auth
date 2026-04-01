@@ -86,7 +86,7 @@
     "eslint": "^9.39.2",
     "happy-dom": "^20.7.0",
     "knip": "^5.66.4",
-    "nitropack": "^2.11.13",
+    "nitropack": "^2.13.2",
     "nuxt": "^4.0.0",
     "playwright": "^1.52.0",
     "prettier": "^3.5.3",
