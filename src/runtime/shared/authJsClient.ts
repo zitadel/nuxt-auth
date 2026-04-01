@@ -32,23 +32,17 @@ export interface RuntimeConfig {
  * full URL is preserved.
  */
 export function resolveBaseURL(runtimeConfig: RuntimeConfig): string {
-  let baseURL = runtimeConfig.public.auth.baseURL
+  // `import.meta.server` is tree-shaken for client builds, so the
+  // `process.env` access never appears in browser bundles.
+  const baseURL =
+    (import.meta.server &&
+      runtimeConfig.public.auth.originEnvKey &&
+      process.env[runtimeConfig.public.auth.originEnvKey]) ||
+    runtimeConfig.public.auth.baseURL
 
-  // On the server, allow overriding via the configured environment variable.
-  // `import.meta.server` is `true` on the server and `undefined`/`false` on
-  // the client, so this branch is tree-shaken for client builds.
-  if (import.meta.server && runtimeConfig.public.auth.originEnvKey) {
-    const envBaseURL = process.env[runtimeConfig.public.auth.originEnvKey]
-    if (envBaseURL) {
-      baseURL = envBaseURL
-    }
-  }
-
-  if (!runtimeConfig.public.auth.disableInternalRouting) {
-    baseURL = withLeadingSlash(parseURL(baseURL).pathname)
-  }
-
-  return baseURL
+  return runtimeConfig.public.auth.disableInternalRouting
+    ? baseURL
+    : withLeadingSlash(parseURL(baseURL).pathname)
 }
 
 /**
