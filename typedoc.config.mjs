@@ -13,7 +13,7 @@ export default {
     'docs/guide/application-side/configuration.md',
     'docs/guide/advanced/caching.md',
   ],
-  tsconfig: './tsconfig.typedoc.json',
+  tsconfig: './tsconfig.json',
   out: '.out/docs',
   highlightLanguages: [
     'typescript',
