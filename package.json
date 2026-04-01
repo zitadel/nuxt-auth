@@ -67,7 +67,6 @@
   "peerDependencies": {
     "@auth/core": ">=0.40.0",
     "@nuxt/schema": "^4.0.0",
-    "cookie-es": "^1.0.0",
     "radix3": "^1.0.0",
     "vue": "^3.0.0"
   },

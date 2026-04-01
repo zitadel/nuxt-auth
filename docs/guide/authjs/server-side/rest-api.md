@@ -10,7 +10,7 @@ All endpoints that Auth.js supports are also supported by `nuxt-auth`:
 
 | Endpoint                        | Request      | Description                                                   |
 |---------------------------------|:-------------|:--------------------------------------------------------------|
-| `${baseURL}/signin`             | `GET`        | Displays the built-in/unbranded sign-in                       |
+| `${baseURL}/signin`             | `GET` `POST` | Displays the built-in/unbranded sign-in or initiates sign-in  |
 | `${baseURL}/signin/:provider`   | `POST`       | Starts a provider-specific sign-in                            |
 | `${baseURL}/callback/:provider` | `GET` `POST` | Handles returning requests from OAuth services during sign-in |
 | `${baseURL}/signout`            | `GET` `POST` | Displays the built-in/unbranded sign out                      |

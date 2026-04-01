@@ -52,10 +52,6 @@ Note that this variable is always **static**, will only be set during build and 
 
 Not setting `baseURL` will default to `/api/auth`.
 
-### 3. Determine origin automatically from the incoming `HTTP` request
-
-When the server is running in **development mode**, NuxtAuth can automatically infer `baseURL` from the incoming request.
-
 ---
 
 We recommend the following setup to configure your `AUTH_ORIGIN` or `baseURL`:

@@ -139,8 +139,7 @@ export interface SignInResult {
    * provider's authorisation URL. For credentials, this is typically the
    * callback URL or the page the user was trying to access.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  readonly url: any
+  readonly url: string | null
 
   /**
    * The result from the internal navigation handler. This value should be

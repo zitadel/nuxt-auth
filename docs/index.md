@@ -22,7 +22,7 @@ features:
   - icon:
         src: /icons/Github.png
     title: OAuth
-    details: Effortlessly connect your Nuxt 4 application with Google, Github, Azure and countless others.
+    details: Effortlessly connect your Nuxt 4 application with Google, GitHub, Azure and countless others.
   - icon:
         src: /icons/Database.png
     title: Database Adapters
@@ -34,15 +34,15 @@ features:
   - icon:
         src: /icons/Server.png
     title: REST API
-    details: Everything authentication related automatically gets servered as new API routes.
+    details: Everything authentication related automatically gets served as new API routes.
   - icon:
         src: /icons/Mail.png
     title: Magic URLs
     details: Allow your users to login with magic links sent by mail.
   - icon:
         src: /icons/Refresh.png
-    title: Refresh Tokens
-    details: Refresh a users access token in the background.
+    title: Session Refresh
+    details: Automatically refresh the session on window focus or periodically.
   - icon:
         src: /icons/Speedometer.png
     title: Made for Nuxt

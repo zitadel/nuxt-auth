@@ -9,13 +9,13 @@ You can install NuxtAuth using nuxi:
 
 ```bash
 # npm
-npx nuxi module add zitadel-auth
+npx nuxi module add @zitadel/nuxt-auth
 
 # pnpm
-pnpm exec nuxi module add zitadel-auth
+pnpm exec nuxi module add @zitadel/nuxt-auth
 
 # yarn
-yarn dlx nuxi module add zitadel-auth
+yarn dlx nuxi module add @zitadel/nuxt-auth
 ```
 
 <details>

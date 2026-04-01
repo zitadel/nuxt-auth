@@ -39,7 +39,7 @@ const demoCredentials = { username: 'test', password: 'hunter2' }
 <template>
   <div>
     <p>Sign-In Options:</p>
-    <button @click="signIn('github')">Github</button>
+    <button @click="signIn('github')">GitHub</button>
     <button @click="signIn('credentials', demoCredentials)">
       Username and Password
     </button>
@@ -109,7 +109,6 @@ const errorCode = computed(() => route.query.error)
   `signIn` or `redirect` callback.
 - `Verification`: Related to the Email provider. The token has expired or has
   already been used.
-- `Default`: Catch all, will apply, if none of the above matched.
 
 ## Themes
 

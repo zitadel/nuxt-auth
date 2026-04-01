@@ -71,7 +71,7 @@ your hosting platform can be trusted.
 Select the default-provider to use when `signIn` is called. Setting this here
 will also affect the global middleware behavior. For instance, when you set it
 to `github` and the user is unauthorized, they will be directly forwarded to
-the Github OAuth page instead of seeing the app-login page.
+the GitHub OAuth page instead of seeing the app-login page.
 
 ### `addDefaultCallbackUrl`
 

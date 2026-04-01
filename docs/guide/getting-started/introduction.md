@@ -19,7 +19,7 @@ sessions within your pages, components and composables directly.
 
 ### Authentication providers
 
-- OAuth (eg. Github, Google, Twitter, Azure...)
+- OAuth (eg. GitHub, Google, Twitter, Azure...)
 - Custom OAuth (Add your own!)
 - Credentials (username / email + password)
 - Email Magic URLs
