@@ -14,7 +14,6 @@ const {
 
 const providers = await getProviders()
 const csrfToken = await getCsrfToken()
-
 </script>
 
 <template>
@@ -48,7 +47,7 @@ Data: {{ data || 'none' }}</pre
               <pre class="bg-gray-50 rounded p-2 overflow-x-auto">
 Refreshed: {{ lastRefreshedAt || 'never' }}</pre
               >
-<pre class="bg-gray-50 rounded p-2 overflow-x-auto">
+              <pre class="bg-gray-50 rounded p-2 overflow-x-auto">
 CSRF: {{ csrfToken }}</pre
               >
               <pre
