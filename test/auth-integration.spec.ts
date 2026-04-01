@@ -313,13 +313,6 @@ describe('auth module integration', async () => {
     })
   })
 
-  describe('token endpoint', () => {
-    it('returns null or undefined without session', async () => {
-      const response = await $fetch('/api/token')
-      expect(response === null || response === undefined).toBe(true)
-    })
-  })
-
   describe('security: open redirect prevention', () => {
     async function loginWithCallback(callbackUrl: string) {
       const csrfResponse = await fetch(url('/api/auth/csrf'))

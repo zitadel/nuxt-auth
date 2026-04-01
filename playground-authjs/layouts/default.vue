@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAsyncData, useAuth, useRequestHeaders } from '#imports'
+import { useAuth } from '#imports'
 
 const {
   data,
@@ -15,11 +15,6 @@ const {
 const providers = await getProviders()
 const csrfToken = await getCsrfToken()
 
-const { data: token } = await useAsyncData('/api/token', async () => {
-  const headers = useRequestHeaders(['cookie'])
-  const result = await $fetch('/api/token', { headers })
-  return { token: result ?? null }
-})
 </script>
 
 <template>
@@ -53,12 +48,7 @@ Data: {{ data || 'none' }}</pre
               <pre class="bg-gray-50 rounded p-2 overflow-x-auto">
 Refreshed: {{ lastRefreshedAt || 'never' }}</pre
               >
-              <pre
-                class="bg-gray-50 rounded p-2 overflow-x-auto whitespace-pre-wrap break-all"
-              >
-JWT: {{ token?.token || 'none' }}</pre
-              >
-              <pre class="bg-gray-50 rounded p-2 overflow-x-auto">
+<pre class="bg-gray-50 rounded p-2 overflow-x-auto">
 CSRF: {{ csrfToken }}</pre
               >
               <pre
