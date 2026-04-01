@@ -29,7 +29,7 @@ const runtimeConfig = useRuntimeConfig()
 const baseURL = runtimeConfig.public.auth.baseURL
 ```
 
-This value is generally the [source of truth](https://github.com/zitadel/nuxt-auth/blob/main/src/runtime/shared/utils/url.ts). It is being [set in the plugin](https://github.com/zitadel/nuxt-auth/blob/main/src/runtime/app/plugins/auth.ts) to also be available on the client.
+This value is generally the source of truth. It is being [set in the plugin](https://github.com/zitadel/nuxt-auth/blob/main/src/runtime/app/plugins/auth.ts) to also be available on the client.
 
 ## Changing `baseURL`
 
@@ -40,13 +40,13 @@ Read next to understand how it can be changed.
 You have multiple ways of changing the `baseURL` via env variables:
 - use `NUXT_PUBLIC_AUTH_BASE_URL`;
 - use `AUTH_ORIGIN` if `originEnvKey` is not set;
-- use the environment variable name set in [`originEnvKey`](../application-side/configuration.md#originenvkey)
+- use the environment variable name set in [`originEnvKey`](../application-side/configuration.md)
 
 Environment variables should work in both build-time and runtime.
 
 ### 2. `baseURL`
 
-If you didn't set an environment variable, NuxtAuth will look for [`auth.baseURL`](../application-side/configuration.md#baseurl) inside the `nuxt.config.ts`.
+If you didn't set an environment variable, NuxtAuth will look for [`auth.baseURL`](../application-side/configuration.md) inside the `nuxt.config.ts`.
 
 Note that this variable is always **static**, will only be set during build and can still be overriden in runtime using env variables.
 

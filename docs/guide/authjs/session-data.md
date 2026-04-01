@@ -43,16 +43,12 @@ export default NuxtAuthHandler({
 })
 ```
 
-> **Note:** Any data injected into the JWT token, cannot be directly accessed
-> from the frontend, however can be accessed on the server side using the
-> `getToken` function.
-
 ## Inject data into the Session
 
 After enriching the JWT token with additional data, you can now access this
 data inside the `session` callback. The `session` callback is invoked every
 time the session data is requested. This can happen when using `useAuth`,
-`getServerSideSession` or when the session is refreshed.
+`getServerSession` or when the session is refreshed.
 
 ```ts
 import { NuxtAuthHandler } from '#auth'
@@ -110,14 +106,14 @@ can be used to inject additional type declarations into installed modules to
 overwrite or add additional data.
 
 Begin by creating a new typescript file in the root of your project named:
-`next-auth.d.ts`. Typescript will automatically recognize that this file is
-augmenting the module types of `next-auth` (running under the hood).
+`auth.d.ts`. Typescript will automatically recognize that this file is
+augmenting the module types of `@auth/core`.
 
 ```ts
-// file: ~/next-auth.d.ts
-import type { DefaultSession } from 'next-auth'
+// file: ~/auth.d.ts
+import type { DefaultSession } from '@auth/core/types'
 
-declare module 'next-auth' {
+declare module '@auth/core/types' {
   /* Returned by `useAuth`, `getSession` and `getServerSession` */
   interface Session extends DefaultSession {
     user: {
@@ -131,13 +127,12 @@ declare module 'next-auth' {
 
 In addition to modifying the `session` data types, you can also extend the
 types of the JWT token. This allows you to receive proper type support when
-accessing the JWT token inside the NuxtAuthHandler or when calling `getToken`
-on the server side.
+accessing the JWT token inside the NuxtAuthHandler callbacks.
 
 ```ts
-// file: ~/next-auth.d.ts
-declare module 'next-auth/jwt' {
-  /** Returned by the `jwt` callback and `getToken` */
+// file: ~/auth.d.ts
+declare module '@auth/core/jwt' {
+  /** Returned by the `jwt` callback */
   interface JWT {
     sessionToken?: string
   }

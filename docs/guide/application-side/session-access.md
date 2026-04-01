@@ -71,23 +71,12 @@ Returns the current Cross Site Request Forgery Token (CSRF Token) required to
 make POST requests (e.g. for signing in and signing out).
 
 You likely only need to use this if you are not using the built-in `signIn()`
-and `signOut()` methods. Read more:
-https://next-auth.js.org/getting-started/client#getcsrftoken
+and `signOut()` methods.
 
 ### `getProviders`
 
 Get a list of all the configured OAuth providers. Useful for creating a custom
-login page. Returns an array of `Provider`.
-
-```ts
-export interface Provider {
-  id: string
-  name: string
-  type: ProviderType
-  signinUrl: string
-  callbackUrl: string
-}
-```
+login page. Returns a record mapping provider IDs to their configuration.
 
 ### `getSession`
 
@@ -121,9 +110,6 @@ await signIn('credentials', { username: 'jsmith', password: 'hunter2' })
 
 // Trigger a signIn with a redirect afterwards
 await signIn(undefined, { callbackUrl: '/protected' })
-
-// Trigger a signIn with a redirect to an external page afterwards
-await signIn(undefined, { callbackUrl: 'https://nuxt.org', external: true })
 ```
 
 > **Note:** You can also pass the `callbackUrl` option to redirect a user to
@@ -142,26 +128,16 @@ const { signOut } = useAuth()
 </script>
 
 <template>
-  <button @click="() => signOut">Signout</button>
+  <button @click="() => signOut()">Signout</button>
   <button @click="() => signOut({ callbackUrl: '/signout' })">
     Signout with redirect
-  </button>
-  <button
-    @click="
-      () => signOut({ callbackUrl: 'https://nuxt.org', external: true })
-    "
-  >
-    Signout with external redirect
   </button>
 </template>
 ```
 
 > **Note:** You can also pass the `callbackUrl` option to redirect a user to
-> a certain page, after they completed the action. This can be useful when a
-> user attempts to open a page (`/protected`) but has to go through external
-> authentication (e.g., via their google account) first.
+> a certain page after they have signed out.
 
 ### `refresh`
 
-Trigger a refresh, this will do a provider-specific session refresh.
-
+Alias for `getSession`. Trigger a refresh of the current session data.

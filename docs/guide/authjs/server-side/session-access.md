@@ -16,16 +16,10 @@ export default eventHandler(async (event) => {
 })
 ```
 
-This is inspired by
-[the `getServerSession`](https://next-auth.js.org/tutorials/securing-pages-and-api-routes#securing-api-routes)
-of NextAuth.js. It also avoids an external HTTP `GET` request to the
-`/api/auth/sessions` endpoint, instead directly calling a pure JS-method.
-
 > **Note:** If you use
 > [Nuxt's `useFetch`](https://nuxt.com/docs/api/composables/use-fetch) from
 > your app-components to fetch data from an endpoint that uses
-> `getServerSession` or `getToken` you will need to manually pass along cookies
-> as
+> `getServerSession` you will need to manually pass along cookies as
 > [Nuxt 4 universal rendering](https://nuxt.com/docs/guide/concepts/rendering#universal-rendering)
 > will not do this per-default when it runs on the server-side. Not passing
 > along cookies will result in `getServerSession` returning `null` when it is
@@ -34,7 +28,7 @@ of NextAuth.js. It also avoids an external HTTP `GET` request to the
 >
 > ```ts
 > const headers = useRequestHeaders(['cookie']) as HeadersInit
-> const { data: token } = await useFetch('/api/token', { headers })
+> const { data: session } = await useFetch('/api/protected', { headers })
 > ```
 
 ## Endpoint Protection

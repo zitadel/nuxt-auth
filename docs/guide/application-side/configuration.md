@@ -105,7 +105,7 @@ guide for configuration options.
 
 ## `sessionRefresh`
 
-- **Type**: `SessionConfig | boolean`
+- **Type**: `SessionRefreshConfig`
 - **Default**: `{ enablePeriodically: false, enableOnWindowFocus: true }`
 
 Configuration of the application-side session. You can configure the following

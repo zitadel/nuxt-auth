@@ -6,40 +6,34 @@ children:
   - ./session-data.md
   - ./custom-pages.md
   - ./server-side/session-access.md
-  - ./server-side/jwt-access.md
   - ./server-side/rest-api.md
 ---
 
 # AuthJS Quickstart
 
-This guide is for setting up `@zitadel/nuxt-auth` with the AuthJS Provider,
-which is best suited for plug-and-play OAuth for established oauth-providers or
+This guide is for setting up `@zitadel/nuxt-auth` with the Auth.js provider,
+which is best suited for plug-and-play OAuth for established OAuth providers or
 magic-url based sign-ins.
 
 ## Installation
 
-If you want to use the AuthJS provider, you have to install `next-auth`. With
-all package managers except npm you must manually install the peer dependency
-alongside nuxt-auth:
+Install `@auth/core` as a peer dependency alongside `@zitadel/nuxt-auth`:
 
 ```bash
+# npm
+npm i @auth/core
+
 # pnpm
-pnpm i next-auth@4.21.1
+pnpm i @auth/core
 
 # yarn
-yarn add next-auth@4.21.1
+yarn add @auth/core
 ```
-
-> **Warning:** Due to a breaking change in NextAuth, nuxt-auth is only
-> compatible with NextAuth versions under v4.23.0. We recommend pinning the
-> version to `4.21.1`. Read more
-> [here](https://github.com/zitadel/nuxt-auth/issues/514).
 
 ## Configuration
 
-After installing `@zitadel/nuxt-auth` and `next-auth`, you can now configure
-NuxtAuth to use the AuthJS provider. Inside your `nuxt.config.ts` add the
-following configuration:
+After installing `@zitadel/nuxt-auth` and `@auth/core`, configure NuxtAuth
+inside your `nuxt.config.ts`:
 
 ```ts
 export default defineNuxtConfig({
@@ -54,9 +48,6 @@ export default defineNuxtConfig({
   },
 })
 ```
-
-You can also configure AuthJS specific options inside the `nuxt.config.ts`, in
-addition to the main module configurations.
 
 ### `trustHost`
 
@@ -74,7 +65,7 @@ your hosting platform can be trusted.
 
 ### `defaultProvider`
 
-- **Type**: `SupportedProviders`
+- **Type**: `string`
 - **Default**: `undefined`
 
 Select the default-provider to use when `signIn` is called. Setting this here
@@ -101,9 +92,9 @@ how your sessions will be composed. The NuxtAuthHandler will automatically
 create all required API endpoints to handle authentication inside your
 application.
 
-The NuxtAuthHandler is an adaptation of the
-[NextAuthHandler](https://next-auth.js.org/configuration/options) built into
-AuthJS. Inside the NuxtAuthHandler you can configure:
+The NuxtAuthHandler wraps the
+[Auth.js `Auth` function](https://authjs.dev/getting-started/installation).
+Inside the NuxtAuthHandler you can configure:
 
 - **OAuth providers**: _How can users login to your application?_
 - **Adapters**: _How are sessions saved? (e.g. JWT Token, Database etc.)_
@@ -126,20 +117,19 @@ export default NuxtAuthHandler({
 ### Adding a provider
 
 After creating your NuxtAuthHandler, you can begin by adding a provider. You
-can find an overview of all the available providers
-[here](https://next-auth.js.org/providers/). For this example we will add the
-GitHub provider.
+can find an overview of all the available providers in the
+[Auth.js documentation](https://authjs.dev/getting-started/providers). For this
+example we will add the GitHub provider.
 
 ```ts
-import GithubProvider from 'next-auth/providers/github'
+import GitHub from '@auth/core/providers/github'
 import { NuxtAuthHandler } from '#auth'
 
 export default NuxtAuthHandler({
   // A secret string you define, to ensure correct encryption
   secret: 'your-secret-here',
   providers: [
-    // @ts-expect-error Use .default here for it to work during SSR.
-    GithubProvider.default({
+    GitHub({
       clientId: 'your-client-id',
       clientSecret: 'your-client-secret',
     }),
@@ -147,17 +137,11 @@ export default NuxtAuthHandler({
 })
 ```
 
-> **Warning:** After importing your provider from
-> `next-auth/providers/[PROVIDER]`, call it using `.default()` inside of the
-> providers array configuration. This is required for SSR to properly function.
-
-The NuxtAuthHandler accepts
-[all options that NextAuth.js](https://next-auth.js.org/configuration/options#options)
-accepts for its API initialization. Use this place to configure authentication
-providers (OAuth, credential flow, ...), your secret, add callbacks for
-authentication events, configure a custom logger and more. Read the
-[NextAuth.js docs](https://next-auth.js.org/configuration/options#options) to
-see all possible options.
+The NuxtAuthHandler accepts all options that
+[Auth.js](https://authjs.dev/reference/core) accepts for its configuration. Use
+this place to configure authentication providers (OAuth, credential flow, ...),
+your secret, add callbacks for authentication events, configure a custom logger
+and more.
 
 ### Setting a secret
 
@@ -173,7 +157,7 @@ import { NuxtAuthHandler } from '#auth'
 
 export default NuxtAuthHandler({
   // A secret string you define, to ensure correct encryption
-  // NUXT_AUTH_SECRET required in production
+  // AUTH_SECRET required in production
   secret: useRuntimeConfig().authSecret,
 
   // rest of your authentication configuration here!
@@ -185,14 +169,13 @@ export default NuxtAuthHandler({
 
 ```ts
 // file: ~/server/api/auth/[...].ts
-import GithubProvider from 'next-auth/providers/github'
+import GitHub from '@auth/core/providers/github'
 import { NuxtAuthHandler } from '#auth'
 
 export default NuxtAuthHandler({
   secret: useRuntimeConfig().authSecret,
   providers: [
-    // @ts-expect-error Use .default here for it to work during SSR.
-    GithubProvider.default({
+    GitHub({
       clientId: 'your-client-id',
       clientSecret: 'your-client-secret',
     }),

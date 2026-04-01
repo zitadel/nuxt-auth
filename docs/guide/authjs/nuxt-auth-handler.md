@@ -5,10 +5,11 @@ group: Auth.js Provider
 
 # NuxtAuthHandler
 
-The NuxtAuthHandler is an adaptation of the
-[NextAuthHandler](https://next-auth.js.org/configuration/options) built into
-AuthJS. You can learn more about how to setup a minimal version of the
-NuxtAuthHandler in the Quick Start section.
+The NuxtAuthHandler wraps the
+[Auth.js `Auth` function](https://authjs.dev/reference/core) to provide
+authentication endpoints for your Nuxt application. You can learn more about
+how to setup a minimal version of the NuxtAuthHandler in the Quick Start
+section.
 
 ## Secret
 
@@ -45,30 +46,26 @@ NUXT_AUTH_SECRET="YOUR-SUPER-SECURE-SECRET"
 ## Providers
 
 The providers are the registered authentication methods that your users can use
-to login to your application. NuxtAuth provides a number of preconfigured
+to login to your application. Auth.js provides a number of preconfigured
 providers you can use to quickly bootstrap your project. These include OAuth
 providers,
-[email-based providers](https://next-auth.js.org/configuration/providers/email)
+[email-based providers](https://authjs.dev/getting-started/providers/email)
 (Magic URLs) and a
-[credentials provider](https://next-auth.js.org/configuration/providers/credentials).
+[credentials provider](https://authjs.dev/getting-started/providers/credentials).
 In addition to using a pre-built provider, you can also create your own
 provider.
 
 You can find an overview of all the prebuilt providers
-[here](https://next-auth.js.org/providers/). If you want to create your own
-provider, please visit the
-[NextAuth docs](https://next-auth.js.org/configuration/providers/oauth#using-a-custom-provider).
-
-> **Warning:** `next-auth@4` providers require an additional `.default` to work
-> in Vite. This will no longer be necessary in `next-auth@5` (`authjs`).
+[here](https://authjs.dev/getting-started/providers). If you want to create
+your own provider, please visit the
+[Auth.js docs](https://authjs.dev/guides/configuring-oauth-providers).
 
 ```ts
-import GithubProvider from 'next-auth/providers/github'
+import GitHub from '@auth/core/providers/github'
 
 export default NuxtAuthHandler({
   providers: [
-    // @ts-expect-error You need to use .default here for it to work during SSR
-    GithubProvider.default({
+    GitHub({
       // GitHub provider configuration
     }),
   ],
@@ -126,15 +123,15 @@ Some uses-cases for each callback could be:
 
 You can read more on each of these callbacks, what data they provide and what
 return value they expect on the official
-[NextAuth docs](https://next-auth.js.org/configuration/callbacks).
+[Auth.js docs](https://authjs.dev/guides/basics/callbacks).
 
 ## Adapters
 
-By default AuthJS only uses JWT tokens to handle authentication and does not
+By default Auth.js only uses JWT tokens to handle authentication and does not
 save this data anywhere else. To persist user sessions, accounts, and related
-data, you can use [AuthJS adapters](https://next-auth.js.org/adapters), i.e.
-modules that implement a database interface. NuxtAuth is adapter-agnostic and
-you can use both the official and the custom adapters.
+data, you can use [Auth.js adapters](https://authjs.dev/getting-started/adapters),
+i.e. modules that implement a database interface. NuxtAuth is adapter-agnostic
+and you can use both the official and the custom adapters.
 
 ```ts
 import { PrismaAdapter } from '@zitadel/authjs-prisma-adapter'
@@ -147,23 +144,20 @@ export default NuxtAuthHandler({
 
 ### Install correct official adapters
 
-When installing official adapters, please use `@next-auth` scoped packages as
-they are made for `next-auth@4`, in contrast to `@auth` scoped packages made
-for `authjs@5`.
+When installing official adapters, use `@auth` scoped packages:
 
-```diff
--npm i @auth/prisma-adapter
-+npm i @next-auth/prisma-adapter
+```bash
+npm i @auth/prisma-adapter
 ```
 
 ### Install ZITADEL adapter for Prisma 6
 
 The official
-[`@next-auth/prisma-adapter`](https://www.npmjs.com/package/@next-auth/prisma-adapter)
+[`@auth/prisma-adapter`](https://www.npmjs.com/package/@auth/prisma-adapter)
 assumes a fixed import path from `@prisma/client`. However, starting from
 Prisma 6 you can now
 [specify a custom client output path](https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/generating-prisma-client#using-a-custom-output-path)
-which breaks compatibility with AuthJS as it cannot import the correct client
+which breaks compatibility with Auth.js as it cannot import the correct client
 anymore.
 
 For this purpose NuxtAuth provides a custom adapter implementation which does
@@ -216,7 +210,7 @@ export default NuxtAuthHandler({
 ```
 
 You can read more on each of these events and what data they provide on the
-official [NextAuth docs](https://next-auth.js.org/configuration/events).
+official [Auth.js docs](https://authjs.dev/reference/core/types#eventcallbacks).
 
 ## Pages
 

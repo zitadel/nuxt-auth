@@ -5,53 +5,12 @@ group: Application Side
 
 # Protecting Pages
 
-NuxtAuth offers different approaches to protect pages:
+NuxtAuth registers a global route middleware that protects all pages by
+default. Individual pages can opt out using `definePageMeta`.
 
-- **Global middleware:** Protects all pages with manual exceptions
-- **Local middleware:** Protects specific pages
-- **Custom middleware:** Create your own middleware
+## Opting out of protection
 
-## Global Middleware
-
-To enable the global middleware on your application, you can configure the
-middleware inside the `nuxt.config.ts`.
-
-```ts
-export default defineNuxtConfig({
-  modules: ['@zitadel/nuxt-auth'],
-  auth: {
-    globalAppMiddleware: true,
-  },
-})
-```
-
-If you like to further customize the global middleware, you can pass an object
-of configurations to `globalAppMiddleware`. See the API reference for details.
-
-### Disabling the Global Middleware
-
-If the global middleware is disabled, you can manually add the middleware to
-individual pages. This is only available if the global middleware is disabled,
-as you will get an error along the lines of
-`Error: Unknown route middleware: 'auth'`. This is because the auth middleware
-is then added globally and not available to use as a local, page-specific
-middleware.
-
-```vue
-<script lang="ts" setup>
-definePageMeta({
-  middleware: 'zitadel-auth',
-})
-</script>
-
-<template>Only I am protected!</template>
-```
-
-## Local Middleware
-
-To locally enable or disable the middleware on a single page, you can use the
-[`definePageMeta`](https://nuxt.com/docs/api/utils/define-page-meta) macro to
-set the authentication metadata for a single page.
+To make a page accessible without authentication, set `auth: false`:
 
 ```vue
 <script setup lang="ts">
@@ -63,10 +22,9 @@ definePageMeta({
 <template>I am not protected anymore!</template>
 ```
 
-### Middleware options
+## Page-level middleware options
 
-`auth` can be either a boolean or an object of further middleware
-configurations.
+`auth` can be either a boolean or an object with further configuration:
 
 ```vue
 <script setup lang="ts">
@@ -81,32 +39,24 @@ definePageMeta({
 <template>I am protected with a custom redirect!</template>
 ```
 
-#### `unauthenticatedOnly`
+### `unauthenticatedOnly`
 
 Whether to allow only unauthenticated users to access this page. Authenticated
 users will be redirected to `/` or to the route specified in
 `navigateAuthenticatedTo`.
 
-If you want to let everyone see the page, set `auth: false` instead (see
-Local Middleware section).
+If you want to let everyone see the page, set `auth: false` instead.
 
-> **Warning:** This option is required from `0.9.4` onwards to prevent
-> ambiguity
-> ([related issue](https://github.com/zitadel/nuxt-auth/issues/926)). Make
-> sure you set it, otherwise Guest Mode will be **enabled** by default — your
-> guests would be able to see the page, but your authenticated users would be
-> redirected away.
-
-#### `navigateAuthenticatedTo`
+### `navigateAuthenticatedTo`
 
 Where to redirect authenticated users if `unauthenticatedOnly` is set to
 `true`.
 
-#### `navigateUnauthenticatedTo`
+### `navigateUnauthenticatedTo`
 
 Where to redirect unauthenticated users if this page is protected.
 
-### Guest mode
+## Guest mode
 
 You can use NuxtAuth to setup pages that are accessible only when the user
 **is not logged in**. This is sometimes called _"guest mode"_. The behavior of

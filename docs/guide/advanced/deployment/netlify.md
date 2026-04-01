@@ -31,5 +31,5 @@ export default defineNuxtConfig({
 At build time this will check if your application is running inside a Netlify environment (using `process.env.DEPLOY_URL` or `process.env.URL`). If this environment variable is set the `baseURL` is infered by combining the `host` and `path` together.
 
 ::: warning
-Securing a preview deployment (with an OAuth provider) comes with some critical obstacles. Most OAuth providers only allow a single redirect/callback URL, or at least a set of full static URLs. Meaning you cannot set the value before publishing the site and you cannot use wildcard subdomains in the callback URL settings of your OAuth provider. To avoid this, AuthJS has a few suggestions you can find [here](https://next-auth.js.org/deployment#securing-a-preview-deployment).
+Securing a preview deployment (with an OAuth provider) comes with some critical obstacles. Most OAuth providers only allow a single redirect/callback URL, or at least a set of full static URLs. Meaning you cannot set the value before publishing the site and you cannot use wildcard subdomains in the callback URL settings of your OAuth provider. To avoid this, Auth.js has a few suggestions you can find [here](https://authjs.dev/getting-started/deployment).
 :::
