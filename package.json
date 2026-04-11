@@ -71,6 +71,7 @@
     "vue": "^3.0.0"
   },
   "devDependencies": {
+    "@commitlint/config-conventional": "^20.5.0",
     "@mridang/eslint-defaults": "^1.0.0",
     "@nuxt/eslint-plugin": "^1.0.0",
     "@nuxt/module-builder": "^1.0.2",
