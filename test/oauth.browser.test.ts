@@ -124,6 +124,26 @@ describe('OAuth browser tests', async () => {
     },
   })
 
+  it('OAuth sign-in via composable button completes the full login flow', async () => {
+    const page = await createPage()
+    await page.goto(url('/'))
+    await page.waitForSelector('[data-testid="signin-oauth"]', {
+      timeout: 10000,
+    })
+    await page.click('[data-testid="signin-oauth"]')
+
+    await page.waitForSelector('input[name="username"]', { timeout: 15000 })
+    await page.fill('input[name="username"]', 'testuser')
+    await page.click('input[type="submit"], button[type="submit"]')
+
+    await page.waitForURL(
+      (pageUrl) => new URL(pageUrl.href).pathname === '/dashboard',
+      { timeout: 15000 },
+    )
+    await expectAuthenticated(page)
+    await page.close()
+  })
+
   it('shows the homepage in an unauthenticated state', async () => {
     const page = await createPage('/')
     await expectUnauthenticated(page)

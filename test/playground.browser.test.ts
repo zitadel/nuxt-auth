@@ -271,6 +271,31 @@ describe('global auth middleware', async () => {
     })
   })
 
+  describe('composable signIn (homepage button)', () => {
+    it('credentials sign-in via composable completes the login flow', async () => {
+      const page = await createPage()
+      await page.goto(url('/'))
+      await page.waitForSelector('[data-testid="signin-credentials"]', {
+        timeout: 10000,
+      })
+      await page.click('[data-testid="signin-credentials"]')
+      // The composable navigates to the Auth.js built-in credentials form.
+      await page.waitForSelector('input[name="username"]', { timeout: 10000 })
+      await page.fill('input[name="username"]', 'jsmith')
+      await page.fill('input[name="password"]', 'hunter2')
+      await page
+        .locator('form:has(input[name="username"]) button[type="submit"]')
+        .click()
+      await page.waitForURL((pageUrl) => !pageUrl.href.includes('/api/auth/'), {
+        timeout: 10000,
+      })
+      // Verify we're back in the app and not stuck on an auth page
+      const currentPath = new URL(page.url()).pathname
+      expect(currentPath).not.toContain('/api/auth/')
+      await page.close()
+    })
+  })
+
   describe('invalid credentials', () => {
     it('stays on the sign-in page after submitting wrong credentials', async () => {
       const page = await createPage()

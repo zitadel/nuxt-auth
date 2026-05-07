@@ -316,6 +316,7 @@ export class AuthJsClient {
         query: authorizationParams,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Auth-Return-Redirect': '1',
         },
         body,
       },
@@ -342,6 +343,7 @@ export class AuthJsClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Auth-Return-Redirect': '1',
       },
       body,
     }).catch((error: { data: unknown }) => error.data as { url: string })

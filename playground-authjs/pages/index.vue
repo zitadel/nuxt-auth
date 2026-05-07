@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { definePageMeta } from '#imports'
+import { definePageMeta, useAuth } from '#imports'
 
 definePageMeta({ auth: false })
+
+const { signIn } = useAuth()
 </script>
 
 <template>
@@ -19,6 +21,23 @@ definePageMeta({ auth: false })
         A demo app for testing authentication flows, middleware, and session
         management. Sign in from the top-right to get started.
       </p>
+    </div>
+
+    <div class="flex gap-4 mb-10">
+      <button
+        data-testid="signin-credentials"
+        class="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
+        @click="signIn('credentials', { callbackUrl: '/dashboard' })"
+      >
+        Sign in with Credentials
+      </button>
+      <button
+        data-testid="signin-oauth"
+        class="px-4 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition font-medium"
+        @click="signIn('mock-oidc', { callbackUrl: '/dashboard' })"
+      >
+        Sign in with OAuth
+      </button>
     </div>
 
     <div class="bg-blue-50 border border-blue-100 rounded-lg p-5 mb-10">
