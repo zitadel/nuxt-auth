@@ -20,7 +20,6 @@ export default {
     'typescript',
     'javascript',
     'json',
-    'astro',
     'jsx',
     'bash',
     'sh',
