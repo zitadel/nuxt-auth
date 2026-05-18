@@ -37,6 +37,14 @@ const authjsDefaults: DeepRequired<ProviderAuthjs> = {
 };
 
 const PACKAGE_NAME = 'zitadel-auth';
+
+/**
+ * Nuxt module that wires Auth.js into the Nuxt runtime, registering
+ * server handlers, the `useAuth` composable, route middleware, and
+ * type augmentations.
+ *
+ * @public
+ */
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: PACKAGE_NAME,
