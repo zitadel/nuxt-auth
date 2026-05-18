@@ -1,5 +1,5 @@
-import mridangPlugin from '@mridang/eslint-defaults'
-import nuxtPlugin from '@nuxt/eslint-plugin'
+import mridangPlugin from '@mridang/eslint-defaults';
+import nuxtPlugin from '@nuxt/eslint-plugin';
 
 export default [
   {
@@ -11,7 +11,8 @@ export default [
       'docs/**',
       'build/**',
       'playground/**',
-      '*.config.*',
+      'vitest.config.ts',
+      'vitest.nuxt.config.ts',
       '**/*.css',
     ],
   },
@@ -29,4 +30,4 @@ export default [
       'no-redeclare': 'off',
     },
   },
-]
+];

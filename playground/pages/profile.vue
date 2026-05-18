@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAuth } from '#imports'
+import { useAuth } from '#imports';
 
-const { data: session, signOut } = useAuth()
+const { data: session, signOut } = useAuth();
 </script>
 
 <template>

@@ -13,7 +13,7 @@ export interface GlobalMiddlewareOptions {
    * @example /i-caught-you-but-now-you-are-signed-in
    * @default true
    */
-  readonly addDefaultCallbackUrl?: boolean | string
+  readonly addDefaultCallbackUrl?: boolean | string;
 }
 
 /**
@@ -25,11 +25,11 @@ export interface ProviderAuthjsCredentials {
   /**
    * Uses the `authjs` provider to facilitate authentication.
    */
-  readonly type: 'authjs'
+  readonly type: 'authjs';
   /**
    * Selects the credentials provider as the default sign-in method.
    */
-  readonly defaultProvider: 'credentials'
+  readonly defaultProvider: 'credentials';
   /**
    * If set to `true`, `authjs` will use either the `x-forwarded-host` or `host` headers instead of `auth.baseURL`.
    *
@@ -39,12 +39,12 @@ export interface ProviderAuthjsCredentials {
    * You should **try to avoid using advanced options** unless you are very comfortable using them.
    * @default false
    */
-  readonly trustHost?: boolean
+  readonly trustHost?: boolean;
   /**
    * Not available for the credentials provider — Auth.js silently ignores
    * `callbackUrl` for credentials sign-in.
    */
-  readonly addDefaultCallbackUrl?: never
+  readonly addDefaultCallbackUrl?: never;
 }
 
 /**
@@ -55,14 +55,14 @@ export interface ProviderAuthjsOther {
   /**
    * Uses the `authjs` provider to facilitate authentication.
    */
-  readonly type: 'authjs'
+  readonly type: 'authjs';
   /**
    * Select the default-provider to use when `signIn` is called. Setting this here will also effect the global middleware behavior: E.g., when you set it to `github` and the user is unauthorized, they will be directly forwarded to the Github OAuth page instead of seeing the app-login page.
    *
    * @example "github"
    * @default undefined
    */
-  readonly defaultProvider?: Exclude<string, 'credentials'>
+  readonly defaultProvider?: Exclude<string, 'credentials'>;
   /**
    * If set to `true`, `authjs` will use either the `x-forwarded-host` or `host` headers instead of `auth.baseURL`.
    *
@@ -72,29 +72,29 @@ export interface ProviderAuthjsOther {
    * You should **try to avoid using advanced options** unless you are very comfortable using them.
    * @default false
    */
-  readonly trustHost?: boolean
+  readonly trustHost?: boolean;
   /**
    * Whether to add a callbackUrl to sign in requests. Setting this to a string-value will result in that being used as the callbackUrl path. Setting this to `true` will result in the blocked original target path being chosen (if it can be determined).
    */
-  readonly addDefaultCallbackUrl?: boolean | string
+  readonly addDefaultCallbackUrl?: boolean | string;
 }
 
 /**
  * Configuration for the `authjs`-provider.
  */
-export type ProviderAuthjs = ProviderAuthjsCredentials | ProviderAuthjsOther
+export type ProviderAuthjs = ProviderAuthjsCredentials | ProviderAuthjsOther;
 
 export interface RefreshHandler {
   /**
    * Initializes the refresh handler.
    * Will be called inside `app:mounted` lifecycle hook.
    */
-  readonly init: () => void
+  readonly init: () => void;
 
   /**
    * Handles cleanup of the refresh handler. Will be called on `unmount` app hook.
    */
-  readonly destroy: () => void
+  readonly destroy: () => void;
 }
 
 /** @internal */
@@ -109,20 +109,20 @@ export interface DefaultRefreshHandlerConfig {
    * @example 1000
    * @default false
    */
-  readonly enablePeriodically?: number | boolean
+  readonly enablePeriodically?: number | boolean;
   /**
    * Whether to refresh the session every time the browser window is refocused.
    *
    * @example false
    * @default true
    */
-  readonly enableOnWindowFocus?: boolean
+  readonly enableOnWindowFocus?: boolean;
 }
 
 /**
  * Configuration for the application-side session.
  */
-export type SessionRefreshConfig = DefaultRefreshHandlerConfig
+export type SessionRefreshConfig = DefaultRefreshHandlerConfig;
 
 /**
  * Configuration for the whole module.
@@ -131,7 +131,7 @@ export interface ModuleOptions {
   /**
    * Whether the module is enabled at all
    */
-  isEnabled?: boolean
+  isEnabled?: boolean;
   /**
    * Disables the Nuxt `$fetch` optimization. Do so when your auth logic is not handled by a Nuxt server (e.g. when using an external backend).
    *
@@ -144,7 +144,7 @@ export interface ModuleOptions {
    * @default false
    * @see https://nuxt.com/docs/api/utils/dollarfetch
    */
-  disableInternalRouting?: boolean
+  disableInternalRouting?: boolean;
   /**
    * Forces your server to send a "loading" status on all requests, prompting the client to fetch on the client. If your website has caching, this prevents the server from caching someone's authentication status.
    *
@@ -159,7 +159,7 @@ export interface ModuleOptions {
    *
    * @default false
    */
-  disableServerSideAuth?: boolean
+  disableServerSideAuth?: boolean;
   /**
    * The name of the environment variable that holds the origin of the application. This is used to determine the full URL of the application in production.
    * As an example, if you set `AUTH_ORIGIN=http://example.org` in your `.env` file, the module will use this to determine the full URL of the application.
@@ -168,7 +168,7 @@ export interface ModuleOptions {
    *
    * @default 'AUTH_ORIGIN'
    */
-  originEnvKey?: string
+  originEnvKey?: string;
   /**
    * Full URL at which the app will run combined with the path to authentication.
    *
@@ -185,15 +185,15 @@ export interface ModuleOptions {
    * @example https://my-cool-site.com/api/authentication
    * @default /api/auth
    */
-  baseURL?: string
+  baseURL?: string;
   /**
    * Configuration of the authentication provider using Auth.js (OAuth focused provider for Nuxt 4 applications).
    */
-  provider?: ProviderAuthjs
+  provider?: ProviderAuthjs;
   /**
    * Configuration of the application-side session.
    */
-  sessionRefresh?: SessionRefreshConfig
+  sessionRefresh?: SessionRefreshConfig;
 }
 
 export type AuthMeta =
@@ -201,10 +201,10 @@ export type AuthMeta =
   | { readonly mode: 'protected'; readonly redirectTo?: string }
   | { readonly mode: 'guest'; readonly redirectTo?: string }
   | {
-      readonly unauthenticatedOnly: boolean
-      readonly navigateAuthenticatedTo?: string
-      readonly navigateUnauthenticatedTo?: string
-    }
+      readonly unauthenticatedOnly: boolean;
+      readonly navigateAuthenticatedTo?: string;
+      readonly navigateUnauthenticatedTo?: string;
+    };
 
 export interface RouteOptions {
   /**
@@ -212,26 +212,26 @@ export interface RouteOptions {
    *
    * @default false
    */
-  disableServerSideAuth: boolean
+  disableServerSideAuth: boolean;
 }
 
 /**
  * Timestamp of the last session refresh, or undefined if never refreshed.
  * @internal
  */
-export type SessionLastRefreshedAt = Date | undefined
+export type SessionLastRefreshedAt = Date | undefined;
 
 /** Current authentication status */
-export type SessionStatus = 'authenticated' | 'unauthenticated' | 'loading'
+export type SessionStatus = 'authenticated' | 'unauthenticated' | 'loading';
 
 /** @internal */
 export interface ModuleOptionsNormalized extends ModuleOptions {
-  isEnabled: boolean
-  baseURL: string
-  disableInternalRouting: boolean
+  isEnabled: boolean;
+  baseURL: string;
+  disableInternalRouting: boolean;
   // Cannot use `DeepRequired` here because it leads to build issues
-  provider: Required<NonNullable<ModuleOptions['provider']>>
-  sessionRefresh: NonNullable<ModuleOptions['sessionRefresh']>
-  globalAppMiddleware?: Required<GlobalMiddlewareOptions>
-  originEnvKey: string
+  provider: Required<NonNullable<ModuleOptions['provider']>>;
+  sessionRefresh: NonNullable<ModuleOptions['sessionRefresh']>;
+  globalAppMiddleware?: Required<GlobalMiddlewareOptions>;
+  originEnvKey: string;
 }

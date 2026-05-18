@@ -7,5 +7,11 @@ module.exports = {
   ],
   ignoreBinaries: ['playwright'],
   entry: ['src/module.ts', 'src/adapter.ts', 'src/runtime/**/*.ts'],
-  ignore: ['commitlint.config.js', 'playground/**'],
-}
+  ignore: [
+    'commitlint.config.js',
+    'dist/**',
+    'build/**',
+    'typedoc.config.mjs',
+    'playground/**',
+  ],
+};

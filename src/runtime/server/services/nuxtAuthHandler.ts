@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import type { H3Event } from 'h3'
+import type { H3Event } from 'h3';
 import {
   appendResponseHeader,
   createError,
@@ -10,15 +10,15 @@ import {
   setResponseStatus,
   splitCookiesString,
   toWebRequest,
-} from 'h3'
-import { Auth, createActionURL, setEnvDefaults } from '@auth/core'
-import type { AuthConfig, Session } from '@auth/core/types'
-import { consola } from 'consola'
-import { defu } from 'defu'
-import { parseURL, withLeadingSlash } from 'ufo'
-import { useRuntimeConfig } from '#imports'
+} from 'h3';
+import { Auth, createActionURL, setEnvDefaults } from '@auth/core';
+import type { AuthConfig, Session } from '@auth/core/types';
+import { consola } from 'consola';
+import { defu } from 'defu';
+import { parseURL, withLeadingSlash } from 'ufo';
+import { useRuntimeConfig } from '#imports';
 
-let authOptions: AuthConfig | undefined
+let authOptions: AuthConfig | undefined;
 
 /**
  * Some environments (e.g. Vitest nuxt) polyfill Request with a class that
@@ -27,15 +27,15 @@ let authOptions: AuthConfig | undefined
  * polyfill case. Re-add the cookie from the H3 event if it was stripped.
  */
 function patchCookieHeader(request: Request, event: H3Event): void {
-  const cookie = event.headers.get('cookie')
+  const cookie = event.headers.get('cookie');
   if (cookie && !request.headers.get('cookie')) {
-    const patchedHeaders = new Headers(request.headers)
-    patchedHeaders.set('cookie', cookie)
+    const patchedHeaders = new Headers(request.headers);
+    patchedHeaders.set('cookie', cookie);
     Object.defineProperty(request, 'headers', {
       value: patchedHeaders,
       writable: false,
       configurable: true,
-    })
+    });
   }
 }
 
@@ -117,27 +117,27 @@ function patchCookieHeader(request: Request, event: H3Event): void {
  * @see {@link https://authjs.dev/guides/callbacks} for callback configuration
  */
 export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
-  const isProduction = process.env.NODE_ENV === 'production'
-  const runtimeConfig = useRuntimeConfig()
-  const trustHostUserPreference = runtimeConfig.public.auth.provider.trustHost
+  const isProduction = process.env.NODE_ENV === 'production';
+  const runtimeConfig = useRuntimeConfig();
+  const trustHostUserPreference = runtimeConfig.public.auth.provider.trustHost;
 
-  const secret = nuxtAuthOptions?.secret || process.env.AUTH_SECRET
+  const secret = nuxtAuthOptions?.secret || process.env.AUTH_SECRET;
   if (!secret) {
     if (isProduction) {
       throw new Error(
         'AUTH_NO_SECRET: No `secret` - this is an error in production. You can ignore this during development',
-      )
+      );
     } else {
       consola.info(
         'AUTH_NO_SECRET: No `secret` - this is an error in production. You can ignore this during development',
-      )
+      );
     }
   }
 
   if (authOptions) {
     consola.error(
       'You setup the auth handler for a second time - this is likely undesired. Make sure that you only call `NuxtAuthHandler( ... )` once',
-    )
+    );
   }
 
   authOptions = defu(nuxtAuthOptions, {
@@ -145,16 +145,16 @@ export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
     providers: [],
     trustHost: trustHostUserPreference || !isProduction,
     basePath: runtimeConfig.public.auth.baseURL,
-  }) as AuthConfig
+  }) as AuthConfig;
 
-  setEnvDefaults(process.env, authOptions)
+  setEnvDefaults(process.env, authOptions);
 
   return eventHandler(async (event: H3Event) => {
-    const request = toWebRequest(event)
+    const request = toWebRequest(event);
 
-    patchCookieHeader(request, event)
+    patchCookieHeader(request, event);
 
-    const response = await Auth(request, authOptions!)
+    const response = await Auth(request, authOptions!);
 
     // Auth.js builds its Response with the environment's Headers class.
     // Some environments (e.g. happy-dom in vitest-nuxt) combine multiple
@@ -162,18 +162,18 @@ export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
     // unreliable. Use h3's splitCookiesString for robust cookie extraction.
     const setCookieHeaders = splitCookiesString(
       response.headers.get('set-cookie') ?? '',
-    )
+    );
 
     // Auth.js returns redirects after sign-in/sign-out. When the client
     // requests JSON (via the composable), return the target URL as data
     // instead of a 302 so the client can handle navigation.
-    const location = response.headers.get('location')
+    const location = response.headers.get('location');
     if (location && response.status >= 300 && response.status < 400) {
       if (getQuery(event).json === 'true') {
         for (const cookie of setCookieHeaders) {
-          appendResponseHeader(event, 'set-cookie', cookie)
+          appendResponseHeader(event, 'set-cookie', cookie);
         }
-        return { url: location }
+        return { url: location };
       }
     }
 
@@ -181,24 +181,24 @@ export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
     // original status code and headers (e.g. cache-control), transfer
     // cookies, and return the parsed body. Returning the parsed value
     // lets h3 send 204 for null (empty sessions).
-    const contentType = response.headers.get('content-type')
+    const contentType = response.headers.get('content-type');
     if (contentType?.includes('application/json')) {
-      setResponseStatus(event, response.status)
+      setResponseStatus(event, response.status);
       response.headers.forEach((headerValue, headerName) => {
         if (headerName.toLowerCase() !== 'set-cookie') {
-          appendResponseHeader(event, headerName, headerValue)
+          appendResponseHeader(event, headerName, headerValue);
         }
-      })
+      });
       for (const cookie of setCookieHeaders) {
-        appendResponseHeader(event, 'set-cookie', cookie)
+        appendResponseHeader(event, 'set-cookie', cookie);
       }
-      return await response.json()
+      return await response.json();
     }
 
     // For all other responses (HTML sign-in/sign-out pages, non-JSON
     // redirects), return the Response — h3 handles it via sendWebResponse.
-    return response
-  })
+    return response;
+  });
 }
 
 /**
@@ -275,17 +275,17 @@ export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
 export async function getServerSession(
   event: H3Event,
 ): Promise<Session | null> {
-  const runtimeConfig = useRuntimeConfig()
+  const runtimeConfig = useRuntimeConfig();
   const authBasePathname = withLeadingSlash(
     parseURL(runtimeConfig.public.auth.baseURL).pathname,
-  )
-  const trustHostUserPreference = runtimeConfig.public.auth.provider.trustHost
+  );
+  const trustHostUserPreference = runtimeConfig.public.auth.provider.trustHost;
 
   // Return null for requests already targeting auth endpoints to prevent
   // infinite recursion: server middleware → getServerSession → $fetch →
   // server middleware → getServerSession → ...
   if (event.path && event.path.startsWith(authBasePathname + '/')) {
-    return null
+    return null;
   }
 
   // Nitro lazily loads route modules, so if getServerSession is called from
@@ -294,24 +294,24 @@ export async function getServerSession(
   // Force-load it by fetching the session endpoint, which triggers module
   // import and NuxtAuthHandler() execution as a side effect.
   if (!authOptions) {
-    const headers = getHeaders(event) as HeadersInit
+    const headers = getHeaders(event) as HeadersInit;
     await $fetch(`${authBasePathname}/session`, { headers }).catch(
       (error: { data: unknown }) => error.data,
-    )
+    );
     if (!authOptions) {
       throw createError({
         statusCode: 500,
         message:
           'Auth handler not initialized. Make sure NuxtAuthHandler() is called in your server/api/auth/[...].ts catch-all route. See https://github.com/zitadel/nuxt-auth#quick-start',
-      })
+      });
     }
   }
 
-  const headers = new Headers(getHeaders(event) as HeadersInit)
+  const headers = new Headers(getHeaders(event) as HeadersInit);
   const origin = getRequestURL(event, {
     xForwardedHost: trustHostUserPreference,
     xForwardedProto: trustHostUserPreference || undefined,
-  })
+  });
 
   const url = createActionURL(
     'session',
@@ -319,20 +319,20 @@ export async function getServerSession(
     headers,
     process.env,
     authOptions,
-  )
+  );
 
-  const request = new Request(url, { headers })
-  patchCookieHeader(request, event)
+  const request = new Request(url, { headers });
+  patchCookieHeader(request, event);
 
-  const response = await Auth(request, authOptions)
-  const data = await response.json()
+  const response = await Auth(request, authOptions);
+  const data = await response.json();
   if (
     typeof data === 'object' &&
     data !== null &&
     Object.keys(data).length > 0
   ) {
-    return data as Session
+    return data as Session;
   }
 
-  return null
+  return null;
 }

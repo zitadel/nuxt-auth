@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useAuth } from '#imports'
+import { useAuth } from '#imports';
 
 const {
   data,
@@ -10,10 +10,10 @@ const {
   getSession,
   signIn,
   signOut,
-} = useAuth()
+} = useAuth();
 
-const providers = await getProviders()
-const csrfToken = await getCsrfToken()
+const providers = await getProviders();
+const csrfToken = await getCsrfToken();
 </script>
 
 <template>

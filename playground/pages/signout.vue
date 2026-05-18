@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { definePageMeta, navigateTo } from '#imports'
+import { definePageMeta, navigateTo } from '#imports';
 
-definePageMeta({ auth: false })
+definePageMeta({ auth: false });
 
-setTimeout(() => navigateTo('/'), 5000)
+setTimeout(() => navigateTo('/'), 5000);
 </script>
 
 <template>

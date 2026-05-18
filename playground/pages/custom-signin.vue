@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { definePageMeta, navigateTo, useAuth } from '#imports'
+import { ref } from 'vue';
+import { definePageMeta, navigateTo, useAuth } from '#imports';
 
-definePageMeta({ auth: false })
+definePageMeta({ auth: false });
 
-const username = ref('')
-const password = ref('')
+const username = ref('');
+const password = ref('');
 
-const { signIn } = useAuth()
+const { signIn } = useAuth();
 
 async function mySignInHandler({
   username,
   password,
   callbackUrl,
 }: {
-  username: string
-  password: string
-  callbackUrl: string
+  username: string;
+  password: string;
+  callbackUrl: string;
 }) {
   const { error, url } = await signIn('credentials', {
     username,
     password,
     callbackUrl,
     redirect: false,
-  })
+  });
 
   if (error) {
     // eslint-disable-next-line no-alert
-    alert('You have made a terrible mistake while entering your credentials')
+    alert('You have made a terrible mistake while entering your credentials');
   } else {
-    return navigateTo(url, { external: true })
+    return navigateTo(url, { external: true });
   }
 }
 </script>

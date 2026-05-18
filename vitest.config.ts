@@ -1,9 +1,9 @@
-import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vitest/config'
+import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vitest/config';
 
 const nuxtEnv = fileURLToPath(
   new URL('./test/helpers/nuxt-env.ts', import.meta.url),
-)
+);
 
 export default defineConfig({
   resolve: {
@@ -32,4 +32,4 @@ export default defineConfig({
       exclude: ['src/**/*.d.ts'],
     },
   },
-})
+});

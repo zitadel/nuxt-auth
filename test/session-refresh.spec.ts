@@ -14,12 +14,12 @@
  * registered hooks and exposes `triggerMount` / `triggerUnmount`
  * helpers to drive the lifecycle.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { ref } from 'vue'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { ref } from 'vue';
 
-const refreshFn = vi.fn()
-const data = ref<Record<string, unknown> | null>(null)
-const lastRefreshedAt = ref<Date | undefined>(new Date())
+const refreshFn = vi.fn();
+const data = ref<Record<string, unknown> | null>(null);
+const lastRefreshedAt = ref<Date | undefined>(new Date());
 
 // noinspection JSUnusedGlobalSymbols
 vi.mock('#imports', () => ({
@@ -38,141 +38,141 @@ vi.mock('#imports', () => ({
     data,
     refresh: refreshFn,
   }),
-}))
+}));
 
 vi.mock('../src/runtime/app/composables/useAuth', () => ({
   useAuthState: () => ({ data, lastRefreshedAt }),
-}))
+}));
 
 interface FakeNuxtApp {
-  hook: (name: string, fn: () => void) => void
-  vueApp: { onUnmount: (fn: () => void) => void }
+  hook: (name: string, fn: () => void) => void;
+  vueApp: { onUnmount: (fn: () => void) => void };
 }
 
 function installPlugin() {
-  let mountFn: (() => void) | undefined
-  let unmountFn: (() => void) | undefined
+  let mountFn: (() => void) | undefined;
+  let unmountFn: (() => void) | undefined;
 
   plugin({
     hook: (name: string, fn: () => void) => {
-      if (name === 'app:mounted') mountFn = fn
+      if (name === 'app:mounted') mountFn = fn;
     },
     vueApp: {
       onUnmount: (fn: () => void) => {
-        unmountFn = fn
+        unmountFn = fn;
       },
     },
-  })
+  });
 
   return {
     triggerMount() {
-      expect(mountFn, 'app:mounted hook was not registered').toBeDefined()
-      mountFn!()
+      expect(mountFn, 'app:mounted hook was not registered').toBeDefined();
+      mountFn!();
     },
     triggerUnmount() {
-      expect(unmountFn, 'onUnmount callback was not registered').toBeDefined()
-      unmountFn!()
+      expect(unmountFn, 'onUnmount callback was not registered').toBeDefined();
+      unmountFn!();
     },
-  }
+  };
 }
 
-let plugin: (nuxtApp: FakeNuxtApp) => void
+let plugin: (nuxtApp: FakeNuxtApp) => void;
 
 beforeEach(async () => {
-  vi.useFakeTimers()
-  refreshFn.mockReset()
-  data.value = null
-  lastRefreshedAt.value = new Date()
+  vi.useFakeTimers();
+  refreshFn.mockReset();
+  data.value = null;
+  lastRefreshedAt.value = new Date();
 
-  const mod = await import('../src/runtime/app/plugins/session-refresh')
-  plugin = mod.default as unknown as typeof plugin
-})
+  const mod = await import('../src/runtime/app/plugins/session-refresh');
+  plugin = mod.default as unknown as typeof plugin;
+});
 
 afterEach(() => {
-  vi.useRealTimers()
-})
+  vi.useRealTimers();
+});
 
 describe('session-refresh plugin', () => {
   it('refreshes the session periodically after mount', () => {
-    data.value = { user: 'test' }
-    const { triggerMount, triggerUnmount } = installPlugin()
+    data.value = { user: 'test' };
+    const { triggerMount, triggerUnmount } = installPlugin();
 
-    triggerMount()
+    triggerMount();
 
-    vi.advanceTimersByTime(5000)
-    expect(refreshFn).toHaveBeenCalledTimes(1)
+    vi.advanceTimersByTime(5000);
+    expect(refreshFn).toHaveBeenCalledTimes(1);
 
-    vi.advanceTimersByTime(5000)
-    expect(refreshFn).toHaveBeenCalledTimes(2)
+    vi.advanceTimersByTime(5000);
+    expect(refreshFn).toHaveBeenCalledTimes(2);
 
-    triggerUnmount()
-  })
+    triggerUnmount();
+  });
 
   it('refreshes the session on visibility change after mount', () => {
-    data.value = { user: 'test' }
-    const { triggerMount, triggerUnmount } = installPlugin()
+    data.value = { user: 'test' };
+    const { triggerMount, triggerUnmount } = installPlugin();
 
-    triggerMount()
+    triggerMount();
 
     Object.defineProperty(document, 'visibilityState', {
       value: 'visible',
       writable: true,
       configurable: true,
-    })
-    document.dispatchEvent(new Event('visibilitychange'))
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
 
-    expect(refreshFn).toHaveBeenCalledTimes(1)
+    expect(refreshFn).toHaveBeenCalledTimes(1);
 
-    triggerUnmount()
-  })
+    triggerUnmount();
+  });
 
   it('stops periodic refresh after unmount', () => {
-    data.value = { user: 'test' }
-    const { triggerMount, triggerUnmount } = installPlugin()
+    data.value = { user: 'test' };
+    const { triggerMount, triggerUnmount } = installPlugin();
 
-    triggerMount()
-    vi.advanceTimersByTime(5000)
-    expect(refreshFn).toHaveBeenCalledTimes(1)
+    triggerMount();
+    vi.advanceTimersByTime(5000);
+    expect(refreshFn).toHaveBeenCalledTimes(1);
 
-    triggerUnmount()
-    refreshFn.mockReset()
+    triggerUnmount();
+    refreshFn.mockReset();
 
-    vi.advanceTimersByTime(10000)
-    expect(refreshFn).not.toHaveBeenCalled()
-  })
+    vi.advanceTimersByTime(10000);
+    expect(refreshFn).not.toHaveBeenCalled();
+  });
 
   it('stops visibility refresh after unmount', () => {
-    data.value = { user: 'test' }
-    const { triggerMount, triggerUnmount } = installPlugin()
+    data.value = { user: 'test' };
+    const { triggerMount, triggerUnmount } = installPlugin();
 
-    triggerMount()
-    triggerUnmount()
+    triggerMount();
+    triggerUnmount();
 
     Object.defineProperty(document, 'visibilityState', {
       value: 'visible',
       writable: true,
       configurable: true,
-    })
-    document.dispatchEvent(new Event('visibilitychange'))
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
 
-    expect(refreshFn).not.toHaveBeenCalled()
-  })
+    expect(refreshFn).not.toHaveBeenCalled();
+  });
 
   it('resets data to undefined on unmount', () => {
-    data.value = { user: 'test' }
-    const { triggerUnmount } = installPlugin()
+    data.value = { user: 'test' };
+    const { triggerUnmount } = installPlugin();
 
-    triggerUnmount()
+    triggerUnmount();
 
-    expect(data.value).toBeUndefined()
-  })
+    expect(data.value).toBeUndefined();
+  });
 
   it('resets lastRefreshedAt to undefined on unmount', () => {
-    expect(lastRefreshedAt.value).toBeInstanceOf(Date)
-    const { triggerUnmount } = installPlugin()
+    expect(lastRefreshedAt.value).toBeInstanceOf(Date);
+    const { triggerUnmount } = installPlugin();
 
-    triggerUnmount()
+    triggerUnmount();
 
-    expect(lastRefreshedAt.value).toBeUndefined()
-  })
-})
+    expect(lastRefreshedAt.value).toBeUndefined();
+  });
+});

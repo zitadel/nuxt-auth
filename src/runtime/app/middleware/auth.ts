@@ -1,10 +1,10 @@
-import type { AuthMeta } from '../../shared/types'
+import type { AuthMeta } from '../../shared/types';
 import {
   defineNuxtRouteMiddleware,
   navigateTo,
   useAuth,
   useRuntimeConfig,
-} from '#imports'
+} from '#imports';
 
 // noinspection JSUnusedGlobalSymbols
 /**
@@ -61,12 +61,12 @@ import {
  * @see {@link AuthMeta} for the type definition of the `auth` meta-field.
  */
 export default defineNuxtRouteMiddleware((to) => {
-  const raw = to.meta.auth as AuthMeta | undefined
-  const { status, signIn } = useAuth()
-  const authConfig = useRuntimeConfig().public.auth
+  const raw = to.meta.auth as AuthMeta | undefined;
+  const { status, signIn } = useAuth();
+  const authConfig = useRuntimeConfig().public.auth;
 
   if (raw === false) {
-    return
+    return;
   }
 
   const { mode, redirectTo } =
@@ -82,38 +82,38 @@ export default defineNuxtRouteMiddleware((to) => {
           : {
               mode: 'protected' as const,
               redirectTo: raw.navigateUnauthenticatedTo,
-            }
+            };
 
   if (mode === 'guest') {
     if (status.value === 'authenticated') {
-      return navigateTo(redirectTo ?? '/')
+      return navigateTo(redirectTo ?? '/');
     } else {
-      return
+      return;
     }
   } else if (mode === 'protected') {
     if (status.value === 'authenticated') {
-      return
+      return;
     } else if (to.matched.length === 0) {
-      return
+      return;
     } else if (redirectTo) {
-      return navigateTo(redirectTo)
+      return navigateTo(redirectTo);
     } else {
       const callbackUrl =
         typeof authConfig.provider.addDefaultCallbackUrl === 'string'
           ? authConfig.provider.addDefaultCallbackUrl
           : authConfig.provider.addDefaultCallbackUrl
             ? to.fullPath
-            : undefined
+            : undefined;
 
       return signIn(undefined, { error: 'SessionRequired', callbackUrl }).then(
         (result) => {
           if (result) {
-            return result.navigationResult
+            return result.navigationResult;
           } else {
-            return true
+            return true;
           }
         },
-      )
+      );
     }
   }
-})
+});

@@ -25,13 +25,13 @@
  *
  * @module
  */
-import { fileURLToPath } from 'node:url'
-import { afterAll, describe, it } from 'vitest'
-import { createPage, setup, url } from '@nuxt/test-utils/e2e'
-import { GenericContainer, Wait } from 'testcontainers'
-import type { StartedTestContainer } from 'testcontainers'
+import { fileURLToPath } from 'node:url';
+import { afterAll, describe, it } from 'vitest';
+import { createPage, setup, url } from '@nuxt/test-utils/e2e';
+import { GenericContainer, Wait } from 'testcontainers';
+import type { StartedTestContainer } from 'testcontainers';
 
-const TEST_PORT = 3457
+const TEST_PORT = 3457;
 
 const container: StartedTestContainer = await new GenericContainer(
   'ghcr.io/navikt/mock-oauth2-server:2.1.10',
@@ -43,15 +43,15 @@ const container: StartedTestContainer = await new GenericContainer(
   .withWaitStrategy(
     Wait.forHttp('/default/.well-known/openid-configuration', 8080),
   )
-  .start()
+  .start();
 
-const issuerUrl = `http://${container.getHost()}:${container.getMappedPort(8080)}/default`
+const issuerUrl = `http://${container.getHost()}:${container.getMappedPort(8080)}/default`;
 
 afterAll(async () => {
-  await container.stop()
-})
+  await container.stop();
+});
 
-type Page = Awaited<ReturnType<typeof createPage>>
+type Page = Awaited<ReturnType<typeof createPage>>;
 
 /**
  * Performs a complete sign-in flow against the mock OIDC provider using
@@ -64,14 +64,14 @@ type Page = Awaited<ReturnType<typeof createPage>>
  * @param page - The Playwright page instance to drive.
  */
 async function signIn(page: Page): Promise<void> {
-  await page.goto(url('/api/auth/signin'))
+  await page.goto(url('/api/auth/signin'));
   await page.waitForSelector('button:has-text("Sign in with Mock OIDC")', {
     timeout: 5000,
-  })
-  await page.click('button:has-text("Sign in with Mock OIDC")')
-  await page.waitForSelector('input[name="username"]', { timeout: 15000 })
-  await page.fill('input[name="username"]', 'testuser')
-  await page.click('input[type="submit"]')
+  });
+  await page.click('button:has-text("Sign in with Mock OIDC")');
+  await page.waitForSelector('input[name="username"]', { timeout: 15000 });
+  await page.fill('input[name="username"]', 'testuser');
+  await page.click('input[type="submit"]');
 }
 
 /**
@@ -85,9 +85,9 @@ async function signIn(page: Page): Promise<void> {
  * @param page - The Playwright page instance to drive.
  */
 async function signOut(page: Page): Promise<void> {
-  await page.goto(url('/api/auth/signout'))
-  await page.waitForSelector('form', { timeout: 5000 })
-  await page.click('button[type="submit"], input[type="submit"]')
+  await page.goto(url('/api/auth/signout'));
+  await page.waitForSelector('form', { timeout: 5000 });
+  await page.click('button[type="submit"], input[type="submit"]');
 }
 
 /**
@@ -97,7 +97,7 @@ async function signOut(page: Page): Promise<void> {
 async function expectUnauthenticated(page: Page): Promise<void> {
   await page.waitForSelector('summary:has-text("Sign in")', {
     timeout: 15000,
-  })
+  });
 }
 
 /**
@@ -105,7 +105,7 @@ async function expectUnauthenticated(page: Page): Promise<void> {
  * the green status indicator in the layout header.
  */
 async function expectAuthenticated(page: Page): Promise<void> {
-  await page.waitForSelector('.bg-green-400', { timeout: 15000 })
+  await page.waitForSelector('.bg-green-400', { timeout: 15000 });
 }
 
 describe('OAuth browser tests', async () => {
@@ -122,50 +122,50 @@ describe('OAuth browser tests', async () => {
       OAUTH_CLIENT_ID: 'test-client',
       OAUTH_CLIENT_SECRET: 'test-secret',
     },
-  })
+  });
 
   it('OAuth sign-in via composable button completes the full login flow', async () => {
-    const page = await createPage()
-    await page.goto(url('/'))
+    const page = await createPage();
+    await page.goto(url('/'));
     await page.waitForSelector('[data-testid="signin-oauth"]', {
       timeout: 10000,
-    })
-    await page.click('[data-testid="signin-oauth"]')
+    });
+    await page.click('[data-testid="signin-oauth"]');
 
-    await page.waitForSelector('input[name="username"]', { timeout: 15000 })
-    await page.fill('input[name="username"]', 'testuser')
-    await page.click('input[type="submit"], button[type="submit"]')
+    await page.waitForSelector('input[name="username"]', { timeout: 15000 });
+    await page.fill('input[name="username"]', 'testuser');
+    await page.click('input[type="submit"], button[type="submit"]');
 
     await page.waitForURL(
       (pageUrl) => new URL(pageUrl.href).pathname === '/profile',
       { timeout: 15000 },
-    )
-    await expectAuthenticated(page)
-    await page.close()
-  })
+    );
+    await expectAuthenticated(page);
+    await page.close();
+  });
 
   it('shows the homepage in an unauthenticated state', async () => {
-    const page = await createPage('/')
-    await expectUnauthenticated(page)
-    await page.close()
-  })
+    const page = await createPage('/');
+    await expectUnauthenticated(page);
+    await page.close();
+  });
 
   it('completes the full OAuth login flow via the browser', async () => {
-    const page = await createPage('/')
-    await signIn(page)
-    await page.goto(url('/'))
-    await expectAuthenticated(page)
-    await page.close()
-  })
+    const page = await createPage('/');
+    await signIn(page);
+    await page.goto(url('/'));
+    await expectAuthenticated(page);
+    await page.close();
+  });
 
   it('completes the sign-out flow via the browser', async () => {
-    const page = await createPage('/')
-    await signIn(page)
-    await page.goto(url('/'))
-    await expectAuthenticated(page)
-    await signOut(page)
-    await page.goto(url('/'))
-    await expectUnauthenticated(page)
-    await page.close()
-  })
-})
+    const page = await createPage('/');
+    await signIn(page);
+    await page.goto(url('/'));
+    await expectAuthenticated(page);
+    await signOut(page);
+    await page.goto(url('/'));
+    await expectUnauthenticated(page);
+    await page.close();
+  });
+});

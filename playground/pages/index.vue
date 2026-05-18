@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { definePageMeta, useAuth } from '#imports'
+import { definePageMeta, useAuth } from '#imports';
 
-definePageMeta({ auth: false })
+definePageMeta({ auth: false });
 
-const { signIn } = useAuth()
+const { signIn } = useAuth();
 </script>
 
 <template>

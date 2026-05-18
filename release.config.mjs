@@ -42,4 +42,4 @@ export default {
     ],
   ],
   repositoryUrl: 'git+https://github.com/zitadel/nuxt-auth.git',
-}
+};

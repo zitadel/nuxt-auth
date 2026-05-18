@@ -1,7 +1,7 @@
-import { consola } from 'consola'
-import { parseURL } from 'ufo'
-import { defineNitroPlugin } from 'nitropack/runtime/plugin'
-import { useRuntimeConfig } from '#imports'
+import { consola } from 'consola';
+import { parseURL } from 'ufo';
+import { defineNitroPlugin } from 'nitropack/runtime/plugin';
+import { useRuntimeConfig } from '#imports';
 
 // noinspection JSUnusedGlobalSymbols
 /**
@@ -29,27 +29,27 @@ import { useRuntimeConfig } from '#imports'
  */
 export default defineNitroPlugin(() => {
   try {
-    const runtimeConfig = useRuntimeConfig()
+    const runtimeConfig = useRuntimeConfig();
 
-    const originEnvKey = runtimeConfig.public.auth.originEnvKey
+    const originEnvKey = runtimeConfig.public.auth.originEnvKey;
     const parsed = parseURL(
       (originEnvKey && process.env[originEnvKey]) ||
         runtimeConfig.public.auth.baseURL,
-    )
+    );
 
     if (!parsed.protocol || !parsed.host) {
       // noinspection ExceptionCaughtLocallyJS
       throw new Error(
         'AUTH_NO_ORIGIN: No `origin` - this is an error in production. You can ignore this during development',
-      )
+      );
     }
   } catch (error) {
     if (process.env.NODE_ENV !== 'production') {
       consola.info(
         'AUTH_NO_ORIGIN: No `origin` - this is an error in production. You can ignore this during development',
-      )
+      );
     } else {
-      throw error
+      throw error;
     }
   }
-})
+});

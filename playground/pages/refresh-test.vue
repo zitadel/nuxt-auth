@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { definePageMeta, useAuth } from '#imports'
+import { ref, watch } from 'vue';
+import { definePageMeta, useAuth } from '#imports';
 
-definePageMeta({ auth: false })
+definePageMeta({ auth: false });
 
-const { status, lastRefreshedAt } = useAuth()
+const { status, lastRefreshedAt } = useAuth();
 
-const refreshCount = ref(0)
+const refreshCount = ref(0);
 
 watch(lastRefreshedAt, () => {
-  refreshCount.value++
-})
+  refreshCount.value++;
+});
 </script>
 
 <template>

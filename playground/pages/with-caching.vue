@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { definePageMeta, ref, useState } from '#imports'
+import { definePageMeta, ref, useState } from '#imports';
 
-const clientRenderTime = ref<Date>(new Date())
-const serverRenderTime = useState('server-render-date', () => new Date())
+const clientRenderTime = ref<Date>(new Date());
+const serverRenderTime = useState('server-render-date', () => new Date());
 
-definePageMeta({ auth: false })
+definePageMeta({ auth: false });
 </script>
 
 <template>

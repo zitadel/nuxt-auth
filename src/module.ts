@@ -7,15 +7,15 @@ import {
   createResolver,
   defineNuxtModule,
   useLogger,
-} from '@nuxt/kit'
-import { defu } from 'defu'
-import type { DeepRequired } from 'ts-essentials'
-import type { NuxtModule } from 'nuxt/schema'
+} from '@nuxt/kit';
+import { defu } from 'defu';
+import type { DeepRequired } from 'ts-essentials';
+import type { NuxtModule } from 'nuxt/schema';
 import type {
   ModuleOptions,
   ModuleOptionsNormalized,
   ProviderAuthjs,
-} from './runtime/shared/types'
+} from './runtime/shared/types';
 
 const topLevelDefaults = {
   isEnabled: true,
@@ -27,16 +27,16 @@ const topLevelDefaults = {
     enablePeriodically: false,
     enableOnWindowFocus: true,
   },
-} satisfies ModuleOptions
+} satisfies ModuleOptions;
 
 const authjsDefaults: DeepRequired<ProviderAuthjs> = {
   type: 'authjs',
   trustHost: false,
   defaultProvider: '',
   addDefaultCallbackUrl: true,
-}
+};
 
-const PACKAGE_NAME = 'zitadel-auth'
+const PACKAGE_NAME = 'zitadel-auth';
 export default defineNuxtModule<ModuleOptions>({
   meta: {
     name: PACKAGE_NAME,
@@ -46,7 +46,7 @@ export default defineNuxtModule<ModuleOptions>({
     },
   },
   setup(userOptions, nuxt) {
-    const logger = useLogger(PACKAGE_NAME)
+    const logger = useLogger(PACKAGE_NAME);
 
     const options = defu(
       {
@@ -58,33 +58,33 @@ export default defineNuxtModule<ModuleOptions>({
       },
       userOptions,
       topLevelDefaults,
-    )
+    );
 
     if (!options.isEnabled) {
-      logger.info(`Skipping ${PACKAGE_NAME} setup, as module is disabled`)
-      return
+      logger.info(`Skipping ${PACKAGE_NAME} setup, as module is disabled`);
+      return;
     }
 
-    nuxt.options.runtimeConfig = nuxt.options.runtimeConfig || { public: {} }
-    nuxt.options.runtimeConfig.public.auth = options
+    nuxt.options.runtimeConfig = nuxt.options.runtimeConfig || { public: {} };
+    nuxt.options.runtimeConfig.public.auth = options;
 
-    const { resolve } = createResolver(import.meta.url)
+    const { resolve } = createResolver(import.meta.url);
 
     addImports([
       {
         name: 'useAuth',
         from: resolve('./runtime/app/composables/useAuth'),
       },
-    ])
+    ]);
 
     nuxt.hook(
       // @ts-expect-error nitro:config hook exists but type definition is missing
       'nitro:config',
       (nitroConfig: {
-        alias?: Record<string, string>
-        externals?: { inline?: string[] }
+        alias?: Record<string, string>;
+        externals?: { inline?: string[] };
       }) => {
-        nitroConfig.alias = nitroConfig.alias || {}
+        nitroConfig.alias = nitroConfig.alias || {};
 
         nitroConfig.externals = defu(
           typeof nitroConfig.externals === 'object'
@@ -93,10 +93,10 @@ export default defineNuxtModule<ModuleOptions>({
           {
             inline: [resolve('./runtime')],
           },
-        )
-        nitroConfig.alias['#auth'] = resolve('./runtime/server/services')
+        );
+        nitroConfig.alias['#auth'] = resolve('./runtime/server/services');
       },
-    )
+    );
 
     addTypeTemplate({
       filename: 'types/auth.d.ts',
@@ -108,7 +108,7 @@ export default defineNuxtModule<ModuleOptions>({
           '}',
           '',
         ].join('\n'),
-    })
+    });
 
     addTypeTemplate({
       filename: 'types/auth-misc.d.ts',
@@ -136,20 +136,20 @@ export default defineNuxtModule<ModuleOptions>({
           '}',
           '',
         ].join('\n'),
-    })
+    });
 
     addRouteMiddleware({
       name: PACKAGE_NAME,
       path: resolve('./runtime/app/middleware/auth'),
       global: true,
-    })
+    });
 
-    addPlugin(resolve('./runtime/app/plugins/auth'))
-    addPlugin(resolve('./runtime/app/plugins/session-refresh'))
+    addPlugin(resolve('./runtime/app/plugins/auth'));
+    addPlugin(resolve('./runtime/app/plugins/session-refresh'));
 
-    addServerPlugin(resolve('./runtime/server/plugins/assertOrigin'))
+    addServerPlugin(resolve('./runtime/server/plugins/assertOrigin'));
   },
-}) satisfies NuxtModule<ModuleOptions>
+}) satisfies NuxtModule<ModuleOptions>;
 
 export type {
   GlobalMiddlewareOptions,
@@ -157,10 +157,12 @@ export type {
   ModuleOptionsNormalized,
   ProviderAuthjs,
   SessionRefreshConfig,
-} from './runtime/shared/types'
+} from './runtime/shared/types';
+
+export { AuthError, CredentialsSignin } from '@auth/core/errors';
 declare module '@nuxt/schema' {
   // noinspection JSUnusedGlobalSymbols
   interface PublicRuntimeConfig {
-    auth: ModuleOptionsNormalized
+    auth: ModuleOptionsNormalized;
   }
 }
