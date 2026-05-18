@@ -4,7 +4,8 @@ import nuxtPlugin from '@nuxt/eslint-plugin';
 export default [
   {
     ignores: [
-      '.nuxt/**',
+      '**/.nuxt/**',
+      'playground-authjs/**',
       '.output/**',
       '.out/**',
       'dist/**',
