@@ -4,7 +4,7 @@
  *
  * ## Global middleware tests
  *
- * The playground-authjs application defines five pages under
+ * The playground application defines five pages under
  * `/middleware-test/`, each with a different `auth` meta value:
  *
  * | Page            | Meta                                          |
@@ -120,7 +120,7 @@ const TEST_PORT = 3456
 
 describe('global auth middleware', async () => {
   await setup({
-    rootDir: fileURLToPath(new URL('../playground-authjs', import.meta.url)),
+    rootDir: fileURLToPath(new URL('../playground', import.meta.url)),
     browser: true,
     server: true,
     build: true,

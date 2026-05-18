@@ -28,7 +28,7 @@ const TEST_PORT = 3457
 
 describe('server-side route protection', async () => {
   await setup({
-    rootDir: fileURLToPath(new URL('../playground-authjs', import.meta.url)),
+    rootDir: fileURLToPath(new URL('../playground', import.meta.url)),
     server: true,
     build: true,
     port: TEST_PORT,

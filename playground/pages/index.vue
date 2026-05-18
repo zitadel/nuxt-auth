@@ -27,14 +27,14 @@ const { signIn } = useAuth()
       <button
         data-testid="signin-credentials"
         class="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
-        @click="signIn('credentials', { callbackUrl: '/dashboard' })"
+        @click="signIn('credentials', { callbackUrl: '/profile' })"
       >
         Sign in with Credentials
       </button>
       <button
         data-testid="signin-oauth"
         class="px-4 py-3 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition font-medium"
-        @click="signIn('mock-oidc', { callbackUrl: '/dashboard' })"
+        @click="signIn('mock-oidc', { callbackUrl: '/profile' })"
       >
         Sign in with OAuth
       </button>

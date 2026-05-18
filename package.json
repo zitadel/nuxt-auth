@@ -15,8 +15,8 @@
     "build": "nuxi build",
     "lint": "eslint .",
     "lint:fix": "npx eslint . --fix",
-    "clean": "rm -rf playground-authjs/.nuxt dist .nuxt",
-    "typecheck": "nuxi prepare playground-authjs && tsc --noEmit",
+    "clean": "rm -rf playground/.nuxt dist .nuxt",
+    "typecheck": "nuxi prepare playground && tsc --noEmit",
     "dev:prepare": "nuxt-module-build build --stub",
     "docs:build": "typedoc",
     "test": "vitest run && vitest run --config vitest.nuxt.config.ts",
@@ -35,6 +35,9 @@
     ".": {
       "types": "./dist/types.d.mts",
       "import": "./dist/module.mjs"
+    },
+    "./adapters": {
+      "types": "./dist/adapter.d.ts"
     }
   },
   "typesVersions": {
@@ -62,7 +65,7 @@
     "zitadel"
   ],
   "workspaces": [
-    "playground-authjs"
+    "playground"
   ],
   "peerDependencies": {
     "@auth/core": ">=0.40.0",

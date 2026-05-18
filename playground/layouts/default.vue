@@ -82,10 +82,10 @@ Providers: {{ providers }}</pre
               class="absolute right-0 mt-2 z-50 w-48 bg-white border border-gray-200 rounded-lg shadow-xl py-1"
             >
               <nuxt-link
-                to="/dashboard"
+                to="/profile"
                 class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
               >
-                Dashboard
+                Profile
               </nuxt-link>
               <button
                 class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
@@ -127,7 +127,7 @@ Providers: {{ providers }}</pre
             >
               <button
                 class="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
-                @click="signIn(undefined, { callbackUrl: '/dashboard' })"
+                @click="signIn(undefined, { callbackUrl: '/profile' })"
               >
                 Sign in with provider
               </button>

@@ -110,7 +110,7 @@ async function expectAuthenticated(page: Page): Promise<void> {
 
 describe('OAuth browser tests', async () => {
   await setup({
-    rootDir: fileURLToPath(new URL('../playground-authjs', import.meta.url)),
+    rootDir: fileURLToPath(new URL('../playground', import.meta.url)),
     browser: true,
     server: true,
     build: true,
@@ -137,7 +137,7 @@ describe('OAuth browser tests', async () => {
     await page.click('input[type="submit"], button[type="submit"]')
 
     await page.waitForURL(
-      (pageUrl) => new URL(pageUrl.href).pathname === '/dashboard',
+      (pageUrl) => new URL(pageUrl.href).pathname === '/profile',
       { timeout: 15000 },
     )
     await expectAuthenticated(page)

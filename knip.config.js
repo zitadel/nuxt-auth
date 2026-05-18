@@ -6,6 +6,6 @@ module.exports = {
     'ofetch',
   ],
   ignoreBinaries: ['playwright'],
-  entry: ['src/module.ts', 'src/runtime/**/*.ts'],
-  ignore: ['commitlint.config.js', 'playground-authjs/**'],
+  entry: ['src/module.ts', 'src/adapter.ts', 'src/runtime/**/*.ts'],
+  ignore: ['commitlint.config.js', 'playground/**'],
 }

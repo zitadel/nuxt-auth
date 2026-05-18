@@ -1,14 +1,32 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useAuth } from '#imports'
+
+const { data: session, signOut } = useAuth()
+</script>
 
 <template>
   <div>
     <div class="mb-10">
       <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 mb-3">
-        Dashboard
+        Profile
       </h1>
       <p class="text-lg text-gray-400 max-w-lg">
-        You are signed in. Explore the pages below. Use the profile menu in the
-        top-right to sign out or refresh your session.
+        You are signed in as
+        <strong>{{ session?.user?.name ?? session?.user?.email }}</strong
+        >.
+      </p>
+      <button
+        data-testid="sign-out-btn"
+        class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+        @click="signOut()"
+      >
+        Sign out
+      </button>
+    </div>
+    <div class="mb-10">
+      <p class="text-lg text-gray-400 max-w-lg">
+        Explore the pages below. Use the profile menu in the top-right to sign
+        out or refresh your session.
       </p>
     </div>
 

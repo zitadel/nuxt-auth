@@ -59,7 +59,7 @@ async function mySignInHandler({
           signIn('credentials', {
             username,
             password,
-            callbackUrl: '/dashboard',
+            callbackUrl: '/profile',
           })
         "
       >
@@ -71,7 +71,7 @@ async function mySignInHandler({
           mySignInHandler({
             username,
             password,
-            callbackUrl: '/dashboard',
+            callbackUrl: '/profile',
           })
         "
       >

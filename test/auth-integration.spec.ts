@@ -9,7 +9,7 @@ beforeAll(() => {
 
 describe('auth module integration', async () => {
   await setup({
-    rootDir: fileURLToPath(new URL('../playground-authjs', import.meta.url)),
+    rootDir: fileURLToPath(new URL('../playground', import.meta.url)),
     server: true,
     build: true,
     env: {

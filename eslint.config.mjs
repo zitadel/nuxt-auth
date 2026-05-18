@@ -10,7 +10,7 @@ export default [
       'dist/**',
       'docs/**',
       'build/**',
-      'playground-authjs/**',
+      'playground/**',
       '*.config.*',
       '**/*.css',
     ],

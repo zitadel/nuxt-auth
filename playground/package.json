@@ -1,9 +1,9 @@
 {
   "private": true,
-  "name": "nuxt-auth-playground-authjs",
+  "name": "nuxt-auth-playground",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "dev": "nuxi prepare && nuxi dev",
+    "dev": "nuxt dev --port ${PORT:-3000}",
     "build": "nuxi build",
     "start": "nuxi preview",
     "postinstall": "nuxt prepare"
