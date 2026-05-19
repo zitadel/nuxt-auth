@@ -9,13 +9,13 @@ export default {
     'src/runtime/server/services/index.ts',
   ],
   projectDocuments: [
-    'docs/guide/getting-started/introduction.md',
-    'docs/guide/authjs/quick-start.md',
-    'docs/guide/application-side/configuration.md',
-    'docs/guide/advanced/caching.md',
+    'docs-src/guide/getting-started/introduction.md',
+    'docs-src/guide/authjs/quick-start.md',
+    'docs-src/guide/application-side/configuration.md',
+    'docs-src/guide/advanced/caching.md',
   ],
   tsconfig: './tsconfig.json',
-  out: '.out/docs',
+  out: 'docs',
   highlightLanguages: [
     'typescript',
     'javascript',

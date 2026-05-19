@@ -10,6 +10,7 @@ export default [
       '.out/**',
       'dist/**',
       'docs/**',
+      'docs-src/**',
       'build/**',
       'playground/**',
       'build.config.ts',
