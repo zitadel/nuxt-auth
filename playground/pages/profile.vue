@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { useAuth } from '#imports';
+import { useAuth, definePageMeta } from '#imports';
+
+// noinspection JSUnusedGlobalSymbols
+definePageMeta({
+  auth: { mode: 'protected', redirectTo: '/auth/login' },
+});
 
 const { data: session, signOut } = useAuth();
 </script>
