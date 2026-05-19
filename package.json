@@ -40,7 +40,7 @@
       "import": "./dist/module.mjs"
     },
     "./adapters": {
-      "types": "./dist/adapter.d.ts"
+      "types": "./dist/adapter.d.mts"
     }
   },
   "typesVersions": {

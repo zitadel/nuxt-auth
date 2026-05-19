@@ -12,6 +12,7 @@ export default [
       'docs/**',
       'build/**',
       'playground/**',
+      'build.config.ts',
       'vitest.config.ts',
       'vitest.nuxt.config.ts',
       '**/*.css',

@@ -3,6 +3,7 @@ module.exports = {
     'commitlint.config.js',
     'dist/**',
     'build/**',
+    'build.config.ts',
     'typedoc.config.mjs',
     'playground/**',
   ],
