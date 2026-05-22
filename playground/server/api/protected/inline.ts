@@ -1,5 +1,5 @@
 import { eventHandler } from 'h3';
-import { getServerSession } from '#auth';
+import { getServerSession } from '~~/server/auth';
 
 export default eventHandler(async (event) => {
   const session = await getServerSession(event);

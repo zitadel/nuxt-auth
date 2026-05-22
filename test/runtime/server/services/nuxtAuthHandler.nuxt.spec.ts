@@ -6,14 +6,14 @@ import type { AddressInfo } from 'node:net';
 import { createApp, toNodeListener } from 'h3';
 import { skipCSRFCheck } from '@auth/core';
 import Credentials from '@auth/core/providers/credentials';
-import { NuxtAuthHandler } from '../../../../src/runtime/server/services';
+import { NuxtAuth } from '../../../../src/runtime/server/services';
 
-describe('NuxtAuthHandler', () => {
+describe('NuxtAuth handlers', () => {
   let baseURL: string;
   let server: Server;
 
   beforeAll(async () => {
-    const handler = NuxtAuthHandler({
+    const { handlers } = NuxtAuth({
       secret: 'test-secret-that-is-at-least-32-characters-long',
       skipCSRFCheck: skipCSRFCheck,
       providers: [
@@ -40,7 +40,7 @@ describe('NuxtAuthHandler', () => {
     });
 
     const app = createApp();
-    app.use(handler);
+    app.use(handlers);
     server = createServer(toNodeListener(app));
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as AddressInfo;

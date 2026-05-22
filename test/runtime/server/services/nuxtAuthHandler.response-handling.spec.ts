@@ -29,24 +29,24 @@ vi.mock('#imports', () => ({
   }),
 }));
 
-let NuxtAuthHandler: typeof import('../../../../src/runtime/server/services/nuxtAuthHandler').NuxtAuthHandler;
+let NuxtAuth: typeof import('../../../../src/runtime/server/services/nuxtAuthHandler').NuxtAuth;
 
-describe('NuxtAuthHandler response handling', () => {
+describe('NuxtAuth handlers — response handling', () => {
   let listener: ReturnType<typeof promisifyNodeListener>;
 
   beforeAll(async () => {
     const mod = await import(
       '../../../../src/runtime/server/services/nuxtAuthHandler'
     );
-    NuxtAuthHandler = mod.NuxtAuthHandler;
+    NuxtAuth = mod.NuxtAuth;
 
-    const handler = NuxtAuthHandler({
+    const { handlers } = NuxtAuth({
       secret: 'test-secret-that-is-at-least-32-characters-long',
       providers: [],
     });
 
     const app = createApp();
-    app.use(handler);
+    app.use(handlers);
     listener = promisifyNodeListener(toNodeListener(app));
   });
 

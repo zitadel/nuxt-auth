@@ -172,7 +172,7 @@ export interface ModuleOptions {
   /**
    * Full URL at which the app will run combined with the path to authentication.
    *
-   * `baseURL` can be `undefined` during development but _must_ be set to the combination of origin + path that points to your `NuxtAuthHandler` for production. The origin consists of:
+   * `baseURL` can be `undefined` during development but _must_ be set to the combination of origin + path that points to your `NuxtAuth` handlers for production. The origin consists of:
    * - `scheme`: http / https
    * - `host`: e.g., localhost, example.org, google.com
    * - `port`: _empty_ (implies `:80`), :3000, :8888

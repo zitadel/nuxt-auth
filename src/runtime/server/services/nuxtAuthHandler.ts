@@ -2,7 +2,6 @@
 import type { H3Event } from 'h3';
 import {
   appendResponseHeader,
-  createError,
   eventHandler,
   getHeaders,
   getQuery,
@@ -11,19 +10,11 @@ import {
   splitCookiesString,
   toWebRequest,
 } from 'h3';
-import {
-  Auth,
-  createActionURL,
-  isAuthAction,
-  setEnvDefaults,
-} from '@auth/core';
+import { Auth, createActionURL, setEnvDefaults } from '@auth/core';
 import type { AuthConfig, Session } from '@auth/core/types';
 import { consola } from 'consola';
 import { defu } from 'defu';
-import { parseURL, withLeadingSlash } from 'ufo';
 import { useRuntimeConfig } from '#imports';
-
-let authOptions: AuthConfig | undefined;
 
 /**
  * Some environments (e.g. Vitest nuxt) polyfill Request with a class that
@@ -45,83 +36,47 @@ function patchCookieHeader(request: Request, event: H3Event): void {
 }
 
 /**
- * Creates the Auth.js event handler that powers all authentication endpoints.
- * Call this once in your `server/api/auth/[...].ts` catch-all route to set up
- * sign-in, sign-out, session, and callback endpoints.
+ * Creates the Nuxt Auth instance.
  *
- * This handler creates the following endpoints under your configured base path
- * (default `/api/auth`):
+ * Mirrors the factory shape used by every other SDK in this family
+ * (next-auth, remix-auth, sveltekit-auth, solidstart-auth, tanstack-auth,
+ * qwik-auth, astro-auth): a single call returns both the catch-all
+ * `handlers` to mount on the auth route and the `getServerSession`
+ * helper to read the current session.
  *
- * - `GET/POST /signin` - Sign-in page and form submission
- * - `GET/POST /signout` - Sign-out page and form submission
- * - `GET /session` - Get current session
- * - `GET /csrf` - Get CSRF token
- * - `GET /providers` - List configured providers
- * - `GET/POST /callback/:provider` - OAuth callback handlers
- *
- * @param nuxtAuthOptions - Auth.js configuration including providers, callbacks,
- *                          and other options. See Auth.js docs for full options.
- * @returns H3 event handler to be exported as the default route handler
+ * Because both are produced inside the same factory call, they close
+ * over the same resolved `AuthConfig`. There is no module-level mutable
+ * state, no lazy `$fetch` bootstrap, and no recursion guard — calling
+ * `getServerSession` requires importing the module that called the
+ * factory, which by ES-module semantics guarantees the factory has
+ * already run.
  *
  * @example
- * Basic setup with OAuth provider:
+ * ```ts
+ * // server/auth.ts
+ * import { NuxtAuth } from '@zitadel/nuxt-auth';
+ * import { authOptions } from './auth.config';
+ *
+ * export const { handlers, getServerSession } = NuxtAuth(authOptions);
+ * ```
+ *
  * ```ts
  * // server/api/auth/[...].ts
- * import { NuxtAuthHandler } from '#auth'
- * import GitHub from '@auth/core/providers/github'
- *
- * export default NuxtAuthHandler({
- *   providers: [
- *     GitHub({
- *       clientId: process.env.GITHUB_CLIENT_ID,
- *       clientSecret: process.env.GITHUB_CLIENT_SECRET,
- *     }),
- *   ],
- *   secret: process.env.AUTH_SECRET,
- * })
+ * import { handlers } from '~~/server/auth';
+ * export default handlers;
  * ```
  *
- * @example
- * With credentials provider for username/password auth:
  * ```ts
- * import { NuxtAuthHandler } from '#auth'
- * import Credentials from '@auth/core/providers/credentials'
- *
- * export default NuxtAuthHandler({
- *   providers: [
- *     Credentials({
- *       credentials: {
- *         email: { label: 'Email', type: 'email' },
- *         password: { label: 'Password', type: 'password' },
- *       },
- *       async authorise(credentials) {
- *         const user = await validateUser(credentials)
- *         return user ?? null
- *       },
- *     }),
- *   ],
- *   secret: process.env.AUTH_SECRET,
- * })
+ * // anywhere on the server (page loaders, API routes, middleware)
+ * import { getServerSession } from '~~/server/auth';
  * ```
  *
- * @example
- * With custom session callback to include user ID:
- * ```ts
- * export default NuxtAuthHandler({
- *   providers: [...],
- *   callbacks: {
- *     session: ({ session, token }) => {
- *       session.user.id = token.sub
- *       return session
- *     },
- *   },
- * })
- * ```
- *
- * @see {@link https://authjs.dev/getting-started/providers} for provider setup
- * @see {@link https://authjs.dev/guides/callbacks} for callback configuration
+ * @public
  */
-export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
+export function NuxtAuth(nuxtAuthOptions?: AuthConfig): {
+  handlers: ReturnType<typeof eventHandler>;
+  getServerSession: (event: H3Event) => Promise<Session | null>;
+} {
   const isProduction = process.env.NODE_ENV === 'production';
   const runtimeConfig = useRuntimeConfig();
   const trustHostUserPreference = runtimeConfig.public.auth.provider.trustHost;
@@ -139,13 +94,7 @@ export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
     }
   }
 
-  if (authOptions) {
-    consola.error(
-      'You setup the auth handler for a second time - this is likely undesired. Make sure that you only call `NuxtAuthHandler( ... )` once',
-    );
-  }
-
-  authOptions = defu(nuxtAuthOptions, {
+  const authOptions = defu(nuxtAuthOptions, {
     secret,
     providers: [],
     trustHost: trustHostUserPreference || !isProduction,
@@ -154,12 +103,12 @@ export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
 
   setEnvDefaults(process.env, authOptions);
 
-  return eventHandler(async (event: H3Event) => {
+  const handlers = eventHandler(async (event: H3Event) => {
     const request = toWebRequest(event);
 
     patchCookieHeader(request, event);
 
-    const response = await Auth(request, authOptions!);
+    const response = await Auth(request, authOptions);
 
     // Auth.js builds its Response with the environment's Headers class.
     // Some environments (e.g. happy-dom in vitest-nuxt) combine multiple
@@ -204,150 +153,37 @@ export function NuxtAuthHandler(nuxtAuthOptions?: AuthConfig) {
     // redirects), return the Response — h3 handles it via sendWebResponse.
     return response;
   });
-}
 
-/**
- * Retrieves the current user's session on the server side. Use this in API
- * routes, server middleware, or any server-side code to check if a user is
- * authenticated and access their session data.
- *
- * Returns `null` if the user is not authenticated or if the session has
- * expired. The session object contains user information and any custom data
- * you've added via Auth.js session callbacks.
- *
- * @param event - The H3 event from the current request
- * @returns The session object if authenticated, or `null` if not
- *
- * @example
- * Protecting an API route:
- * ```ts
- * // server/api/user/profile.ts
- * import { getServerSession } from '#auth'
- *
- * export default defineEventHandler(async (event) => {
- *   const session = await getServerSession(event)
- *
- *   if (!session) {
- *     throw createError({
- *       statusCode: 401,
- *       message: 'You must be logged in to access this resource',
- *     })
- *   }
- *
- *   // User is authenticated, return their data
- *   return {
- *     email: session.user?.email,
- *     name: session.user?.name,
- *   }
- * })
- * ```
- *
- * @example
- * Server middleware to protect all /api/admin routes:
- * ```ts
- * // server/middleware/admin-auth.ts
- * import { getServerSession } from '#auth'
- *
- * export default defineEventHandler(async (event) => {
- *   if (!event.path.startsWith('/api/admin')) return
- *
- *   const session = await getServerSession(event)
- *   if (!session || session.user?.role !== 'admin') {
- *     throw createError({ statusCode: 403, message: 'Forbidden' })
- *   }
- * })
- * ```
- *
- * @example
- * Fetching user-specific data:
- * ```ts
- * // server/api/orders.ts
- * import { getServerSession } from '#auth'
- *
- * export default defineEventHandler(async (event) => {
- *   const session = await getServerSession(event)
- *   if (!session) {
- *     throw createError({ statusCode: 401 })
- *   }
- *
- *   const orders = await db.orders.findMany({
- *     where: { userId: session.user.id },
- *   })
- *   return orders
- * })
- * ```
- */
-export async function getServerSession(
-  event: H3Event,
-): Promise<Session | null> {
-  const runtimeConfig = useRuntimeConfig();
-  const authBasePathname = withLeadingSlash(
-    parseURL(runtimeConfig.public.auth.baseURL).pathname,
-  );
-  const trustHostUserPreference = runtimeConfig.public.auth.provider.trustHost;
+  async function getServerSession(event: H3Event): Promise<Session | null> {
+    const headers = new Headers(getHeaders(event) as HeadersInit);
+    const origin = getRequestURL(event, {
+      xForwardedHost: trustHostUserPreference,
+      xForwardedProto: trustHostUserPreference || undefined,
+    });
 
-  // Return null for requests already targeting Auth.js's own action
-  // endpoints to prevent infinite recursion: server middleware →
-  // getServerSession → $fetch → server middleware → getServerSession → ...
-  //
-  // The guard only matches the literal Auth.js actions (signin, signout,
-  // callback, session, csrf, providers, error, verify-request); custom
-  // routes that consumers mount under the same basePath (e.g.
-  // /api/auth/logout, /api/auth/logout/callback for OIDC RP-initiated
-  // logout) are NOT Auth.js endpoints and must be allowed to call
-  // getServerSession.
-  if (event.path && event.path.startsWith(authBasePathname + '/')) {
-    const action = event.path.slice(authBasePathname.length + 1).split('/')[0];
-    if (isAuthAction(action)) {
-      return null;
-    }
-  }
-
-  // Nitro lazily loads route modules, so if getServerSession is called from
-  // server middleware before any request has hit /api/auth/*, the catch-all
-  // route module hasn't been imported yet, and authOptions is still undefined.
-  // Force-load it by fetching the session endpoint, which triggers module
-  // import and NuxtAuthHandler() execution as a side effect.
-  if (!authOptions) {
-    const headers = getHeaders(event) as HeadersInit;
-    await $fetch(`${authBasePathname}/session`, { headers }).catch(
-      (error: { data: unknown }) => error.data,
+    const url = createActionURL(
+      'session',
+      origin.protocol.slice(0, -1) as 'http' | 'https',
+      headers,
+      process.env,
+      authOptions,
     );
-    if (!authOptions) {
-      throw createError({
-        statusCode: 500,
-        message:
-          'Auth handler not initialized. Make sure NuxtAuthHandler() is called in your server/api/auth/[...].ts catch-all route. See https://github.com/zitadel/nuxt-auth#quick-start',
-      });
+
+    const request = new Request(url, { headers });
+    patchCookieHeader(request, event);
+
+    const response = await Auth(request, authOptions);
+    const data = await response.json();
+    if (
+      typeof data === 'object' &&
+      data !== null &&
+      Object.keys(data).length > 0
+    ) {
+      return data as Session;
     }
+
+    return null;
   }
 
-  const headers = new Headers(getHeaders(event) as HeadersInit);
-  const origin = getRequestURL(event, {
-    xForwardedHost: trustHostUserPreference,
-    xForwardedProto: trustHostUserPreference || undefined,
-  });
-
-  const url = createActionURL(
-    'session',
-    origin.protocol.slice(0, -1) as 'http' | 'https',
-    headers,
-    process.env,
-    authOptions,
-  );
-
-  const request = new Request(url, { headers });
-  patchCookieHeader(request, event);
-
-  const response = await Auth(request, authOptions);
-  const data = await response.json();
-  if (
-    typeof data === 'object' &&
-    data !== null &&
-    Object.keys(data).length > 0
-  ) {
-    return data as Session;
-  }
-
-  return null;
+  return { handlers, getServerSession };
 }

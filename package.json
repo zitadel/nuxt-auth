@@ -39,6 +39,10 @@
       "types": "./dist/types.d.mts",
       "import": "./dist/module.mjs"
     },
+    "./server": {
+      "types": "./dist/runtime/server/services/index.d.ts",
+      "import": "./dist/runtime/server/services/index.js"
+    },
     "./adapters": {
       "types": "./dist/adapter.d.mts"
     }
@@ -47,6 +51,9 @@
     "*": {
       ".": [
         "./dist/types.d.mts"
+      ],
+      "server": [
+        "./dist/runtime/server/services/index.d.ts"
       ]
     }
   },
