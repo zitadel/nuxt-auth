@@ -107,7 +107,17 @@ export default defineNuxtModule<ModuleOptions>({
             ? nitroConfig.externals
             : {},
           {
-            inline: [resolve('./runtime')],
+            // Inline the SDK's runtime so Nitro bundles it into the
+            // production output instead of attempting to externalize it
+            // (which breaks when the SDK is linked via `file:../` because
+            // Nitro emits a relative path from the chunk to the symlinked
+            // location and miscounts the directory levels).
+            //
+            // Also inline @auth/core and its sub-paths: they are reached
+            // via the SDK's runtime imports and would otherwise be
+            // externalized into `.output/server/node_modules/@auth/core/`,
+            // which doesn't exist when the SDK is symlinked.
+            inline: [resolve('./runtime'), '@auth/core'],
           },
         );
         nitroConfig.alias['#auth'] = resolve('./runtime/server/services');
