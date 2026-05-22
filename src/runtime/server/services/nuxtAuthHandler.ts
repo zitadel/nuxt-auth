@@ -11,7 +11,12 @@ import {
   splitCookiesString,
   toWebRequest,
 } from 'h3';
-import { Auth, createActionURL, setEnvDefaults } from '@auth/core';
+import {
+  Auth,
+  createActionURL,
+  isAuthAction,
+  setEnvDefaults,
+} from '@auth/core';
 import type { AuthConfig, Session } from '@auth/core/types';
 import { consola } from 'consola';
 import { defu } from 'defu';
@@ -281,11 +286,21 @@ export async function getServerSession(
   );
   const trustHostUserPreference = runtimeConfig.public.auth.provider.trustHost;
 
-  // Return null for requests already targeting auth endpoints to prevent
-  // infinite recursion: server middleware → getServerSession → $fetch →
-  // server middleware → getServerSession → ...
+  // Return null for requests already targeting Auth.js's own action
+  // endpoints to prevent infinite recursion: server middleware →
+  // getServerSession → $fetch → server middleware → getServerSession → ...
+  //
+  // The guard only matches the literal Auth.js actions (signin, signout,
+  // callback, session, csrf, providers, error, verify-request); custom
+  // routes that consumers mount under the same basePath (e.g.
+  // /api/auth/logout, /api/auth/logout/callback for OIDC RP-initiated
+  // logout) are NOT Auth.js endpoints and must be allowed to call
+  // getServerSession.
   if (event.path && event.path.startsWith(authBasePathname + '/')) {
-    return null;
+    const action = event.path.slice(authBasePathname.length + 1).split('/')[0];
+    if (isAuthAction(action)) {
+      return null;
+    }
   }
 
   // Nitro lazily loads route modules, so if getServerSession is called from
