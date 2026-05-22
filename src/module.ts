@@ -83,6 +83,14 @@ export default defineNuxtModule<ModuleOptions>({
         name: 'useAuth',
         from: resolve('./runtime/app/composables/useAuth'),
       },
+      {
+        name: 'signInUrl',
+        from: resolve('./runtime/shared/urls'),
+      },
+      {
+        name: 'signOutUrl',
+        from: resolve('./runtime/shared/urls'),
+      },
     ]);
 
     nuxt.hook(
