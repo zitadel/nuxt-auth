@@ -17,6 +17,15 @@ export default [
   ...mridangPlugin.configs.recommended,
   { plugins: { nuxt: nuxtPlugin } },
   {
+    files: ['**/*.{yml,yaml}'],
+    rules: {
+      // Defer YAML quote style to prettier — yml/quotes (from
+      // @nuxt/eslint-plugin) wants double quotes, prettier wants
+      // single, and the two cycle endlessly when both run.
+      'yml/quotes': 'off',
+    },
+  },
+  {
     files: ['src/**/*.ts'],
     rules: {
       // This is a Vue/Nuxt project — disable React-specific rules that

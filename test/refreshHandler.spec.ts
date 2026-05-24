@@ -13,9 +13,8 @@ vi.mock('#imports', () => ({
 }))
 
 // Import after mock so the module picks up our mock
-const { DefaultRefreshHandler } = await import(
-  '../src/runtime/app/utils/refreshHandler'
-)
+const { DefaultRefreshHandler } =
+  await import('../src/runtime/app/utils/refreshHandler')
 
 beforeEach(() => {
   vi.useFakeTimers()

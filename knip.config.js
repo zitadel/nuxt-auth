@@ -6,5 +6,5 @@ module.exports = {
     'ofetch',
   ],
   entry: ['src/module.ts', 'src/runtime/**/*.ts'],
-  ignore: ['commitlint.config.js', 'docs/**', 'playground/**'],
+  ignore: ['commitlint.config.js', 'playground/**'],
 }
