@@ -131,12 +131,12 @@ describe('endpoint path construction', () => {
     });
 
     it('can override default', () => {
-      vi.stubEnv('AUTH_ORIGIN', '/other');
+      vi.stubEnv('AUTH_URL', '/other');
       expect(testResolve('/api/auth')).toBe('/other/signin');
     });
 
     it('can override default with fully-specified URL', () => {
-      vi.stubEnv('AUTH_ORIGIN', 'https://example.com/auth');
+      vi.stubEnv('AUTH_URL', 'https://example.com/auth');
       expect(testResolve('/api/auth')).toBe('/auth/signin');
     });
 
@@ -147,8 +147,8 @@ describe('endpoint path construction', () => {
       );
     });
 
-    it('does not use AUTH_ORIGIN when other env key is given', () => {
-      vi.stubEnv('AUTH_ORIGIN', '/other');
+    it('does not use AUTH_URL when other env key is given', () => {
+      vi.stubEnv('AUTH_URL', '/other');
       expect(testResolve('/api/auth', undefined, 'OTHER_ENV')).toBe(
         '/api/auth/signin',
       );
@@ -165,7 +165,7 @@ describe('endpoint path construction', () => {
       const initialBaseURL = 'https://example.com/api/auth';
       const newBaseURL = 'https://changed.example.com/auth/v2';
       const expectedNewBaseURL = '/auth/v2';
-      const envName = 'AUTH_ORIGIN';
+      const envName = 'AUTH_URL';
       vi.stubEnv(envName, newBaseURL);
 
       const runtimeConfig = mockRuntimeConfig(initialBaseURL, envName);
@@ -189,7 +189,7 @@ describe('endpoint path construction', () => {
 function testResolve(
   desiredBaseURL: string,
   endpointPath = '/signin',
-  envVariableName = 'AUTH_ORIGIN',
+  envVariableName = 'AUTH_URL',
 ): string {
   const runtimeConfig = mockRuntimeConfig(desiredBaseURL, envVariableName);
   const baseURL = resolveBaseURL(runtimeConfig);

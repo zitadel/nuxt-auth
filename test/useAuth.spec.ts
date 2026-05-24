@@ -135,7 +135,7 @@ beforeEach(() => {
       auth: {
         baseURL,
         disableInternalRouting: true,
-        originEnvKey: 'AUTH_ORIGIN',
+        originEnvKey: 'AUTH_URL',
         provider: {
           defaultProvider: '',
           addDefaultCallbackUrl: true,
@@ -454,7 +454,7 @@ describe('useAuth', () => {
             auth: {
               baseURL,
               disableInternalRouting: true,
-              originEnvKey: 'AUTH_ORIGIN',
+              originEnvKey: 'AUTH_URL',
               provider: {
                 defaultProvider: 'credentials',
                 addDefaultCallbackUrl: true,

@@ -22,7 +22,7 @@ const topLevelDefaults = {
   baseURL: '/api/auth',
   disableInternalRouting: false as boolean,
   disableServerSideAuth: false,
-  originEnvKey: 'AUTH_ORIGIN',
+  originEnvKey: 'AUTH_URL',
   sessionRefresh: {
     enablePeriodically: false,
     enableOnWindowFocus: true,
@@ -186,6 +186,13 @@ export type {
 } from './runtime/shared/types';
 
 export { AuthError, CredentialsSignin } from '@auth/core/errors';
+export type {
+  Account,
+  DefaultSession,
+  Profile,
+  Session,
+  User,
+} from '@auth/core/types';
 declare module '@nuxt/schema' {
   // noinspection JSUnusedGlobalSymbols
   interface PublicRuntimeConfig {

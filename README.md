@@ -63,7 +63,7 @@ First, add the module to your Nuxt config:
 export default defineNuxtConfig({
   modules: ['@zitadel/nuxt-auth'],
   auth: {
-    originEnvKey: 'AUTH_ORIGIN',
+    originEnvKey: 'AUTH_URL',
     baseURL: '/api/auth',
     provider: {
       type: 'authjs',
@@ -191,7 +191,7 @@ export default NuxtAuthHandler({
 
 ## Known Issues
 
-- **Environment Configuration:** The integration relies on `AUTH_ORIGIN` (or a
+- **Environment Configuration:** The integration relies on `AUTH_URL` (or a
   custom `originEnvKey`) to determine the application origin in production.
   Ensure this is correctly set in your environment. During development, the
   origin is inferred automatically from incoming requests.

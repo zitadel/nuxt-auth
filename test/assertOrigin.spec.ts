@@ -4,7 +4,7 @@ const mockConfig = {
   public: {
     auth: {
       baseURL: 'https://example.com/api/auth',
-      originEnvKey: 'AUTH_ORIGIN',
+      originEnvKey: 'AUTH_URL',
     },
   },
 };
@@ -23,7 +23,7 @@ const plugin = (await import('../src/runtime/server/plugins/assertOrigin'))
 
 beforeEach(() => {
   mockConfig.public.auth.baseURL = 'https://example.com/api/auth';
-  mockConfig.public.auth.originEnvKey = 'AUTH_ORIGIN';
+  mockConfig.public.auth.originEnvKey = 'AUTH_URL';
 });
 
 afterEach(() => {
@@ -37,7 +37,7 @@ describe('assertOrigin plugin', () => {
 
   it('succeeds when env override provides valid URL', () => {
     mockConfig.public.auth.baseURL = '/api/auth';
-    vi.stubEnv('AUTH_ORIGIN', 'https://override.example.com/auth');
+    vi.stubEnv('AUTH_URL', 'https://override.example.com/auth');
 
     expect(() => plugin()).not.toThrow();
   });

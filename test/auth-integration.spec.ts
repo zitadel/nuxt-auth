@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { $fetch, setup, url } from '@nuxt/test-utils/e2e';
 
 beforeAll(() => {
-  process.env.AUTH_ORIGIN = 'http://localhost:3000';
+  process.env.AUTH_URL = 'http://localhost:3000';
   process.env.AUTH_SECRET = 'test-secret-for-testing';
 });
 
@@ -13,7 +13,7 @@ describe('auth module integration', async () => {
     server: true,
     build: true,
     env: {
-      AUTH_ORIGIN: 'http://localhost:3000',
+      AUTH_URL: 'http://localhost:3000',
       AUTH_SECRET: 'test-secret-for-testing',
     },
   });
