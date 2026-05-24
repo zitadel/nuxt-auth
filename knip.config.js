@@ -5,7 +5,6 @@ module.exports = {
     'vitest-environment-nuxt',
     'ofetch',
   ],
-  ignoreBinaries: ['playwright'],
   entry: ['src/module.ts', 'src/runtime/**/*.ts'],
-  ignore: ['commitlint.config.js', 'playground-authjs/**'],
+  ignore: ['commitlint.config.js', 'docs/**', 'playground/**'],
 }

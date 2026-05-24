@@ -8,6 +8,9 @@ build/
 out/
 *.tsbuildinfo
 
+# Typedoc generated output
+docs/
+
 # Environment configuration files
 .env
 .env.local
