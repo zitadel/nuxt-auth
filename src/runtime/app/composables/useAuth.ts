@@ -1,13 +1,13 @@
-import { defu } from 'defu'
-import { computed, readonly } from 'vue'
-import type { Ref, ComputedRef } from 'vue'
-import type { Session } from '@auth/core/types'
-import type { AuthJsClient, ProviderInfo } from '../../shared/authJsClient'
-import type { SessionLastRefreshedAt, SessionStatus } from '../../shared/types'
-import { getQuery, hasProtocol, isScriptProtocol, parseURL } from 'ufo'
-import { determineCallbackUrl } from '../utils/callbackUrl'
-import type { NuxtApp } from '#app/nuxt'
-import { callWithNuxt } from '#app/nuxt'
+import { defu } from 'defu';
+import { computed, readonly } from 'vue';
+import type { Ref, ComputedRef } from 'vue';
+import type { Session } from '@auth/core/types';
+import type { AuthJsClient, ProviderInfo } from '../../shared/authJsClient';
+import type { SessionLastRefreshedAt, SessionStatus } from '../../shared/types';
+import { getQuery, hasProtocol, isScriptProtocol, parseURL } from 'ufo';
+import { determineCallbackUrl } from '../utils/callbackUrl';
+import type { NuxtApp } from '#app/nuxt';
+import { callWithNuxt } from '#app/nuxt';
 import {
   createError,
   useNuxtApp,
@@ -15,14 +15,14 @@ import {
   useRouter,
   useRuntimeConfig,
   useState,
-} from '#imports'
+} from '#imports';
 
 /**
  * The session data structure returned by Auth.js.
  *
  * @see {@link https://authjs.dev/getting-started/session-management}
  */
-export type SessionData = Session
+export type SessionData = Session;
 
 /**
  * Provides direct access to the writable reactive authentication state.
@@ -35,57 +35,57 @@ export function useAuthState() {
   const data = useState<SessionData | undefined | null>(
     'auth:data',
     () => undefined,
-  )
+  );
 
   const lastRefreshedAt = useState<SessionLastRefreshedAt>(
     'auth:lastRefreshedAt',
     () => {
       if (data.value) {
-        return new Date()
+        return new Date();
       }
-      return undefined
+      return undefined;
     },
-  )
+  );
 
-  const loading = useState<boolean>('auth:loading', () => false)
+  const loading = useState<boolean>('auth:loading', () => false);
   const status = computed<SessionStatus>(() => {
     if (loading.value) {
-      return 'loading'
+      return 'loading';
     }
     if (data.value) {
-      return 'authenticated'
+      return 'authenticated';
     }
-    return 'unauthenticated'
-  })
+    return 'unauthenticated';
+  });
 
-  return { data, loading, lastRefreshedAt, status }
+  return { data, loading, lastRefreshedAt, status };
 }
 
 interface SecondarySignInOptions extends Record<string, unknown> {
   /** URL to redirect to after signing in. Defaults to current page. */
-  readonly callbackUrl?: string
+  readonly callbackUrl?: string;
   /** Whether to redirect after sign-in. @default true */
-  readonly redirect?: boolean
+  readonly redirect?: boolean;
   /** Whether to call getSession after sign-in. @default true */
-  readonly callGetSession?: boolean
+  readonly callGetSession?: boolean;
 }
 
 interface SignOutOptions {
   /** URL to redirect to after signing out. */
-  readonly callbackUrl?: string
+  readonly callbackUrl?: string;
   /** Whether to redirect after sign-out. @default true */
-  readonly redirect?: boolean
+  readonly redirect?: boolean;
 }
 
 interface GetSessionOptions {
   /** If true, redirects to sign-in when not authenticated. */
-  readonly required?: boolean
+  readonly required?: boolean;
   /** URL to redirect to after sign-in (when required is true). */
-  readonly callbackUrl?: string
+  readonly callbackUrl?: string;
   /** Custom handler when unauthenticated and required is true. */
-  readonly onUnauthenticated?: () => void
+  readonly onUnauthenticated?: () => void;
   /** Refetch session even if token is null. @default false */
-  readonly force?: boolean
+  readonly force?: boolean;
 }
 
 /**
@@ -118,28 +118,28 @@ export interface SignInResult {
    * credentials and "InvalidProvider" when the specified provider doesn't
    * exist or isn't configured.
    */
-  readonly error: string | null
+  readonly error: string | null;
 
   /**
    * The HTTP status code from the sign-in response. A status of 200 indicates
    * success without redirect, 302 indicates a successful redirect, and 4xx/5xx
    * codes indicate various error conditions.
    */
-  readonly status: number
+  readonly status: number;
 
   /**
    * Indicates whether the sign-in request completed without server errors.
    * Note that this being true doesn't necessarily mean the user is
    * authenticated; check the error property for authentication failures.
    */
-  readonly ok: boolean
+  readonly ok: boolean;
 
   /**
    * The URL to redirect to after sign-in. For OAuth providers, this is the
    * provider's authorisation URL. For credentials, this is typically the
    * callback URL or the page the user was trying to access.
    */
-  readonly url: string | null
+  readonly url: string | null;
 
   /**
    * The result from the internal navigation handler. This value should be
@@ -149,10 +149,10 @@ export interface SignInResult {
    *
    * @see https://github.com/zitadel/nuxt-auth/pull/1057
    */
-  readonly navigationResult: boolean | string | void | undefined
+  readonly navigationResult: boolean | string | void | undefined;
 }
 
-export type { ProviderInfo }
+export type { ProviderInfo };
 
 /**
  * The return type of the `useAuth` composable.
@@ -164,7 +164,7 @@ export interface UseAuthReturn {
    * configured in your Auth.js callbacks. The value is `null` when not
    * authenticated and `undefined` during initial loading.
    */
-  data: Readonly<Ref<SessionData | null | undefined>>
+  data: Readonly<Ref<SessionData | null | undefined>>;
 
   /**
    * Computed property indicating the current authentication status.
@@ -173,12 +173,12 @@ export interface UseAuthReturn {
    * - `'authenticated'` - User has a valid session
    * - `'unauthenticated'` - No valid session exists
    */
-  status: ComputedRef<SessionStatus>
+  status: ComputedRef<SessionStatus>;
 
   /**
    * Timestamp of the last session refresh, or `undefined` if never fetched.
    */
-  lastRefreshedAt: Readonly<Ref<SessionLastRefreshedAt>>
+  lastRefreshedAt: Readonly<Ref<SessionLastRefreshedAt>>;
 
   /**
    * Initiates authentication with the specified provider.
@@ -190,12 +190,12 @@ export interface UseAuthReturn {
   signIn: (
     provider?: string,
     options?: {
-      callbackUrl?: string
-      redirect?: boolean
-      callGetSession?: boolean
+      callbackUrl?: string;
+      redirect?: boolean;
+      callGetSession?: boolean;
     } & Record<string, unknown>,
     authorisationParams?: Record<string, string>,
-  ) => Promise<SignInResult>
+  ) => Promise<SignInResult>;
 
   /**
    * Signs out the current user and optionally redirects.
@@ -203,9 +203,9 @@ export interface UseAuthReturn {
    * @param options - Sign-out options including `callbackUrl` and `redirect`
    */
   signOut: (options?: {
-    callbackUrl?: string
-    redirect?: boolean
-  }) => Promise<unknown>
+    callbackUrl?: string;
+    redirect?: boolean;
+  }) => Promise<unknown>;
 
   /**
    * Fetches the current session from the server.
@@ -213,25 +213,25 @@ export interface UseAuthReturn {
    * @param getSessionOptions - Options including `required` to enforce auth
    */
   getSession: (getSessionOptions?: {
-    required?: boolean
-    callbackUrl?: string
-    onUnauthenticated?: () => void
-    force?: boolean
-  }) => Promise<SessionData | null>
+    required?: boolean;
+    callbackUrl?: string;
+    onUnauthenticated?: () => void;
+    force?: boolean;
+  }) => Promise<SessionData | null>;
 
   /** Retrieves the CSRF token for custom auth requests. */
-  getCsrfToken: () => Promise<string>
+  getCsrfToken: () => Promise<string>;
 
   /** Fetches all configured authentication providers. */
-  getProviders: () => Promise<Record<string, ProviderInfo | undefined>>
+  getProviders: () => Promise<Record<string, ProviderInfo | undefined>>;
 
   /** Alias for `getSession`. */
   refresh: (getSessionOptions?: {
-    required?: boolean
-    callbackUrl?: string
-    onUnauthenticated?: () => void
-    force?: boolean
-  }) => Promise<SessionData | null>
+    required?: boolean;
+    callbackUrl?: string;
+    onUnauthenticated?: () => void;
+    force?: boolean;
+  }) => Promise<SessionData | null>;
 }
 
 /**
@@ -319,10 +319,10 @@ export interface UseAuthReturn {
  * @see {@link https://authjs.dev/} for Auth.js documentation
  */
 export function useAuth(): UseAuthReturn {
-  const nuxt = useNuxtApp()
-  const client = nuxt.$authClient as AuthJsClient
-  const runtimeConfig = useRuntimeConfig()
-  const { data, loading, status, lastRefreshedAt } = useAuthState()
+  const nuxt = useNuxtApp();
+  const client = nuxt.$authClient as AuthJsClient;
+  const runtimeConfig = useRuntimeConfig();
+  const { data, loading, status, lastRefreshedAt } = useAuthState();
 
   /**
    * Initiates the authentication flow for the specified provider. This method
@@ -392,10 +392,10 @@ export function useAuth(): UseAuthReturn {
   ): Promise<SignInResult> {
     const configuredProviders = await callWithNuxt(nuxt, () =>
       client.getProviders(),
-    )
+    );
     if (!configuredProviders) {
-      const errorUrl = client.getErrorPageUrl()
-      const navigationResult = await navigateToAuthPageWN(nuxt, errorUrl, true)
+      const errorUrl = client.getErrorPageUrl();
+      const navigationResult = await navigateToAuthPageWN(nuxt, errorUrl, true);
 
       return {
         error: 'InvalidProvider',
@@ -403,27 +403,27 @@ export function useAuth(): UseAuthReturn {
         status: 500,
         url: errorUrl,
         navigationResult,
-      }
+      };
     }
 
     const resolvedProvider =
-      provider ?? runtimeConfig.public.auth.provider.defaultProvider
+      provider ?? runtimeConfig.public.auth.provider.defaultProvider;
 
-    const { redirect = true } = options ?? {}
+    const { redirect = true } = options ?? {};
 
     const callbackUrl = await callWithNuxt(nuxt, () =>
       determineCallbackUrl(runtimeConfig.public.auth, options?.callbackUrl),
-    )
+    );
 
     const selectedProvider =
-      resolvedProvider && configuredProviders[resolvedProvider]
+      resolvedProvider && configuredProviders[resolvedProvider];
     if (!selectedProvider) {
-      const hrefSignInAllProviderPage = client.getSignInPageUrl(callbackUrl)
+      const hrefSignInAllProviderPage = client.getSignInPageUrl(callbackUrl);
       const navigationResult = await navigateToAuthPageWN(
         nuxt,
         hrefSignInAllProviderPage,
         true,
-      )
+      );
 
       return {
         error: 'InvalidProvider',
@@ -431,14 +431,14 @@ export function useAuth(): UseAuthReturn {
         status: 400,
         url: hrefSignInAllProviderPage,
         navigationResult,
-      }
+      };
     }
 
-    const isCredentials = selectedProvider.type === 'credentials'
-    const isEmail = selectedProvider.type === 'email'
-    const isSupportingReturn = isCredentials || isEmail
+    const isCredentials = selectedProvider.type === 'credentials';
+    const isEmail = selectedProvider.type === 'email';
+    const isSupportingReturn = isCredentials || isEmail;
 
-    const csrfToken = await callWithNuxt(nuxt, () => client.getCsrfToken())
+    const csrfToken = await callWithNuxt(nuxt, () => client.getCsrfToken());
 
     // @ts-expect-error `options` is typed as any, but is a valid parameter for URLSearchParams
     const body = new URLSearchParams({
@@ -446,7 +446,7 @@ export function useAuth(): UseAuthReturn {
       csrfToken,
       callbackUrl,
       json: true,
-    })
+    });
 
     const signInData = await callWithNuxt(nuxt, () =>
       client.signIn(
@@ -455,13 +455,13 @@ export function useAuth(): UseAuthReturn {
         body,
         authorisationParams,
       ),
-    )
+    );
 
     if (redirect || !isSupportingReturn) {
-      const href = signInData.url ?? callbackUrl
-      const navigationResult = await navigateToAuthPageWN(nuxt, href)
+      const href = signInData.url ?? callbackUrl;
+      const navigationResult = await navigateToAuthPageWN(nuxt, href);
 
-      const error = (getQuery(href).error as string) ?? null
+      const error = (getQuery(href).error as string) ?? null;
 
       return {
         error,
@@ -469,11 +469,11 @@ export function useAuth(): UseAuthReturn {
         status: 302,
         url: href,
         navigationResult,
-      }
+      };
     }
 
-    const error = (getQuery(signInData.url).error as string) ?? null
-    await getSessionWithNuxt(nuxt)
+    const error = (getQuery(signInData.url).error as string) ?? null;
+    await getSessionWithNuxt(nuxt);
 
     return {
       error,
@@ -481,7 +481,7 @@ export function useAuth(): UseAuthReturn {
       ok: true,
       url: error ? null : signInData.url,
       navigationResult: undefined,
-    }
+    };
   }
 
   /**
@@ -508,7 +508,7 @@ export function useAuth(): UseAuthReturn {
    * ```
    */
   async function getProviders() {
-    return callWithNuxt(nuxt, () => client.getProviders())
+    return callWithNuxt(nuxt, () => client.getProviders());
   }
 
   /**
@@ -573,7 +573,7 @@ export function useAuth(): UseAuthReturn {
   async function getSession(
     getSessionOptions?: GetSessionOptions,
   ): Promise<SessionData | null> {
-    const callbackUrlFallback = useRequestURL().href
+    const callbackUrlFallback = useRequestURL().href;
     const { required, callbackUrl, onUnauthenticated } = defu(
       getSessionOptions || {},
       {
@@ -584,39 +584,39 @@ export function useAuth(): UseAuthReturn {
             callbackUrl: getSessionOptions?.callbackUrl || callbackUrlFallback,
           }),
       },
-    )
+    );
 
-    lastRefreshedAt.value = new Date()
+    lastRefreshedAt.value = new Date();
 
     try {
       const sessionData = await callWithNuxt(nuxt, () =>
         client.getSession(callbackUrl || callbackUrlFallback),
-      )
+      );
 
       if (
         typeof sessionData === 'object' &&
         sessionData !== null &&
         Object.keys(sessionData).length > 0
       ) {
-        data.value = sessionData as unknown as SessionData
+        data.value = sessionData as unknown as SessionData;
       } else {
-        data.value = null
+        data.value = null;
       }
-      loading.value = false
+      loading.value = false;
 
       if (required && status.value === 'unauthenticated') {
-        await onUnauthenticated()
-        return data.value ?? null
+        await onUnauthenticated();
+        return data.value ?? null;
       }
 
-      return data.value ?? null
+      return data.value ?? null;
     } catch (error) {
-      loading.value = false
-      throw error
+      loading.value = false;
+      throw error;
     }
   }
   function getSessionWithNuxt(nuxt: NuxtApp) {
-    return callWithNuxt(nuxt, getSession)
+    return callWithNuxt(nuxt, getSession);
   }
 
   /**
@@ -669,34 +669,34 @@ export function useAuth(): UseAuthReturn {
    * ```
    */
   async function signOut(options?: SignOutOptions) {
-    const { callbackUrl: userCallbackUrl, redirect = true } = options ?? {}
+    const { callbackUrl: userCallbackUrl, redirect = true } = options ?? {};
 
-    const csrfToken = await callWithNuxt(nuxt, () => client.getCsrfToken())
+    const csrfToken = await callWithNuxt(nuxt, () => client.getCsrfToken());
 
     const callbackUrl = await determineCallbackUrl(
       runtimeConfig.public.auth,
       userCallbackUrl,
       true,
-    )
+    );
 
     if (!csrfToken) {
       throw createError({
         status: 400,
         message: 'Could not fetch CSRF Token for signing out',
-      })
+      });
     }
 
     const signoutData = await callWithNuxt(nuxt, () =>
       client.signOut(csrfToken, callbackUrl),
-    )
+    );
 
     if (redirect) {
-      const url = signoutData.url ?? callbackUrl
-      return navigateToAuthPageWN(nuxt, url)
+      const url = signoutData.url ?? callbackUrl;
+      return navigateToAuthPageWN(nuxt, url);
     }
 
-    await getSessionWithNuxt(nuxt)
-    return signoutData
+    await getSessionWithNuxt(nuxt);
+    return signoutData;
   }
 
   /**
@@ -729,7 +729,7 @@ export function useAuth(): UseAuthReturn {
    * ```
    */
   async function getCsrfToken() {
-    return callWithNuxt(nuxt, () => client.getCsrfToken())
+    return callWithNuxt(nuxt, () => client.getCsrfToken());
   }
 
   return {
@@ -742,7 +742,7 @@ export function useAuth(): UseAuthReturn {
     signIn,
     signOut,
     refresh: getSession,
-  }
+  };
 }
 
 function navigateToAuthPageWN(
@@ -750,7 +750,11 @@ function navigateToAuthPageWN(
   href: string,
   isInternalRouting?: boolean,
 ) {
-  return callWithNuxt(nuxt, navigateToAuthPage, [nuxt, href, isInternalRouting])
+  return callWithNuxt(nuxt, navigateToAuthPage, [
+    nuxt,
+    href,
+    isInternalRouting,
+  ]);
 }
 
 /**
@@ -763,14 +767,14 @@ function navigateToAuthPageWN(
  * Adapted from https://github.com/nuxt/nuxt/blob/16d213bbdcc69c0cc72afb355755ff877654a374/packages/nuxt/src/app/composables/router.ts#L270-L282
  */
 function encodeURL(location: string, isExternalHost = false) {
-  const url = new URL(location, 'http://localhost')
+  const url = new URL(location, 'http://localhost');
   if (!isExternalHost) {
-    return url.pathname + url.search + url.hash
+    return url.pathname + url.search + url.hash;
   }
   if (location.startsWith('//')) {
-    return url.toString().replace(url.protocol, '')
+    return url.toString().replace(url.protocol, '');
   }
-  return url.toString()
+  return url.toString();
 }
 
 /**
@@ -821,17 +825,17 @@ function navigateToAuthPage(
   href: string,
   isInternalRouting = false,
 ) {
-  const router = useRouter()
+  const router = useRouter();
 
   // https://github.com/nuxt/nuxt/blob/dc69e26c5b9adebab3bf4e39417288718b8ddf07/packages/nuxt/src/app/composables/router.ts#L84-L93
-  const inMiddleware = Boolean(nuxtApp._processingMiddleware)
+  const inMiddleware = Boolean(nuxtApp._processingMiddleware);
 
   // https://github.com/nuxt/nuxt/blob/v4.4.2/packages/nuxt/src/app/composables/router.ts#L167-L172
-  const isExternalHost = hasProtocol(href, { acceptRelative: true })
+  const isExternalHost = hasProtocol(href, { acceptRelative: true });
   if (isExternalHost) {
-    const { protocol } = parseURL(href)
+    const { protocol } = parseURL(href);
     if (protocol && isScriptProtocol(protocol)) {
-      throw new Error(`Cannot navigate to a URL with '${protocol}' protocol.`)
+      throw new Error(`Cannot navigate to a URL with '${protocol}' protocol.`);
     }
   }
 
@@ -840,37 +844,37 @@ function navigateToAuthPage(
       const location =
         isExternalHost || isInternalRouting
           ? href
-          : router.resolve(href).fullPath || '/'
+          : router.resolve(href).fullPath || '/';
 
       async function redirect(response: false | undefined) {
         // Matches upstream navigateTo — remove if Nuxt deprecates `app:redirected`
-        await nuxtApp.callHook('app:redirected')
-        const encodedLoc = location.replace(/"/g, '%22')
-        const encodedHeader = encodeURL(location, isExternalHost)
+        await nuxtApp.callHook('app:redirected');
+        const encodedLoc = location.replace(/"/g, '%22');
+        const encodedHeader = encodeURL(location, isExternalHost);
 
         nuxtApp.ssrContext!._renderResponse = {
           statusCode: 302,
           body: `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${encodedLoc}"></head></html>`,
           headers: { location: encodedHeader },
-        }
-        return response
+        };
+        return response;
       }
 
       // `final.fullPath` is not percent-encoded, so comparing it to `location` always fails.
       // See: https://github.com/nuxt/nuxt/issues/33273
       if (!isExternalHost && inMiddleware) {
-        return redirect(undefined)
+        return redirect(undefined);
       }
-      return redirect(!inMiddleware ? undefined : false)
+      return redirect(!inMiddleware ? undefined : false);
     }
   }
 
   // https://github.com/nuxt/nuxt/blob/v4.4.2/packages/nuxt/src/app/composables/router.ts#L199
-  nuxtApp._scope.stop()
-  window.location.href = href
+  nuxtApp._scope.stop();
+  window.location.href = href;
   if (href.includes('#')) {
-    window.location.reload()
+    window.location.reload();
   }
 
-  return new Promise<void>(() => {})
+  return new Promise<void>(() => {});
 }

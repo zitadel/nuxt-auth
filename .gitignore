@@ -71,5 +71,17 @@ Thumbs.db
 # Jest coverage
 .out
 
+# TypeDoc output
+docs
+
 # Github Keys
 *.pem
+.devbox/
+
+# Playground build artifacts (not tracked)
+playground/node_modules/
+playground/dist/
+playground/build/
+build/playwright/
+build/playwright-report/
+playground-authjs/

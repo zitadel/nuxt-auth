@@ -1,30 +1,26 @@
-import mridangPlugin from '@mridang/eslint-defaults'
-import nuxtPlugin from '@nuxt/eslint-plugin'
+import mridangPlugin from '@mridang/eslint-defaults';
+import nuxtPlugin from '@nuxt/eslint-plugin';
 
 export default [
   {
     ignores: [
       '**/.nuxt/**',
-      '**/.output/**',
+      'playground-authjs/**',
+      '.output/**',
       '.out/**',
       'dist/**',
       'docs/**',
+      'docs-src/**',
       'build/**',
-      '*.config.*',
+      'playground/**',
+      'build.config.ts',
+      'vitest.config.ts',
+      'vitest.nuxt.config.ts',
       '**/*.css',
     ],
   },
   ...mridangPlugin.configs.recommended,
   { plugins: { nuxt: nuxtPlugin } },
-  {
-    files: ['**/*.{yml,yaml}'],
-    rules: {
-      // Defer YAML quote style to prettier — yml/quotes (from
-      // @nuxt/eslint-plugin) wants double quotes, prettier wants
-      // single, and the two cycle endlessly when both run.
-      'yml/quotes': 'off',
-    },
-  },
   {
     files: ['src/**/*.ts'],
     rules: {
@@ -37,4 +33,4 @@ export default [
       'no-redeclare': 'off',
     },
   },
-]
+];

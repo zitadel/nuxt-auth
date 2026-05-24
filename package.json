@@ -15,12 +15,15 @@
     "build": "nuxi build",
     "lint": "eslint .",
     "lint:fix": "npx eslint . --fix",
-    "clean": "rm -rf playground/.nuxt dist .nuxt .out",
+    "clean": "rm -rf playground/.nuxt dist .nuxt",
     "typecheck": "nuxi prepare playground && tsc --noEmit",
     "dev:prepare": "nuxt-module-build build --stub",
     "docs": "typedoc",
-    "test": "vitest run && vitest run --config vitest.nuxt.config.ts",
-    "test:watch": "npm run test -- --watch",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "vitest run test/ && vitest run --config vitest.nuxt.config.ts",
+    "test:e2e": "vitest run spec/",
+    "test:e2e:ui": "vitest --ui spec/",
+    "test:watch": "vitest test/",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -35,12 +38,22 @@
     ".": {
       "types": "./dist/types.d.mts",
       "import": "./dist/module.mjs"
+    },
+    "./server": {
+      "types": "./dist/runtime/server/services/index.d.ts",
+      "import": "./dist/runtime/server/services/index.js"
+    },
+    "./adapters": {
+      "types": "./dist/adapter.d.mts"
     }
   },
   "typesVersions": {
     "*": {
       ".": [
         "./dist/types.d.mts"
+      ],
+      "server": [
+        "./dist/runtime/server/services/index.d.ts"
       ]
     }
   },
@@ -62,7 +75,7 @@
     "zitadel"
   ],
   "workspaces": [
-    "playground-authjs"
+    "playground"
   ],
   "peerDependencies": {
     "@auth/core": ">=0.40.0",
@@ -71,7 +84,6 @@
     "vue": "^3.0.0"
   },
   "devDependencies": {
-    "@auth/core": "^0.40.0",
     "@commitlint/config-conventional": "^20.5.0",
     "@mridang/eslint-defaults": "^1.6.1",
     "@nuxt/eslint-plugin": "^1.0.0",
@@ -92,7 +104,7 @@
     "nuxt": "^4.0.0",
     "playwright": "^1.52.0",
     "prettier": "3.6.2",
-    "semantic-release": "^25.0.1",
+    "semantic-release": "^25.0.3",
     "testcontainers": "^11.12.0",
     "ts-essentials": "^10.1.1",
     "typedoc": "^0.28.7",

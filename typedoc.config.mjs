@@ -1,4 +1,5 @@
 // noinspection JSUnusedGlobalSymbols
+/** @type {import('typedoc').TypeDocOptions} */
 export default {
   readme: 'README.md',
   entryPoints: [
@@ -8,18 +9,17 @@ export default {
     'src/runtime/server/services/index.ts',
   ],
   projectDocuments: [
-    'docs/guide/getting-started/introduction.md',
-    'docs/guide/authjs/quick-start.md',
-    'docs/guide/application-side/configuration.md',
-    'docs/guide/advanced/caching.md',
+    'docs-src/guide/getting-started/introduction.md',
+    'docs-src/guide/authjs/quick-start.md',
+    'docs-src/guide/application-side/configuration.md',
+    'docs-src/guide/advanced/caching.md',
   ],
   tsconfig: './tsconfig.json',
-  out: '.out/docs',
+  out: 'docs',
   highlightLanguages: [
     'typescript',
     'javascript',
     'json',
-    'astro',
     'jsx',
     'bash',
     'sh',
@@ -28,12 +28,63 @@ export default {
     'diff',
     'dotenv',
   ],
+  externalSymbolLinkMappings: {
+    oauth4webapi: {
+      'TokenEndpointResponse.expires_in':
+        'https://github.com/panva/oauth4webapi/blob/HEAD/docs/interfaces/TokenEndpointResponse.md',
+      'TokenEndpointResponse.access_token':
+        'https://github.com/panva/oauth4webapi/blob/HEAD/docs/interfaces/TokenEndpointResponse.md',
+      'TokenEndpointResponse.refresh_token':
+        'https://github.com/panva/oauth4webapi/blob/HEAD/docs/interfaces/TokenEndpointResponse.md',
+    },
+    '@auth/core': {
+      'AuthConfig.adapter': 'https://authjs.dev/reference/core#adapter',
+      'AuthConfig.session': 'https://authjs.dev/reference/core#session',
+      JWT: 'https://authjs.dev/reference/core/jwt',
+      'AuthConfig.logger': 'https://authjs.dev/guides/debugging#logging',
+      'AuthConfig.debug': 'https://authjs.dev/guides/debugging',
+      'AuthConfig.pages':
+        'https://authjs.dev/getting-started/session-management/custom-pages',
+      OAuthConfig: 'https://authjs.dev/reference/core/providers#oauthconfig',
+      'OAuthConfig.profile':
+        'https://authjs.dev/reference/core/providers#profile',
+      CredentialsConfig:
+        'https://authjs.dev/reference/core/providers/credentials',
+      'CredentialsConfig.authorize':
+        'https://authjs.dev/reference/core/providers/credentials#authorize',
+      TokenSet: 'https://authjs.dev/reference/core/types#account',
+      OAuth2Config: 'https://authjs.dev/reference/core/providers#oauth2config',
+      'OAuth2Config.checks':
+        'https://authjs.dev/reference/core/providers#checks',
+    },
+    '@auth/core/types': {
+      'AuthConfig.adapter': 'https://authjs.dev/reference/core#adapter',
+      'AuthConfig.session': 'https://authjs.dev/reference/core#session',
+      JWT: 'https://authjs.dev/reference/core/jwt',
+      'AuthConfig.logger': 'https://authjs.dev/guides/debugging#logging',
+      'AuthConfig.debug': 'https://authjs.dev/guides/debugging',
+      'AuthConfig.pages':
+        'https://authjs.dev/getting-started/session-management/custom-pages',
+      OAuthConfig: 'https://authjs.dev/reference/core/providers#oauthconfig',
+      'OAuthConfig.profile':
+        'https://authjs.dev/reference/core/providers#profile',
+      CredentialsConfig:
+        'https://authjs.dev/reference/core/providers/credentials',
+      'CredentialsConfig.authorize':
+        'https://authjs.dev/reference/core/providers/credentials#authorize',
+      TokenSet: 'https://authjs.dev/reference/core/types#account',
+      OAuth2Config: 'https://authjs.dev/reference/core/providers#oauth2config',
+      'OAuth2Config.checks':
+        'https://authjs.dev/reference/core/providers#checks',
+    },
+  },
   cleanOutputDir: true,
   treatWarningsAsErrors: false,
   excludeInternal: true,
+  excludePrivate: true,
   validation: {
     invalidLink: true,
     notExported: true,
     notDocumented: false,
   },
-}
+};

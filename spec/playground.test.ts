@@ -4,7 +4,7 @@
  *
  * ## Global middleware tests
  *
- * The playground-authjs application defines five pages under
+ * The playground application defines five pages under
  * `/middleware-test/`, each with a different `auth` meta value:
  *
  * | Page            | Meta                                          |
@@ -45,11 +45,11 @@
  *
  * @module
  */
-import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
-import { createPage, setup, url } from '@nuxt/test-utils/e2e'
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
+import { createPage, setup, url } from '@nuxt/test-utils/e2e';
 
-type Page = Awaited<ReturnType<typeof createPage>>
+type Page = Awaited<ReturnType<typeof createPage>>;
 
 /**
  * Drives the Auth.js credentials sign-in form rendered at
@@ -59,16 +59,16 @@ type Page = Awaited<ReturnType<typeof createPage>>
  * @param page - The Playwright page instance to drive.
  */
 async function signIn(page: Page): Promise<void> {
-  await page.goto(url('/api/auth/signin'))
-  await page.waitForSelector('input[name="username"]', { timeout: 10000 })
-  await page.fill('input[name="username"]', 'jsmith')
-  await page.fill('input[name="password"]', 'hunter2')
+  await page.goto(url('/api/auth/signin'));
+  await page.waitForSelector('input[name="username"]', { timeout: 10000 });
+  await page.fill('input[name="username"]', 'jsmith');
+  await page.fill('input[name="password"]', 'hunter2');
   await page
     .locator('form:has(input[name="username"]) button[type="submit"]')
-    .click()
+    .click();
   await page.waitForURL((pageUrl) => !pageUrl.href.includes('/api/auth/'), {
     timeout: 10000,
-  })
+  });
 }
 
 /**
@@ -84,15 +84,15 @@ async function expectAccessGranted(
   path: string,
   heading: string,
 ): Promise<void> {
-  await page.goto(url(path), { waitUntil: 'networkidle' })
-  const currentUrl = page.url()
-  const currentPath = new URL(currentUrl).pathname
+  await page.goto(url(path), { waitUntil: 'networkidle' });
+  const currentUrl = page.url();
+  const currentPath = new URL(currentUrl).pathname;
   expect(
     currentPath,
     `Expected to stay on ${path} but was redirected to ${currentPath}`,
-  ).toBe(path)
-  const h1 = await page.textContent('h1')
-  expect(h1).toBe(heading)
+  ).toBe(path);
+  const h1 = await page.textContent('h1');
+  expect(h1).toBe(heading);
 }
 
 /**
@@ -103,9 +103,9 @@ async function expectAccessGranted(
  * @param path - The URL path to navigate to.
  */
 async function expectRedirected(page: Page, path: string): Promise<void> {
-  await page.goto(url(path), { waitUntil: 'networkidle' })
-  const currentPath = new URL(page.url()).pathname
-  expect(currentPath).not.toBe(path)
+  await page.goto(url(path), { waitUntil: 'networkidle' });
+  const currentPath = new URL(page.url()).pathname;
+  expect(currentPath).not.toBe(path);
 }
 
 const pages = [
@@ -114,13 +114,13 @@ const pages = [
   { path: '/middleware-test/auth-true', heading: 'auth-true' },
   { path: '/middleware-test/protected', heading: 'protected' },
   { path: '/middleware-test/guest-only', heading: 'guest-only' },
-] as const
+] as const;
 
-const TEST_PORT = 3456
+const TEST_PORT = 3456;
 
 describe('global auth middleware', async () => {
   await setup({
-    rootDir: fileURLToPath(new URL('../playground-authjs', import.meta.url)),
+    rootDir: fileURLToPath(new URL('../playground', import.meta.url)),
     browser: true,
     server: true,
     build: true,
@@ -129,283 +129,283 @@ describe('global auth middleware', async () => {
       AUTH_ORIGIN: `http://localhost:${TEST_PORT}/api/auth`,
       AUTH_SECRET: 'test-secret-for-testing',
     },
-  })
+  });
 
   describe('unauthenticated', () => {
     it('redirects from no-meta (protected by global middleware)', async () => {
-      const page = await createPage()
-      await expectRedirected(page, pages[0].path)
-      await page.close()
-    })
+      const page = await createPage();
+      await expectRedirected(page, pages[0].path);
+      await page.close();
+    });
 
     it('allows access to auth-false (opted out)', async () => {
-      const page = await createPage()
-      await expectAccessGranted(page, pages[1].path, pages[1].heading)
-      await page.close()
-    })
+      const page = await createPage();
+      await expectAccessGranted(page, pages[1].path, pages[1].heading);
+      await page.close();
+    });
 
     it('redirects from auth-true (protected)', async () => {
-      const page = await createPage()
-      await expectRedirected(page, pages[2].path)
-      await page.close()
-    })
+      const page = await createPage();
+      await expectRedirected(page, pages[2].path);
+      await page.close();
+    });
 
     it('redirects from protected (unauthenticatedOnly: false)', async () => {
-      const page = await createPage()
-      await expectRedirected(page, pages[3].path)
-      await page.close()
-    })
+      const page = await createPage();
+      await expectRedirected(page, pages[3].path);
+      await page.close();
+    });
 
     it('allows access to guest-only (unauthenticatedOnly: true)', async () => {
-      const page = await createPage()
-      await expectAccessGranted(page, pages[4].path, pages[4].heading)
-      await page.close()
-    })
-  })
+      const page = await createPage();
+      await expectAccessGranted(page, pages[4].path, pages[4].heading);
+      await page.close();
+    });
+  });
 
   describe('authenticated', () => {
     it('allows access to no-meta', async () => {
-      const page = await createPage()
-      await signIn(page)
-      await expectAccessGranted(page, pages[0].path, pages[0].heading)
-      await page.close()
-    })
+      const page = await createPage();
+      await signIn(page);
+      await expectAccessGranted(page, pages[0].path, pages[0].heading);
+      await page.close();
+    });
 
     it('allows access to auth-false', async () => {
-      const page = await createPage()
-      await signIn(page)
-      await expectAccessGranted(page, pages[1].path, pages[1].heading)
-      await page.close()
-    })
+      const page = await createPage();
+      await signIn(page);
+      await expectAccessGranted(page, pages[1].path, pages[1].heading);
+      await page.close();
+    });
 
     it('allows access to auth-true', async () => {
-      const page = await createPage()
-      await signIn(page)
-      await expectAccessGranted(page, pages[2].path, pages[2].heading)
-      await page.close()
-    })
+      const page = await createPage();
+      await signIn(page);
+      await expectAccessGranted(page, pages[2].path, pages[2].heading);
+      await page.close();
+    });
 
     it('allows access to protected', async () => {
-      const page = await createPage()
-      await signIn(page)
-      await expectAccessGranted(page, pages[3].path, pages[3].heading)
-      await page.close()
-    })
+      const page = await createPage();
+      await signIn(page);
+      await expectAccessGranted(page, pages[3].path, pages[3].heading);
+      await page.close();
+    });
 
     it('redirects from guest-only (authenticated users not allowed)', async () => {
-      const page = await createPage()
-      await signIn(page)
-      await expectRedirected(page, pages[4].path)
-      await page.close()
-    })
-  })
+      const page = await createPage();
+      await signIn(page);
+      await expectRedirected(page, pages[4].path);
+      await page.close();
+    });
+  });
 
   describe('open redirect prevention', () => {
     it('rejects an external callbackUrl passed via sign-in query param', async () => {
-      const page = await createPage()
+      const page = await createPage();
       await page.goto(
         url('/api/auth/signin?callbackUrl=https://evil.example.com'),
-      )
-      await page.waitForSelector('input[name="username"]', { timeout: 10000 })
-      await page.fill('input[name="username"]', 'jsmith')
-      await page.fill('input[name="password"]', 'hunter2')
+      );
+      await page.waitForSelector('input[name="username"]', { timeout: 10000 });
+      await page.fill('input[name="username"]', 'jsmith');
+      await page.fill('input[name="password"]', 'hunter2');
       await page
         .locator('form:has(input[name="username"]) button[type="submit"]')
-        .click()
+        .click();
       await page.waitForURL((pageUrl) => !pageUrl.href.includes('/api/auth/'), {
         timeout: 10000,
-      })
+      });
 
-      const finalUrl = new URL(page.url())
+      const finalUrl = new URL(page.url());
       expect(
         finalUrl.hostname,
         `Expected to stay on the app but was redirected to ${finalUrl.href}`,
-      ).not.toBe('evil.example.com')
-      await page.close()
-    })
+      ).not.toBe('evil.example.com');
+      await page.close();
+    });
 
     it('rejects an external callbackUrl passed via sign-out query param', async () => {
-      const page = await createPage()
-      await signIn(page)
+      const page = await createPage();
+      await signIn(page);
 
       await page.goto(
         url('/api/auth/signout?callbackUrl=https://evil.example.com'),
-      )
-      await page.waitForSelector('button[type="submit"]', { timeout: 10000 })
-      await page.locator('button[type="submit"]').click()
+      );
+      await page.waitForSelector('button[type="submit"]', { timeout: 10000 });
+      await page.locator('button[type="submit"]').click();
       await page.waitForURL((pageUrl) => !pageUrl.href.includes('/api/auth/'), {
         timeout: 10000,
-      })
+      });
 
-      const finalUrl = new URL(page.url())
+      const finalUrl = new URL(page.url());
       expect(
         finalUrl.hostname,
         `Expected to stay on the app but was redirected to ${finalUrl.href}`,
-      ).not.toBe('evil.example.com')
-      await page.close()
-    })
-  })
+      ).not.toBe('evil.example.com');
+      await page.close();
+    });
+  });
 
   describe('page-level protection', () => {
     it('redirects unauthenticated user from globally protected page', async () => {
-      const page = await createPage()
-      await expectRedirected(page, '/protected/globally')
-      await page.close()
-    })
+      const page = await createPage();
+      await expectRedirected(page, '/protected/globally');
+      await page.close();
+    });
 
     it('allows authenticated user to access globally protected page', async () => {
-      const page = await createPage()
-      await signIn(page)
+      const page = await createPage();
+      await signIn(page);
       await expectAccessGranted(
         page,
         '/protected/globally',
         'Globally protected',
-      )
-      await page.close()
-    })
+      );
+      await page.close();
+    });
 
     it('redirects unauthenticated user from locally protected page', async () => {
-      const page = await createPage()
-      await expectRedirected(page, '/protected/locally')
-      await page.close()
-    })
-  })
+      const page = await createPage();
+      await expectRedirected(page, '/protected/locally');
+      await page.close();
+    });
+  });
 
   describe('composable signIn (homepage button)', () => {
     it('credentials sign-in via composable completes the login flow', async () => {
-      const page = await createPage()
-      await page.goto(url('/'))
+      const page = await createPage();
+      await page.goto(url('/'));
       await page.waitForSelector('[data-testid="signin-credentials"]', {
         timeout: 10000,
-      })
-      await page.click('[data-testid="signin-credentials"]')
+      });
+      await page.click('[data-testid="signin-credentials"]');
       // The composable navigates to the Auth.js built-in credentials form.
-      await page.waitForSelector('input[name="username"]', { timeout: 10000 })
-      await page.fill('input[name="username"]', 'jsmith')
-      await page.fill('input[name="password"]', 'hunter2')
+      await page.waitForSelector('input[name="username"]', { timeout: 10000 });
+      await page.fill('input[name="username"]', 'jsmith');
+      await page.fill('input[name="password"]', 'hunter2');
       await page
         .locator('form:has(input[name="username"]) button[type="submit"]')
-        .click()
+        .click();
       await page.waitForURL((pageUrl) => !pageUrl.href.includes('/api/auth/'), {
         timeout: 10000,
-      })
+      });
       // Verify we're back in the app and not stuck on an auth page
-      const currentPath = new URL(page.url()).pathname
-      expect(currentPath).not.toContain('/api/auth/')
-      await page.close()
-    })
-  })
+      const currentPath = new URL(page.url()).pathname;
+      expect(currentPath).not.toContain('/api/auth/');
+      await page.close();
+    });
+  });
 
   describe('invalid credentials', () => {
     it('stays on the sign-in page after submitting wrong credentials', async () => {
-      const page = await createPage()
-      await page.goto(url('/api/auth/signin'))
-      await page.waitForSelector('input[name="username"]', { timeout: 10000 })
-      await page.fill('input[name="username"]', 'jsmith')
-      await page.fill('input[name="password"]', 'wrong-password')
+      const page = await createPage();
+      await page.goto(url('/api/auth/signin'));
+      await page.waitForSelector('input[name="username"]', { timeout: 10000 });
+      await page.fill('input[name="username"]', 'jsmith');
+      await page.fill('input[name="password"]', 'wrong-password');
       await page
         .locator('form:has(input[name="username"]) button[type="submit"]')
-        .click()
-      await page.waitForLoadState('networkidle')
+        .click();
+      await page.waitForLoadState('networkidle');
 
-      const currentPath = new URL(page.url()).pathname
+      const currentPath = new URL(page.url()).pathname;
       expect(
         currentPath,
         'Expected to stay on the sign-in page after invalid credentials',
-      ).toContain('/api/auth/signin')
-      await page.close()
-    })
+      ).toContain('/api/auth/signin');
+      await page.close();
+    });
 
     it('does not create a session after invalid credentials', async () => {
-      const page = await createPage()
-      await page.goto(url('/api/auth/signin'))
-      await page.waitForSelector('input[name="username"]', { timeout: 10000 })
-      await page.fill('input[name="username"]', 'jsmith')
-      await page.fill('input[name="password"]', 'wrong-password')
+      const page = await createPage();
+      await page.goto(url('/api/auth/signin'));
+      await page.waitForSelector('input[name="username"]', { timeout: 10000 });
+      await page.fill('input[name="username"]', 'jsmith');
+      await page.fill('input[name="password"]', 'wrong-password');
       await page
         .locator('form:has(input[name="username"]) button[type="submit"]')
-        .click()
-      await page.waitForLoadState('networkidle')
+        .click();
+      await page.waitForLoadState('networkidle');
 
       // Navigate to a protected page — should be redirected
-      await expectRedirected(page, '/middleware-test/no-meta')
-      await page.close()
-    })
-  })
+      await expectRedirected(page, '/middleware-test/no-meta');
+      await page.close();
+    });
+  });
 
   describe('DefaultRefreshHandler', () => {
     it('refreshes the session periodically', async () => {
-      const page = await createPage()
-      await signIn(page)
-      await page.goto(url('/refresh-test'), { waitUntil: 'networkidle' })
+      const page = await createPage();
+      await signIn(page);
+      await page.goto(url('/refresh-test'), { waitUntil: 'networkidle' });
 
-      await page.waitForSelector('[data-testid="status"]')
+      await page.waitForSelector('[data-testid="status"]');
       const initialCount = parseInt(
         (
           (await page.textContent('[data-testid="refresh-count"]')) ?? '0'
         ).trim(),
         10,
-      )
+      );
 
       // Wait longer than one periodic interval (3 s)
-      await page.waitForTimeout(5000)
+      await page.waitForTimeout(5000);
 
       const updatedCount = parseInt(
         (
           (await page.textContent('[data-testid="refresh-count"]')) ?? '0'
         ).trim(),
         10,
-      )
+      );
       expect(
         updatedCount,
         `Expected refresh count to increase from ${initialCount} after 5 s`,
-      ).toBeGreaterThan(initialCount)
+      ).toBeGreaterThan(initialCount);
 
-      await page.close()
-    })
+      await page.close();
+    });
 
     it('refreshes the session on tab focus', async () => {
-      const page = await createPage()
-      await signIn(page)
-      await page.goto(url('/refresh-test'), { waitUntil: 'networkidle' })
+      const page = await createPage();
+      await signIn(page);
+      await page.goto(url('/refresh-test'), { waitUntil: 'networkidle' });
 
-      await page.waitForSelector('[data-testid="status"]')
+      await page.waitForSelector('[data-testid="status"]');
       const before = (
         (await page.textContent('[data-testid="last-refreshed-at"]')) ?? ''
-      ).trim()
+      ).trim();
 
       // Ensure a detectable timestamp difference
-      await page.waitForTimeout(1100)
+      await page.waitForTimeout(1100);
 
       // Simulate tab blur then tab focus
       await page.evaluate(() => {
         Object.defineProperty(document, 'visibilityState', {
           value: 'hidden',
           configurable: true,
-        })
-        document.dispatchEvent(new Event('visibilitychange'))
-      })
-      await page.waitForTimeout(200)
+        });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      await page.waitForTimeout(200);
       await page.evaluate(() => {
         Object.defineProperty(document, 'visibilityState', {
           value: 'visible',
           configurable: true,
-        })
-        document.dispatchEvent(new Event('visibilitychange'))
-      })
+        });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
 
       // Wait for the refresh fetch to complete
-      await page.waitForTimeout(2000)
+      await page.waitForTimeout(2000);
 
       const after = (
         (await page.textContent('[data-testid="last-refreshed-at"]')) ?? ''
-      ).trim()
+      ).trim();
       expect(
         after,
         'Expected lastRefreshedAt to change after simulated tab focus',
-      ).not.toBe(before)
+      ).not.toBe(before);
 
-      await page.close()
-    })
-  })
-})
+      await page.close();
+    });
+  });
+});

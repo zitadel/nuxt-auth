@@ -1,8 +1,8 @@
 import type {
   DefaultRefreshHandlerConfig,
   RefreshHandler,
-} from '../../shared/types'
-import { useAuth } from '#imports'
+} from '../../shared/types';
+import { useAuth } from '#imports';
 
 /**
  * Default implementation of {@link RefreshHandler} that keeps the Auth.js
@@ -30,42 +30,42 @@ import { useAuth } from '#imports'
  */
 export class DefaultRefreshHandler implements RefreshHandler {
   /** Cached return value of {@link useAuth}, used for session data and refresh. */
-  auth?: ReturnType<typeof useAuth>
+  auth?: ReturnType<typeof useAuth>;
 
   /** Handle returned by `setInterval`, cleared in {@link destroy}. */
-  refetchIntervalTimer?: ReturnType<typeof setInterval>
+  refetchIntervalTimer?: ReturnType<typeof setInterval>;
 
   /** Pre-bound reference to {@link visibilityHandler} so the same function
    *  can be passed to both `addEventListener` and `removeEventListener`. */
-  private readonly boundVisibilityHandler: typeof this.visibilityHandler
+  private readonly boundVisibilityHandler: typeof this.visibilityHandler;
 
   constructor(public readonly config: DefaultRefreshHandlerConfig) {
-    this.boundVisibilityHandler = this.visibilityHandler.bind(this)
+    this.boundVisibilityHandler = this.visibilityHandler.bind(this);
   }
 
   /** Starts the periodic timer and visibility listener. */
   init(): void {
-    this.auth = useAuth()
+    this.auth = useAuth();
 
     document.addEventListener(
       'visibilitychange',
       this.boundVisibilityHandler,
       false,
-    )
+    );
 
-    const { enablePeriodically } = this.config
+    const { enablePeriodically } = this.config;
 
     if (enablePeriodically !== false && enablePeriodically !== undefined) {
       const intervalTime =
         enablePeriodically === true
           ? 1000
-          : Math.min(enablePeriodically, MAX_SAFE_INTERVAL_MS)
+          : Math.min(enablePeriodically, MAX_SAFE_INTERVAL_MS);
 
       this.refetchIntervalTimer = setInterval(() => {
         if (this.auth?.data.value) {
-          void this.auth.refresh()
+          void this.auth.refresh();
         }
-      }, intervalTime)
+      }, intervalTime);
     }
   }
 
@@ -75,9 +75,9 @@ export class DefaultRefreshHandler implements RefreshHandler {
       'visibilitychange',
       this.boundVisibilityHandler,
       false,
-    )
-    clearInterval(this.refetchIntervalTimer)
-    this.auth = undefined
+    );
+    clearInterval(this.refetchIntervalTimer);
+    this.auth = undefined;
   }
 
   /** Handles `visibilitychange` events — refreshes the session when the tab
@@ -89,10 +89,10 @@ export class DefaultRefreshHandler implements RefreshHandler {
       document.visibilityState === 'visible' &&
       this.auth?.data.value
     ) {
-      void this.auth.refresh()
+      void this.auth.refresh();
     }
   }
 }
 
 /** Maximum delay accepted by `setInterval` (signed 32-bit integer). */
-const MAX_SAFE_INTERVAL_MS = 2147483647
+const MAX_SAFE_INTERVAL_MS = 2147483647;

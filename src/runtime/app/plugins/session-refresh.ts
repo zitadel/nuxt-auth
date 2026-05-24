@@ -1,6 +1,6 @@
-import { DefaultRefreshHandler } from '../utils/refreshHandler'
-import { useAuthState } from '../composables/useAuth'
-import { defineNuxtPlugin, useRuntimeConfig } from '#imports'
+import { DefaultRefreshHandler } from '../utils/refreshHandler';
+import { useAuthState } from '../composables/useAuth';
+import { defineNuxtPlugin, useRuntimeConfig } from '#imports';
 
 // noinspection JSUnusedGlobalSymbols
 /**
@@ -74,17 +74,17 @@ import { defineNuxtPlugin, useRuntimeConfig } from '#imports'
  * @see {@link DefaultRefreshHandlerConfig} for the configuration shape.
  */
 export default defineNuxtPlugin((nuxtApp) => {
-  const { data, lastRefreshedAt } = useAuthState()
-  const config = useRuntimeConfig().public.auth.sessionRefresh
-  const handler = new DefaultRefreshHandler(config)
+  const { data, lastRefreshedAt } = useAuthState();
+  const config = useRuntimeConfig().public.auth.sessionRefresh;
+  const handler = new DefaultRefreshHandler(config);
 
   nuxtApp.hook('app:mounted', () => {
-    handler.init()
-  })
+    handler.init();
+  });
 
   nuxtApp.vueApp.onUnmount(() => {
-    handler.destroy()
-    lastRefreshedAt.value = undefined
-    data.value = undefined
-  })
-})
+    handler.destroy();
+    lastRefreshedAt.value = undefined;
+    data.value = undefined;
+  });
+});

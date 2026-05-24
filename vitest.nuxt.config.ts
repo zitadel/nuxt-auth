@@ -1,5 +1,5 @@
-import { fileURLToPath } from 'node:url'
-import { defineVitestConfig } from '@nuxt/test-utils/config'
+import { fileURLToPath } from 'node:url';
+import { defineVitestConfig } from '@nuxt/test-utils/config';
 
 export default defineVitestConfig({
   test: {
@@ -19,8 +19,8 @@ export default defineVitestConfig({
     },
     environmentOptions: {
       nuxt: {
-        rootDir: fileURLToPath(new URL('./playground-authjs', import.meta.url)),
+        rootDir: fileURLToPath(new URL('./playground', import.meta.url)),
       },
     },
   },
-})
+});

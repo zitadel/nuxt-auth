@@ -1,6 +1,6 @@
-import { parseURL } from 'ufo'
-import { defineNitroPlugin } from 'nitropack/runtime/plugin'
-import { useRuntimeConfig } from '#imports'
+import { parseURL } from 'ufo';
+import { defineNitroPlugin } from 'nitropack/runtime/plugin';
+import { useRuntimeConfig } from '#imports';
 
 // noinspection JSUnusedGlobalSymbols
 /**
@@ -19,7 +19,7 @@ import { useRuntimeConfig } from '#imports'
  *
  * 1. Reads `runtimeConfig.public.auth.baseURL` as the starting value.
  * 2. On the server, checks the environment variable named by `originEnvKey`
- *    (defaulting to `AUTH_ORIGIN`) and uses its value if set.
+ *    (defaulting to `AUTH_URL`) and uses its value if set.
  * 3. The result is parsed with `parseURL` from `ufo`. If both `protocol` and
  *    `host` are present, the origin is considered valid and the plugin succeeds
  *    silently.
@@ -28,27 +28,27 @@ import { useRuntimeConfig } from '#imports'
  */
 export default defineNitroPlugin(() => {
   try {
-    const runtimeConfig = useRuntimeConfig()
+    const runtimeConfig = useRuntimeConfig();
 
-    const originEnvKey = runtimeConfig.public.auth.originEnvKey
+    const originEnvKey = runtimeConfig.public.auth.originEnvKey;
     const parsed = parseURL(
       (originEnvKey && process.env[originEnvKey]) ||
         runtimeConfig.public.auth.baseURL,
-    )
+    );
 
     if (!parsed.protocol || !parsed.host) {
       // noinspection ExceptionCaughtLocallyJS
       throw new Error(
         'AUTH_NO_ORIGIN: No `origin` - this is an error in production. You can ignore this during development',
-      )
+      );
     }
   } catch (error) {
     if (process.env.NODE_ENV !== 'production') {
       console.warn(
         '[@zitadel/nuxt-auth] AUTH_NO_ORIGIN: No `origin` - this is an error in production. You can ignore this during development',
-      )
+      );
     } else {
-      throw error
+      throw error;
     }
   }
-})
+});

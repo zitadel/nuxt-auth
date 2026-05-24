@@ -1,0 +1,17 @@
+{
+  "private": true,
+  "name": "nuxt-auth-playground",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dev": "nuxt dev --port ${PORT:-3000}",
+    "build": "nuxi build",
+    "start": "nuxi preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@auth/core": ">=0.40.0",
+    "nuxt": "^4.0.0",
+    "typescript": "^5.8.3",
+    "vue-tsc": "^2.2.12"
+  }
+}

@@ -20,32 +20,32 @@
  *
  * @module
  */
-import { fileURLToPath } from 'node:url'
-import { describe, expect, it } from 'vitest'
-import { setup, url } from '@nuxt/test-utils/e2e'
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
+import { setup, url } from '@nuxt/test-utils/e2e';
 
-const TEST_PORT = 3457
+const TEST_PORT = 3457;
 
 describe('server-side route protection', async () => {
   await setup({
-    rootDir: fileURLToPath(new URL('../playground-authjs', import.meta.url)),
+    rootDir: fileURLToPath(new URL('../playground', import.meta.url)),
     server: true,
     build: true,
     port: TEST_PORT,
     env: {
-      AUTH_ORIGIN: `http://localhost:${TEST_PORT}/api/auth`,
+      AUTH_URL: `http://localhost:${TEST_PORT}/api/auth`,
       AUTH_SECRET: 'test-secret-for-testing',
     },
-  })
+  });
 
   /**
    * Authenticates via the credentials callback and returns the combined
    * session cookies as a string suitable for the `Cookie` header.
    */
   async function login(): Promise<string> {
-    const csrfResponse = await fetch(url('/api/auth/csrf'))
-    const { csrfToken } = await csrfResponse.json()
-    const cookies = csrfResponse.headers.getSetCookie()
+    const csrfResponse = await fetch(url('/api/auth/csrf'));
+    const { csrfToken } = await csrfResponse.json();
+    const cookies = csrfResponse.headers.getSetCookie();
 
     const loginResponse = await fetch(url('/api/auth/callback/credentials'), {
       method: 'POST',
@@ -59,80 +59,80 @@ describe('server-side route protection', async () => {
         csrfToken,
       }),
       redirect: 'manual',
-    })
+    });
 
-    return [...cookies, ...loginResponse.headers.getSetCookie()].join('; ')
+    return [...cookies, ...loginResponse.headers.getSetCookie()].join('; ');
   }
 
   describe('unauthenticated', () => {
     it('allows access to unprotected route', async () => {
-      const response = await fetch(url('/api/unprotected'))
-      expect(response.status).toBe(200)
-      const body = await response.json()
-      expect(body.status).toBe('ok')
-    })
+      const response = await fetch(url('/api/unprotected'));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.status).toBe('ok');
+    });
 
     it('rejects access to secured route with 403', async () => {
-      const response = await fetch(url('/api/secured'))
-      expect(response.status).toBe(403)
-    })
+      const response = await fetch(url('/api/secured'));
+      expect(response.status).toBe(403);
+    });
 
     it('returns unauthenticated from inline-protected route', async () => {
-      const response = await fetch(url('/api/protected/inline'))
-      expect(response.status).toBe(200)
-      const body = await response.json()
-      expect(body.status).toBe('unauthenticated!')
-    })
+      const response = await fetch(url('/api/protected/inline'));
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.status).toBe('unauthenticated!');
+    });
 
     it('rejects access to middleware-protected route with 403', async () => {
-      const response = await fetch(url('/api/protected/middleware'))
-      expect(response.status).toBe(403)
-    })
-  })
+      const response = await fetch(url('/api/protected/middleware'));
+      expect(response.status).toBe(403);
+    });
+  });
 
   describe('authenticated', () => {
     it('allows access to unprotected route', async () => {
-      const cookies = await login()
+      const cookies = await login();
       const response = await fetch(url('/api/unprotected'), {
         headers: { Cookie: cookies },
-      })
-      expect(response.status).toBe(200)
-      const body = await response.json()
-      expect(body.status).toBe('ok')
-    })
+      });
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.status).toBe('ok');
+    });
 
     it('allows access to secured route with session', async () => {
-      const cookies = await login()
+      const cookies = await login();
       const response = await fetch(url('/api/secured'), {
         headers: { Cookie: cookies },
-      })
-      expect(response.status).toBe(200)
-      const body = await response.json()
-      expect(body.status).toBe('ok')
-      expect(body.session).toBeDefined()
-      expect(body.session.user).toBeDefined()
-    })
+      });
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.status).toBe('ok');
+      expect(body.session).toBeDefined();
+      expect(body.session.user).toBeDefined();
+    });
 
     it('returns authenticated from inline-protected route with session', async () => {
-      const cookies = await login()
+      const cookies = await login();
       const response = await fetch(url('/api/protected/inline'), {
         headers: { Cookie: cookies },
-      })
-      expect(response.status).toBe(200)
-      const body = await response.json()
-      expect(body.status).toBe('authenticated!')
-      expect(body.session).toBeDefined()
-      expect(body.session.user).toBeDefined()
-    })
+      });
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.status).toBe('authenticated!');
+      expect(body.session).toBeDefined();
+      expect(body.session.user).toBeDefined();
+    });
 
     it('allows access to middleware-protected route with session', async () => {
-      const cookies = await login()
+      const cookies = await login();
       const response = await fetch(url('/api/protected/middleware'), {
         headers: { Cookie: cookies },
-      })
-      expect(response.status).toBe(200)
-      const body = await response.json()
-      expect(body.status).toBe('authenticated')
-    })
-  })
-})
+      });
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.status).toBe('authenticated');
+    });
+  });
+});
