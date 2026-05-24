@@ -172,16 +172,20 @@ export function NuxtAuth(nuxtAuthOptions?: AuthConfig): {
     patchCookieHeader(request, event);
 
     const response = await Auth(request, authOptions);
-    const data = await response.json();
-    if (
-      typeof data === 'object' &&
-      data !== null &&
-      Object.keys(data).length > 0
-    ) {
-      return data as Session;
-    }
+    const data = (await response.json()) as Record<string, unknown> | null;
 
-    return null;
+    // An empty session is `{}` with status 200; non-200 responses (e.g.
+    // 401/500) typically carry `{ message: "..." }` and must NOT be
+    // returned as a Session — that would let callers mistake an error
+    // payload for a valid logged-in session. Match the status check the
+    // other 7 SDK getSession implementations use.
+    if (!data || !Object.keys(data).length) {
+      return null;
+    }
+    if (response.status === 200) {
+      return data as unknown as Session;
+    }
+    throw new Error((data as { message?: string }).message ?? 'Session error');
   }
 
   return { handlers, getServerSession };
