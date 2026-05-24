@@ -35,8 +35,9 @@ describe('NuxtAuthHandler response handling', () => {
   let listener: ReturnType<typeof promisifyNodeListener>
 
   beforeAll(async () => {
-    const mod =
-      await import('../../../../src/runtime/server/services/nuxtAuthHandler')
+    const mod = await import(
+      '../../../../src/runtime/server/services/nuxtAuthHandler'
+    )
     NuxtAuthHandler = mod.NuxtAuthHandler
 
     const handler = NuxtAuthHandler({

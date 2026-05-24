@@ -7,9 +7,10 @@ import {
   withQuery,
   withTrailingSlash,
 } from 'ufo'
-import { consola } from 'consola'
 
-const logger = consola.withTag('@zitadel/nuxt-auth')
+const logger = {
+  error: (...args: unknown[]) => console.error('[@zitadel/nuxt-auth]', ...args),
+}
 
 export interface RuntimeConfig {
   readonly public: {
