@@ -8,7 +8,7 @@ children:
 # Introduction
 
 NuxtAuth is an open source Nuxt module that provides authentication for Nuxt 4
-applications. It wraps [Auth.js](https://authjs.dev/) (`@auth/core`) to bring
+applications. It wraps auth (`@auth/core`) to bring
 OAuth, credentials, and magic-link authentication to Nuxt with a native
 developer experience.
 

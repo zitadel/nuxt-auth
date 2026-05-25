@@ -1,6 +1,6 @@
 ---
 title: Session Data
-group: Auth.js Provider
+group: OAuth Provider
 ---
 
 # Session data

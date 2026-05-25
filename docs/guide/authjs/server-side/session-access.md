@@ -1,6 +1,6 @@
 ---
 title: Session Access
-group: Auth.js Provider
+group: OAuth Provider
 category: Server Side
 ---
 

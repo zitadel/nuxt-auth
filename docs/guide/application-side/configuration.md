@@ -105,10 +105,10 @@ the [URL resolution guide](../advanced/url-resolutions.md).
 
 ## `provider`
 
-- **Type**: `ProviderAuthjs`
+- **Type**: `ProviderConfig`
 - **Default**: `undefined`
 
-Configuration of the authentication provider. See the Auth.js quick start
+Configuration of the authentication provider. See the OAuth quick start
 guide for configuration options.
 
 ## `sessionRefresh`

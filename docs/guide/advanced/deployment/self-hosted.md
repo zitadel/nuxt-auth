@@ -8,9 +8,9 @@ category: Deployment
 
 This guide will explain how you can self-host a Nuxt 4 application running NuxtAuth.
 
-## Auth.js Provider
+## OAuth Provider
 
-When deploying the Auth.js provider, the application must be informed what URL it is running at. This is to properly determine callback urls when navigating users to external OAuth providers. Depending on your setup, NuxtAuth allows you to set this value at either [**Runtime**](https://nuxt.com/docs/guide/going-further/hooks#app-hooks-runtime) or [**Buildtime**](https://nuxt.com/docs/guide/going-further/hooks#nuxt-hooks-build-time).
+When deploying the OAuth provider, the application must be informed what URL it is running at. This is to properly determine callback urls when navigating users to external OAuth providers. Depending on your setup, NuxtAuth allows you to set this value at either [**Runtime**](https://nuxt.com/docs/guide/going-further/hooks#app-hooks-runtime) or [**Buildtime**](https://nuxt.com/docs/guide/going-further/hooks#nuxt-hooks-build-time).
 
 - **Runtime:** Set the `AUTH_ORIGIN` environment variable (or the variable name configured in `originEnvKey`).
 - **Buildtime:** Set the `baseURL`-config key inside the `nuxt.config.ts`

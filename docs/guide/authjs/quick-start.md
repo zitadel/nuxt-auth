@@ -1,6 +1,6 @@
 ---
 title: Quick Start
-group: Auth.js Provider
+group: OAuth Provider
 children:
   - ./nuxt-auth-handler.md
   - ./session-data.md
@@ -9,9 +9,9 @@ children:
   - ./server-side/rest-api.md
 ---
 
-# AuthJS Quickstart
+# Quick Start
 
-This guide is for setting up `@zitadel/nuxt-auth` with the Auth.js provider,
+This guide is for setting up `@zitadel/nuxt-auth` with the OAuth provider,
 which is best suited for plug-and-play OAuth for established OAuth providers or
 magic-url based sign-ins.
 
@@ -93,7 +93,7 @@ create all required API endpoints to handle authentication inside your
 application.
 
 The NuxtAuthHandler wraps the
-[Auth.js `Auth` function](https://authjs.dev/getting-started/installation).
+[OAuth `Auth` function](https://authjs.dev/getting-started/installation).
 Inside the NuxtAuthHandler you can configure:
 
 - **OAuth providers**: _How can users login to your application?_
@@ -118,7 +118,7 @@ export default NuxtAuthHandler({
 
 After creating your NuxtAuthHandler, you can begin by adding a provider. You
 can find an overview of all the available providers in the
-[Auth.js documentation](https://authjs.dev/getting-started/providers). For this
+[OAuth documentation](https://authjs.dev/getting-started/providers). For this
 example we will add the GitHub provider.
 
 ```ts
@@ -138,7 +138,7 @@ export default NuxtAuthHandler({
 ```
 
 The NuxtAuthHandler accepts all options that
-[Auth.js](https://authjs.dev/reference/core) accepts for its configuration. Use
+[OAuth](https://authjs.dev/reference/core) accepts for its configuration. Use
 this place to configure authentication providers (OAuth, credential flow, ...),
 your secret, add callbacks for authentication events, configure a custom logger
 and more.

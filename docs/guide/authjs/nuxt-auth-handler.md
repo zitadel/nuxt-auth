@@ -1,12 +1,12 @@
 ---
 title: NuxtAuthHandler
-group: Auth.js Provider
+group: OAuth Provider
 ---
 
 # NuxtAuthHandler
 
 The NuxtAuthHandler wraps the
-[Auth.js `Auth` function](https://authjs.dev/reference/core) to provide
+[OAuth `Auth` function](https://authjs.dev/reference/core) to provide
 authentication endpoints for your Nuxt application. You can learn more about
 how to setup a minimal version of the NuxtAuthHandler in the Quick Start
 section.
@@ -46,7 +46,7 @@ NUXT_AUTH_SECRET="YOUR-SUPER-SECURE-SECRET"
 ## Providers
 
 The providers are the registered authentication methods that your users can use
-to login to your application. Auth.js provides a number of preconfigured
+to login to your application. OAuth provides a number of preconfigured
 providers you can use to quickly bootstrap your project. These include OAuth
 providers,
 [email-based providers](https://authjs.dev/getting-started/providers/email)
@@ -58,7 +58,7 @@ provider.
 You can find an overview of all the prebuilt providers
 [here](https://authjs.dev/getting-started/providers). If you want to create
 your own provider, please visit the
-[Auth.js docs](https://authjs.dev/guides/configuring-oauth-providers).
+[OAuth docs](https://authjs.dev/guides/configuring-oauth-providers).
 
 ```ts
 import GitHub from '@auth/core/providers/github'
@@ -123,13 +123,13 @@ Some uses-cases for each callback could be:
 
 You can read more on each of these callbacks, what data they provide and what
 return value they expect on the official
-[Auth.js docs](https://authjs.dev/guides/basics/callbacks).
+[OAuth docs](https://authjs.dev/guides/basics/callbacks).
 
 ## Adapters
 
-By default Auth.js only uses JWT tokens to handle authentication and does not
+By default OAuth only uses JWT tokens to handle authentication and does not
 save this data anywhere else. To persist user sessions, accounts, and related
-data, you can use [Auth.js adapters](https://authjs.dev/getting-started/adapters),
+data, you can use [OAuth adapters](https://authjs.dev/getting-started/adapters),
 i.e. modules that implement a database interface. NuxtAuth is adapter-agnostic
 and you can use both the official and the custom adapters.
 
@@ -157,7 +157,7 @@ The official
 assumes a fixed import path from `@prisma/client`. However, starting from
 Prisma 6 you can now
 [specify a custom client output path](https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/generating-prisma-client#using-a-custom-output-path)
-which breaks compatibility with Auth.js as it cannot import the correct client
+which breaks compatibility with OAuth as it cannot import the correct client
 anymore.
 
 For this purpose NuxtAuth provides a custom adapter implementation which does
@@ -210,7 +210,7 @@ export default NuxtAuthHandler({
 ```
 
 You can read more on each of these events and what data they provide on the
-official [Auth.js docs](https://authjs.dev/reference/core/types#eventcallbacks).
+official [OAuth docs](https://authjs.dev/reference/core/types#eventcallbacks).
 
 ## Pages
 
