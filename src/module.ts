@@ -1,3 +1,36 @@
+/**
+ * Auth.js integration for Nuxt.
+ *
+ * Provides authentication via Auth.js with support for OAuth providers,
+ * credentials, JWT sessions, and Nuxt's module + composable patterns.
+ *
+ * @packageDocumentation
+ *
+ * @example Registering the module
+ * ```ts
+ * // nuxt.config.ts
+ * export default defineNuxtConfig({
+ *   modules: ['@zitadel/nuxt-auth'],
+ *   auth: {
+ *     provider: { type: 'authjs' },
+ *   },
+ * });
+ * ```
+ *
+ * @example Server-side handler
+ * ```ts
+ * // server/api/auth/[...].ts
+ * import { NuxtAuthHandler } from '#auth';
+ * import Zitadel from '@auth/core/providers/zitadel';
+ *
+ * export default NuxtAuthHandler({
+ *   providers: [Zitadel({ clientId: process.env.ZITADEL_CLIENT_ID! })],
+ * });
+ * ```
+ *
+ * @public
+ */
+
 import {
   addImports,
   addPlugin,
