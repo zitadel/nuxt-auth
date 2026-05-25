@@ -116,7 +116,7 @@ describe('OAuth browser tests', async () => {
     build: true,
     port: TEST_PORT,
     env: {
-      AUTH_ORIGIN: `http://localhost:${TEST_PORT}/api/auth`,
+      AUTH_URL: `http://localhost:${TEST_PORT}/api/auth`,
       AUTH_SECRET: 'test-secret-for-testing',
       OAUTH_ISSUER_URL: issuerUrl,
       OAUTH_CLIENT_ID: 'test-client',

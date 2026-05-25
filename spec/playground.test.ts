@@ -126,7 +126,7 @@ describe('global auth middleware', async () => {
     build: true,
     port: TEST_PORT,
     env: {
-      AUTH_ORIGIN: `http://localhost:${TEST_PORT}/api/auth`,
+      AUTH_URL: `http://localhost:${TEST_PORT}/api/auth`,
       AUTH_SECRET: 'test-secret-for-testing',
     },
   });
