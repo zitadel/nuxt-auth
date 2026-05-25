@@ -30,8 +30,8 @@ of applications or deployment scenarios might warrant different approaches:
   SSR-friendly composables and state management that work across server-rendered
   pages, client hydration, and client-side navigations.
 - **Route Protection:** Many applications need fine-grained authorization
-  beyond simple authentication. This calls for cohesive building blocks: global
-  middleware, per-page overrides, and guest-only pages.
+  beyond simple authentication. This integration provides global middleware,
+  per-page overrides, and guest-only pages for protecting routes.
 
 This integration, `@zitadel/nuxt-auth`, aims to provide the flexibility to
 handle such scenarios. It allows you to leverage the full Auth.js ecosystem
@@ -83,14 +83,15 @@ Then, create the Auth.js handler in your server directory:
 ```ts
 // server/api/auth/[...].ts
 import { NuxtAuthHandler } from '#auth';
-import GoogleProvider from '@auth/core/providers/google';
+import Zitadel from '@auth/core/providers/zitadel';
 
 export default NuxtAuthHandler({
   secret: process.env.AUTH_SECRET,
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    Zitadel({
+      clientId: process.env.ZITADEL_CLIENT_ID,
+      clientSecret: process.env.ZITADEL_CLIENT_SECRET,
+      issuer: process.env.ZITADEL_DOMAIN,
     }),
   ],
 });
@@ -101,7 +102,7 @@ export default NuxtAuthHandler({
 The integration provides several functions and hooks for handling
 authentication:
 
-**Functions and Hooks:**
+**Server Utilities:**
 
 - `useAuth()`: Client-side composable providing reactive session state and auth methods
 - `getServerSession(event)`: Server-side utility to retrieve the session in API routes
@@ -155,19 +156,20 @@ providers and custom session configuration:
 ```ts
 // server/api/auth/[...].ts
 import { NuxtAuthHandler } from '#auth';
-import GoogleProvider from '@auth/core/providers/google';
-import GitHubProvider from '@auth/core/providers/github';
+import Zitadel from '@auth/core/providers/zitadel';
+import Google from '@auth/core/providers/google';
 
 export default NuxtAuthHandler({
   secret: process.env.AUTH_SECRET,
   providers: [
-    GoogleProvider({
+    Zitadel({
+      clientId: process.env.ZITADEL_CLIENT_ID,
+      clientSecret: process.env.ZITADEL_CLIENT_SECRET,
+      issuer: process.env.ZITADEL_DOMAIN,
+    }),
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
   ],
   session: {
@@ -191,6 +193,10 @@ export default NuxtAuthHandler({
 
 ## Known Issues
 
+- **Nuxt Module Required:** The integration is delivered as a Nuxt module and
+  must be registered via the `modules` array in `nuxt.config.ts`. Without
+  this, the auto-imported composables (`useAuth`) and server utilities
+  (`#auth`) will not be available.
 - **Environment Configuration:** The integration relies on `AUTH_URL` (or a
   custom `originEnvKey`) to determine the application origin in production.
   Ensure this is correctly set in your environment. During development, the
