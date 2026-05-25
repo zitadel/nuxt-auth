@@ -2,7 +2,7 @@
   "name": "@zitadel/nuxt-auth",
   "version": "1.1.0",
   "type": "module",
-  "description": "A comprehensive Auth.js integration for Nuxt 4 applications with TypeScript support and session management",
+  "description": "A comprehensive authentication integration for Nuxt 4 applications with TypeScript support and session management",
   "author": {
     "name": "Mridang Agarwalla",
     "email": "mridang@zitadel.com",
@@ -58,21 +58,19 @@
     }
   },
   "keywords": [
-    "nuxt",
-    "nuxt4",
-    "authjs",
+    "auth",
     "authentication",
     "authorization",
+    "authn",
+    "authz",
     "oauth",
-    "session",
+    "oidc",
+    "authjs",
     "jwt",
-    "typescript",
-    "middleware",
-    "google",
-    "github",
-    "social-login",
-    "security",
-    "zitadel"
+    "jwks",
+    "pkce",
+    "nuxt",
+    "vue"
   ],
   "workspaces": [
     "playground"
