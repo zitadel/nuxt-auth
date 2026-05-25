@@ -200,10 +200,11 @@ export default handlers;
   must be registered via the `modules` array in `nuxt.config.ts`. Without
   this, the auto-imported composables (`useAuth`) and server utilities
   (`#auth`) will not be available.
-- **Environment Configuration:** The integration relies on `AUTH_URL` (or a
-  custom `originEnvKey`) to determine the application origin in production.
-  Ensure this is correctly set in your environment. During development, the
-  origin is inferred automatically from incoming requests.
+- **Environment Configuration:** The integration relies on `AUTH_SECRET` for
+  signing sessions, and on `AUTH_URL` (or a custom `originEnvKey`) to
+  determine the application origin in production. Ensure both are correctly
+  set in your environment. During development, the origin is inferred
+  automatically from incoming requests.
 - **Callback URLs:** OAuth providers must be configured with the correct
   callback URL: `[origin]/api/auth/callback/[provider]` (or your custom
   `baseURL` path).
