@@ -7,8 +7,8 @@
  * | Route                       | Protection                              |
  * |-----------------------------|-----------------------------------------|
  * | `/api/unprotected`          | None — publicly accessible              |
- * | `/api/secured`              | Inline `getServerSession` — throws 403  |
- * | `/api/protected/inline`     | Inline `getServerSession` — returns JSON |
+ * | `/api/secured`              | Inline `getSession` — throws 403  |
+ * | `/api/protected/inline`     | Inline `getSession` — returns JSON |
  * | `/api/protected/middleware`  | Server middleware — throws 403          |
  *
  * Each test makes HTTP requests as either an unauthenticated or

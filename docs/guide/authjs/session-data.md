@@ -48,7 +48,7 @@ export default NuxtAuthHandler({
 After enriching the JWT token with additional data, you can now access this
 data inside the `session` callback. The `session` callback is invoked every
 time the session data is requested. This can happen when using `useAuth`,
-`getServerSession` or when the session is refreshed.
+`getSession` or when the session is refreshed.
 
 ```ts
 import { NuxtAuthHandler } from '#auth'
@@ -114,7 +114,7 @@ augmenting the module types of `@auth/core`.
 import type { DefaultSession } from '@auth/core/types'
 
 declare module '@auth/core/types' {
-  /* Returned by `useAuth`, `getSession` and `getServerSession` */
+  /* Returned by `useAuth`, `getSession` and `getSession` */
   interface Session extends DefaultSession {
     user: {
       name: string

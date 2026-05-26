@@ -9,20 +9,20 @@ category: Server Side
 On the server side you can get access to the current session like this:
 
 ```ts
-import { getServerSession } from '#auth'
+import { getSession } from '#auth'
 
 export default eventHandler(async (event) => {
-  const session = await getServerSession(event)
+  const session = await getSession(event)
 })
 ```
 
 > **Note:** If you use
 > [Nuxt's `useFetch`](https://nuxt.com/docs/api/composables/use-fetch) from
 > your app-components to fetch data from an endpoint that uses
-> `getServerSession` you will need to manually pass along cookies as
+> `getSession` you will need to manually pass along cookies as
 > [Nuxt 4 universal rendering](https://nuxt.com/docs/guide/concepts/rendering#universal-rendering)
 > will not do this per-default when it runs on the server-side. Not passing
-> along cookies will result in `getServerSession` returning `null` when it is
+> along cookies will result in `getSession` returning `null` when it is
 > called from the server-side as no auth cookies will exist. Here's an example
 > that manually passes along cookies:
 >
@@ -37,10 +37,10 @@ To protect an endpoint, check the session after fetching it:
 
 ```ts
 // file: ~/server/api/protected.get.ts
-import { getServerSession } from '#auth'
+import { getSession } from '#auth'
 
 export default eventHandler(async (event) => {
-  const session = await getServerSession(event)
+  const session = await getSession(event)
   if (!session) {
     return { status: 'unauthenticated!' }
   }
@@ -57,10 +57,10 @@ your endpoints:
 
 ```ts
 // file: ~/server/middleware/auth.ts
-import { getServerSession } from '#auth'
+import { getSession } from '#auth'
 
 export default eventHandler(async (event) => {
-  const session = await getServerSession(event)
+  const session = await getSession(event)
   if (!session) {
     throw createError({
       message: 'Unauthenticated',

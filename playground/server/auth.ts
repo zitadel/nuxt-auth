@@ -2,7 +2,7 @@ import Credentials from '@auth/core/providers/credentials';
 import { NuxtAuth } from '../../src/runtime/server/services';
 
 // noinspection JSUnusedGlobalSymbols
-export const { handlers, getServerSession } = NuxtAuth({
+export const { handlers, getSession } = NuxtAuth({
   // a) Never hardcode your secret in your code!! and b) use a secure secret, `test-123` is **not** secure!!
   secret: process.env.AUTH_SECRET ?? 'test-123',
   providers: [

@@ -84,7 +84,7 @@ Then, create the auth handler in your server directory:
 import { NuxtAuth } from '#auth';
 import Zitadel from '@auth/core/providers/zitadel';
 
-export const { handlers, getServerSession } = NuxtAuth({
+export const { handlers, getSession } = NuxtAuth({
   secret: process.env.AUTH_SECRET,
   providers: [
     Zitadel({
@@ -106,8 +106,8 @@ authentication:
 **Server Utilities:**
 
 - `useAuth()`: Client-side composable providing reactive session state and auth methods
-- `getServerSession(event)`: Server-side utility to retrieve the session in API routes
-- `NuxtAuth(config)`: Server handler factory returning `{ handlers, getServerSession }`
+- `getSession(event)`: Server-side utility to retrieve the session in API routes
+- `NuxtAuth(config)`: Server handler factory returning `{ handlers, getSession }`
 - `definePageMeta({ auth })`: Per-page route protection configuration
 
 **Basic Usage:**
@@ -136,10 +136,10 @@ Server-side session access in API routes:
 
 ```ts
 // server/api/profile.ts
-import { getServerSession } from '#auth';
+import { getSession } from '#auth';
 
 export default eventHandler(async (event) => {
-  const session = await getServerSession(event);
+  const session = await getSession(event);
 
   if (!session) {
     throw createError({ statusCode: 401, message: 'Unauthorized' });
@@ -160,7 +160,7 @@ import { NuxtAuth } from '#auth';
 import Zitadel from '@auth/core/providers/zitadel';
 import Google from '@auth/core/providers/google';
 
-export const { handlers, getServerSession } = NuxtAuth({
+export const { handlers, getSession } = NuxtAuth({
   secret: process.env.AUTH_SECRET,
   providers: [
     Zitadel({

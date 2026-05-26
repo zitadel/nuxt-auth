@@ -1,5 +1,5 @@
 import { createError, eventHandler } from 'h3';
-import { getServerSession } from '~~/server/auth';
+import { getSession } from '~~/server/auth';
 
 export default eventHandler(async (event) => {
   // Only protect a certain backend route
@@ -7,7 +7,7 @@ export default eventHandler(async (event) => {
     return;
   }
 
-  const session = await getServerSession(event);
+  const session = await getSession(event);
   if (!session) {
     throw createError({ message: 'Unauthenticated', statusCode: 403 });
   }

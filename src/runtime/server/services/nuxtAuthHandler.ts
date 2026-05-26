@@ -40,15 +40,14 @@ function patchCookieHeader(request: Request, event: H3Event): void {
  * Mirrors the factory shape used by every other SDK in this family
  * (next-auth, remix-auth, sveltekit-auth, solidstart-auth, tanstack-auth,
  * qwik-auth, astro-auth): a single call returns both the catch-all
- * `handlers` to mount on the auth route and the `getServerSession`
- * helper to read the current session.
+ * `handlers` to mount on the auth route and the `getSession` helper to
+ * read the current session.
  *
  * Because both are produced inside the same factory call, they close
  * over the same resolved `AuthConfig`. There is no module-level mutable
  * state, no lazy `$fetch` bootstrap, and no recursion guard — calling
- * `getServerSession` requires importing the module that called the
- * factory, which by ES-module semantics guarantees the factory has
- * already run.
+ * `getSession` requires importing the module that called the factory,
+ * which by ES-module semantics guarantees the factory has already run.
  *
  * @example
  * ```ts
@@ -56,7 +55,7 @@ function patchCookieHeader(request: Request, event: H3Event): void {
  * import { NuxtAuth } from '@zitadel/nuxt-auth';
  * import { authOptions } from './auth.config';
  *
- * export const { handlers, getServerSession } = NuxtAuth(authOptions);
+ * export const { handlers, getSession } = NuxtAuth(authOptions);
  * ```
  *
  * ```ts
@@ -67,13 +66,15 @@ function patchCookieHeader(request: Request, event: H3Event): void {
  *
  * ```ts
  * // anywhere on the server (page loaders, API routes, middleware)
- * import { getServerSession } from '~~/server/auth';
+ * import { getSession } from '~~/server/auth';
  * ```
  *
  * @public
  */
 export function NuxtAuth(nuxtAuthOptions?: AuthConfig): {
   handlers: ReturnType<typeof eventHandler>;
+  getSession: (event: H3Event) => Promise<Session | null>;
+  /** @deprecated Use `getSession` instead. */
   getServerSession: (event: H3Event) => Promise<Session | null>;
 } {
   const isProduction = process.env.NODE_ENV === 'production';
@@ -153,7 +154,7 @@ export function NuxtAuth(nuxtAuthOptions?: AuthConfig): {
     return response;
   });
 
-  async function getServerSession(event: H3Event): Promise<Session | null> {
+  async function getSession(event: H3Event): Promise<Session | null> {
     const headers = new Headers(getHeaders(event) as HeadersInit);
     const origin = getRequestURL(event, {
       xForwardedHost: trustHostUserPreference,
@@ -188,5 +189,11 @@ export function NuxtAuth(nuxtAuthOptions?: AuthConfig): {
     throw new Error((data as { message?: string }).message ?? 'Session error');
   }
 
-  return { handlers, getServerSession };
+  return {
+    handlers,
+    getSession,
+    // Pre-rename alias. Kept so consumers on the old name still compile;
+    // see the @deprecated tag on the factory return type.
+    getServerSession: getSession,
+  };
 }

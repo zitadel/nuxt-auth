@@ -1,8 +1,8 @@
 import { createError, eventHandler } from 'h3';
-import { getServerSession } from '~~/server/auth';
+import { getSession } from '~~/server/auth';
 
 export default eventHandler(async (event) => {
-  const session = await getServerSession(event);
+  const session = await getSession(event);
   if (!session) {
     throw createError({ statusCode: 403, message: 'Unauthenticated' });
   }
