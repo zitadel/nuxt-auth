@@ -38,6 +38,13 @@ const { signIn } = useAuth();
       >
         Sign in with OAuth
       </button>
+      <button
+        data-testid="signin-default"
+        class="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+        @click="signIn()"
+      >
+        Sign in
+      </button>
     </div>
 
     <div class="bg-blue-50 border border-blue-100 rounded-lg p-5 mb-10">

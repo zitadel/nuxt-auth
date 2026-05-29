@@ -21,7 +21,7 @@ const { data: session, signOut } = useAuth();
         >.
       </p>
       <button
-        data-testid="sign-out-btn"
+        data-testid="signout-button"
         class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
         @click="signOut()"
       >
