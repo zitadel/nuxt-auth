@@ -4,14 +4,16 @@ import nuxtPlugin from '@nuxt/eslint-plugin';
 export default [
   {
     ignores: [
-      '**/.nuxt/**',
-      'playground-authjs/**',
-      '.output/**',
+      'coverage/**',
       '.out/**',
-      'dist/**',
+      '.npm/**',
       'docs/**',
-      'build/**',
       'playground/**',
+      // Repo-specific:
+      '**/.nuxt/**',
+      '.output/**',
+      'playground-authjs/**',
+      // The following are challenged in the audit but kept until verified:
       'build.config.ts',
       'vitest.config.ts',
       'vitest.nuxt.config.ts',
