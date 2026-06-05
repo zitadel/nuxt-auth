@@ -16,22 +16,59 @@ import { defu } from 'defu';
 import { useRuntimeConfig } from '#imports';
 
 /**
- * Some environments (e.g. Vitest nuxt) polyfill Request with a class that
- * strips `cookie` per the Fetch spec's forbidden request-header rules.
- * Node 22's native Request no longer does this, but we need to handle the
- * polyfill case. Re-add the cookie from the H3 event if it was stripped.
+ * Some environments (e.g. Vitest nuxt) polyfill Request with a class whose
+ * Headers constructor cannot consume the Headers instance carried by an H3
+ * event — class-identity mismatches between the polyfill's Headers and the
+ * host's native Headers cause the init to be silently discarded.
+ *
+ * Under Vitest 3 this only affected `cookie` (stripped per the Fetch spec's
+ * forbidden request-header rules); under Vitest 4 every header is dropped.
+ * Either way Node's native Request preserves them, so production runtime is
+ * unaffected.
+ *
+ * Re-copy every header present on the H3 event onto the web Request when
+ * it's missing. Skip the forbidden headers the spec disallows on a Request
+ * so the polyfill doesn't reject the patched Headers entirely.
  */
-function patchCookieHeader(request: Request, event: H3Event): void {
-  const cookie = event.headers.get('cookie');
-  if (cookie && !request.headers.get('cookie')) {
-    const patchedHeaders = new Headers(request.headers);
-    patchedHeaders.set('cookie', cookie);
-    Object.defineProperty(request, 'headers', {
-      value: patchedHeaders,
-      writable: false,
-      configurable: true,
-    });
-  }
+const FORBIDDEN_REQUEST_HEADERS = new Set([
+  'accept-charset',
+  'accept-encoding',
+  'access-control-request-headers',
+  'access-control-request-method',
+  'connection',
+  'content-length',
+  'cookie2',
+  'date',
+  'dnt',
+  'expect',
+  'host',
+  'keep-alive',
+  'origin',
+  'referer',
+  'te',
+  'trailer',
+  'transfer-encoding',
+  'upgrade',
+  'via',
+]);
+
+function patchRequestHeaders(request: Request, event: H3Event): void {
+  const patched = new Headers(request.headers);
+  let changed = false;
+  event.headers.forEach((value, name) => {
+    const lower = name.toLowerCase();
+    if (FORBIDDEN_REQUEST_HEADERS.has(lower)) return;
+    if (lower.startsWith('proxy-') || lower.startsWith('sec-')) return;
+    if (patched.has(name)) return;
+    patched.set(name, value);
+    changed = true;
+  });
+  if (!changed) return;
+  Object.defineProperty(request, 'headers', {
+    value: patched,
+    writable: false,
+    configurable: true,
+  });
 }
 
 /**
@@ -106,7 +143,7 @@ export function NuxtAuth(nuxtAuthOptions?: AuthConfig): {
   const handlers = eventHandler(async (event: H3Event) => {
     const request = toWebRequest(event);
 
-    patchCookieHeader(request, event);
+    patchRequestHeaders(request, event);
 
     const response = await Auth(request, authOptions);
 
@@ -170,7 +207,7 @@ export function NuxtAuth(nuxtAuthOptions?: AuthConfig): {
     );
 
     const request = new Request(url, { headers });
-    patchCookieHeader(request, event);
+    patchRequestHeaders(request, event);
 
     const response = await Auth(request, authOptions);
     const data = (await response.json()) as Record<string, unknown> | null;

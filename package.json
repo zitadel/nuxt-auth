@@ -85,14 +85,14 @@
     "@mridang/eslint-defaults": "^1.6.3",
     "@nuxt/eslint-plugin": "^1.0.0",
     "@nuxt/module-builder": "^1.0.2",
-    "@nuxt/test-utils": "^3.23.0",
+    "@nuxt/test-utils": "^4.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^12.0.0",
     "@semantic-release/npm": "^13.1.5",
     "@semantic-release/release-notes-generator": "^14.1.0",
     "@types/node": "^22.18.13",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/coverage-v8": "^4.1.8",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^9.39.1",
     "happy-dom": "^20.7.0",
@@ -106,7 +106,7 @@
     "ts-essentials": "^10.1.1",
     "typedoc": "^0.28.7",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.4"
+    "vitest": "^4.1.8"
   },
   "repository": {
     "type": "git",
