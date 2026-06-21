@@ -1,6 +1,6 @@
 {
   "name": "@zitadel/nuxt-auth",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "description": "A comprehensive authentication integration for Nuxt 4 applications with TypeScript support and session management",
   "author": {
