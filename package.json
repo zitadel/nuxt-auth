@@ -113,7 +113,7 @@
     "url": "git+https://github.com/zitadel/nuxt-auth.git"
   },
   "dependencies": {
-    "@auth/core": "^0.40.0",
+    "@auth/core": "^0.41.3",
     "@nuxt/kit": "^4.0.0",
     "defu": "^6.1.4",
     "h3": "^1.15.5",
